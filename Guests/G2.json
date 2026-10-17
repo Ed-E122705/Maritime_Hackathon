@@ -31,17 +31,7 @@
         "footprint_m2": null
       }
     ],
-    "requires": [
-      {
-        "type": "part_of",
-        "parent_guest": "G2",
-        "components": [
-          "winch",
-          "probe"
-        ],
-        "notes": "Winch and probe are part of one guest; individual component masses not specified."
-      }
-    ],
+    "requires": [],
     "excludes": []
   },
   "placement": {
@@ -144,6 +134,7 @@
   "operational_modes": [
     {
       "id": "probe_operation",
+      "power_mode_id": "continuous",
       "requirements": [
         {
           "field": "navigation.speed_knots",
@@ -175,6 +166,7 @@
     },
     {
       "id": "winch_operation",
+      "power_mode_id": "winch_operation",
       "requirements": [
         {
           "field": "platform.emission_state",
@@ -191,7 +183,7 @@
         },
         {
           "guest_id": "G4",
-          "guest_mode": "recovery",
+          "guest_mode": "launch_recovery",
           "reason": "Winch cannot operate during rescue-drone recovery."
         }
       ],
@@ -200,14 +192,13 @@
   ],
   "installation": [
     {
-      "component_ids": [
-        "ocean_module"
-      ],
-      "port_only": true,
-      "crew_required": 4,
-      "duration_minutes": 360,
-      "at_sea_window": null,
-      "notes": "Port-only assembly installation."
+    "operation": "install_assembly",
+    "component_ids": ["ocean_module"],
+    "port_only": true,
+    "crew_required": 4,
+    "duration_minutes": 360,
+    "at_sea_window": null,
+    "notes": "Port-only assembly installation."
     }
   ],
   "special_events": [],

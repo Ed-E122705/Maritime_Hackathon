@@ -228,6 +228,7 @@
   "operational_modes": [
     {
       "id": "operating",
+      "allowed_power_mode_ids": ["full", "low_power"],
       "requirements": [
         {
           "field": "platform.emission_state",

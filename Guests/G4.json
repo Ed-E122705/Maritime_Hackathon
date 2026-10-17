@@ -1,3 +1,4 @@
+
 {
   "schema_version": "1.0",
   "id": "G4",
@@ -41,10 +42,7 @@
       {
         "type": "part_of",
         "parent_guest": "G4",
-        "components": [
-          "drone",
-          "hangar"
-        ],
+        "components": ["drone", "hangar"],
         "notes": "Single guest, even though drone may be swapped at sea."
       }
     ],
@@ -144,6 +142,7 @@
   "operational_modes": [
     {
       "id": "launch_recovery",
+      "power_mode_id": null,
       "requirements": [
         {
           "field": "platform.flight_deck_clear",
@@ -215,16 +214,37 @@
     },
     {
       "id": "in_flight",
+      "power_mode_id": null,
       "requirements": [],
       "conflicts": [],
       "notes": "Endurance 90 minutes. In emission silence the drone returns home, requiring deck clearance."
+    },
+    {
+      "id": "standby",
+      "power_mode_id": "standby",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "Drone and hangar in standby configuration. 2 kW."
+    },
+    {
+      "id": "charging_initial",
+      "power_mode_id": "charging_initial",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "35 kW charging for the initial 20 minutes."
+    },
+    {
+      "id": "charging_followup",
+      "power_mode_id": "charging_followup",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "10 kW after the initial charging period. Remaining duration unspecified."
     }
   ],
   "installation": [
     {
-      "component_ids": [
-        "hangar"
-      ],
+      "operation": "install_component",
+      "component_ids": ["hangar"],
       "port_only": true,
       "crew_required": 4,
       "duration_minutes": 240,
@@ -232,9 +252,8 @@
       "notes": "Hangar port only."
     },
     {
-      "component_ids": [
-        "drone"
-      ],
+      "operation": "swap_component",
+      "component_ids": ["drone"],
       "port_only": false,
       "crew_required": 3,
       "duration_minutes": 30,

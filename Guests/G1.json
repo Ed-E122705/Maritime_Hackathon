@@ -117,7 +117,8 @@
       "id": "passive_sensing",
       "requirements": [],
       "conflicts": [],
-      "notes": "No course or speed restrictions. Passive sensing remains available in emission silence."
+      "notes": "No course or speed restrictions. Passive sensing remains available in emission silence.",
+      "power_mode_id": "active"
     }
   ],
   "installation": [

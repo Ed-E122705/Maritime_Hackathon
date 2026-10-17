@@ -1,3 +1,4 @@
+
 {
   "schema_version": "1.0",
   "id": "G3",
@@ -31,17 +32,7 @@
         "footprint_m2": null
       }
     ],
-    "requires": [
-      {
-        "type": "part_of",
-        "parent_guest": "G3",
-        "components": [
-          "inspection_vehicle",
-          "cradle"
-        ],
-        "notes": "Single 5.5-tonne assembly for admission/shedding; separate component masses not provided."
-      }
-    ],
+    "requires": [],
     "excludes": []
   },
   "placement": {
@@ -130,6 +121,7 @@
   "operational_modes": [
     {
       "id": "surveying",
+      "power_mode_id": null,
       "requirements": [
         {
           "field": "navigation.speed_knots",
@@ -164,7 +156,7 @@
         },
         {
           "guest_id": "G4",
-          "guest_mode": "recovery",
+          "guest_mode": "launch_recovery",
           "reason": "Drone recovery requires manoeuvre freedom and deck activity, incompatible with quiet surveying."
         }
       ],
@@ -172,6 +164,7 @@
     },
     {
       "id": "launch_recovery",
+      "power_mode_id": null,
       "requirements": [
         {
           "field": "platform.stern_ramp_free",
@@ -207,15 +200,30 @@
       "conflicts": [
         {
           "guest_id": "G4",
-          "guest_mode": "recovery",
+          "guest_mode": "launch_recovery",
           "reason": "Flight deck and stern ramp cannot operate simultaneously (Annex A.3)."
         }
       ],
       "notes": null
+    },
+    {
+      "id": "standby",
+      "power_mode_id": "standby",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "Cradle standby, 1 kW ship-side demand."
+    },
+    {
+      "id": "charging",
+      "power_mode_id": "charging",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "25 kW noninterruptible charging for 60 minutes after each 40-minute survey leg."
     }
   ],
   "installation": [
     {
+      "operation": "install_assembly",
       "component_ids": [
         "vehicle_and_cradle"
       ],
@@ -223,9 +231,11 @@
       "crew_required": 4,
       "duration_minutes": 360,
       "at_sea_window": null,
-      "notes": "Cradle is port-only; 6 hours."
+      "notes": "Cradle and vehicle assembly installed in port."
     },
     {
+      "operation": "swap_vehicle_only",
+      "operation_target": "vehicle",
       "component_ids": [
         "vehicle_and_cradle"
       ],
@@ -233,7 +243,7 @@
       "crew_required": 4,
       "duration_minutes": 45,
       "at_sea_window": "Annex A.11",
-      "notes": "At sea, this applies ONLY to swapping the vehicle, not installing/moving the cradle."
+      "notes": "Only the vehicle may be swapped at sea. The cradle remains installed."
     }
   ],
   "special_events": [
