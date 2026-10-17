@@ -1,0 +1,177 @@
+{
+  "schema_version": "vessel-resource-demo/1",
+  "electrical": {
+    "reserve_kw_by_speed": {
+      "slow": {
+        "1": 100,
+        "2": 200
+      },
+      "cruise": {
+        "1": 100,
+        "2": 200
+      }
+    },
+    "peak_extra_kw": {
+      "1": 100,
+      "2": 250
+    },
+    "peak_max_duration_s": 60,
+    "lines_kw": {
+      "port": 150,
+      "stbd": 150
+    }
+  },
+  "cooling": {
+    "cold_c": 12,
+    "hot_c": 30,
+    "cold_kw": 160,
+    "hot_kw": 120,
+    "fault_loss_fraction": 0.4
+  },
+  "positions": {
+    "bay1": {
+      "kind": "deck",
+      "dimensions_m": [
+        6.1,
+        2.4,
+        2.6
+      ],
+      "mass_limit_kg": 8000,
+      "units": 2,
+      "stability_multiplier": 1,
+      "cooling": "loop"
+    },
+    "bay2": {
+      "kind": "deck",
+      "dimensions_m": [
+        3,
+        2.4,
+        2.6
+      ],
+      "mass_limit_kg": 4000,
+      "units": 1,
+      "stability_multiplier": 1,
+      "cooling": "loop"
+    },
+    "hangar": {
+      "kind": "deck",
+      "dimensions_m": [
+        12,
+        8,
+        4
+      ],
+      "mass_limit_kg": 1500,
+      "units": 1,
+      "stability_multiplier": 1.2,
+      "cooling": "loop"
+    },
+    "roof": {
+      "kind": "deck",
+      "dimensions_m": [
+        2,
+        2,
+        2
+      ],
+      "mass_limit_kg": 100,
+      "units": 1,
+      "stability_multiplier": 1.2,
+      "cooling": "air",
+      "air_heat_limit_kw": 2
+    },
+    "mast1": {
+      "kind": "mast",
+      "reserved": true,
+      "mass_limit_kg": 60,
+      "area_limit_m2": 0.6,
+      "stability_multiplier": 3,
+      "cooling": "air",
+      "air_heat_limit_kw": 2
+    },
+    "mast2": {
+      "kind": "mast",
+      "reserved": true,
+      "mass_limit_kg": 60,
+      "area_limit_m2": 0.6,
+      "stability_multiplier": 3,
+      "cooling": "air",
+      "air_heat_limit_kw": 2
+    },
+    "mast3": {
+      "kind": "mast",
+      "reserved": false,
+      "mass_limit_kg": 60,
+      "area_limit_m2": 0.6,
+      "stability_multiplier": 3,
+      "cooling": "air",
+      "air_heat_limit_kw": 2
+    }
+  },
+  "mass": {
+    "margin_kg": 10000,
+    "stability_budget_kg_eq": 12000
+  },
+  "operations": {
+    "flight": {
+      "min_speed_kn": 5,
+      "max_speed_kn": 12,
+      "max_sea_state": 4,
+      "max_wind_kn": 25
+    },
+    "ramp": {
+      "min_speed_kn": 4,
+      "max_speed_kn": 8,
+      "max_sea_state": 4
+    }
+  },
+  "datalinks": {
+    "backbone": {
+      "max_mbps": 20000
+    },
+    "satcom": {
+      "max_mbps": 8
+    },
+    "los": {
+      "max_mbps": 20
+    },
+    "acoustic": {
+      "max_mbps": 0.005
+    }
+  },
+  "compute": {
+    "guest_fraction": 0.8,
+    "nodes": {
+      "node1": {
+        "cores": 32,
+        "ram_gb": 128,
+        "accelerators": 1,
+        "guest_accelerators": 1
+      },
+      "node2": {
+        "cores": 32,
+        "ram_gb": 128,
+        "accelerators": 1,
+        "guest_accelerators": 1
+      },
+      "node3": {
+        "cores": 32,
+        "ram_gb": 128,
+        "accelerators": 1,
+        "guest_accelerators": 1
+      },
+      "node4": {
+        "cores": 32,
+        "ram_gb": 128,
+        "accelerators": 1,
+        "guest_accelerators": 0
+      }
+    },
+    "shared_storage_tb": 20
+  },
+  "timing_ms": {
+    "admission": 30000,
+    "arbitration": 2000,
+    "first_shed": 5000,
+    "full_shed": 60000,
+    "safety_command": 200
+  }
+}

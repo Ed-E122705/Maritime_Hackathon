@@ -1,0 +1,3634 @@
+{
+  "schema_version": "assumption-register/3",
+  "title": "VesselOS assumption register regenerated for the updated G1–G5",
+  "scope": "Ship specifications from the uploaded ZIP plus the newly attached G1 (1).json through G5 (1).json. Canonical guest copies are byte-identical to those updates; ship_specs is unchanged.",
+  "status_meaning": {
+    "SOURCE_CONFIGURED_RULE": "Present in supplied input; not independent hardware verification.",
+    "DERIVED_FROM_MANIFEST": "Exact arithmetic or explicit mapping from the supplied guest.",
+    "NARROWED_REFERENCE": "A selected reference value; does not establish the full envelope.",
+    "SYNTHETIC_DEMO_INPUT": "Invented numerical test input, not a guest specification.",
+    "MODEL_APPROXIMATION": "Simplified method whose limits are stated.",
+    "UNVERIFIED_HOST_PLACEHOLDER": "Host geometry/limit without supporting source in the guest/reference files.",
+    "SCENARIO_ASSIGNMENT": "Selected state or resource assignment for a scenario.",
+    "CONSERVATIVE_BOUND": "Explicit bound; not an actual operating demand.",
+    "MODEL_SCOPE_RESTRICTION": "Coverage deliberately excluded and marked unverified.",
+    "SOURCE_IMPLEMENTATION_RULE": "Executable integrity/mapping rule derived from supplied structured inputs.",
+    "SOURCE_RULE_WITH_LIMITED_IMPLEMENTATION": "Source requirement implemented as a snapshot screen; additional temporal/operational evidence is needed."
+  },
+  "source_files": [
+    {
+      "file": "physical_model/data/ship_specs.json",
+      "sha256": "c55cf8e87ce9f5d9eb3d01bceb78b92065b36d6d05dc60016d8e5f0140e8d5c4",
+      "role": "authoritative input for this review; configured values can still include assumptions"
+    },
+    {
+      "file": "data/guests/G1_passive_radio_sensor.json",
+      "sha256": "58c3851c938d0d13f4c72b867e56c744d10e31f7336733c439d78b1b35ba9eba",
+      "role": "authoritative input for this review; configured values can still include assumptions"
+    },
+    {
+      "file": "data/guests/G2_ocean_and_weather_module.json",
+      "sha256": "93394d33c5fa3a3bd5ee063e5b73b6a3d3c435152ef5f53774f493e3875238a3",
+      "role": "authoritative input for this review; configured values can still include assumptions"
+    },
+    {
+      "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+      "sha256": "dac35e49718b980ad879f09a8344d3f5ce87587a08dc635ef4e9e826ae01d0f1",
+      "role": "authoritative input for this review; configured values can still include assumptions"
+    },
+    {
+      "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+      "sha256": "1b73fe429a4202786e29d6a8f1943c3ec2cbf304bb3a53f05e681a30b864bacb",
+      "role": "authoritative input for this review; configured values can still include assumptions"
+    },
+    {
+      "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+      "sha256": "8173a46838bee604fb828b06887f43a65778408aac07c39dff2c417aff9b850d",
+      "role": "authoritative input for this review; configured values can still include assumptions"
+    }
+  ],
+  "source_rules": [
+    {
+      "id": "PHY-09",
+      "topic": "G5 installed mass",
+      "classification": "DERIVED_FROM_MANIFEST",
+      "current_value": {
+        "main_kg": 3000,
+        "antenna_kg": 25,
+        "total_kg": 3025
+      },
+      "why": "Sum the components explicitly declared by the supplied G5 file once. This is not a new mass assumption relative to that file.",
+      "source_refs": [
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/assembly/components",
+          "value": [
+            {
+              "id": "compute_node",
+              "name": "Emergency communications / edge compute module",
+              "mass_kg": 3000,
+              "footprint_m2": null
+            },
+            {
+              "id": "antenna",
+              "name": "External antenna",
+              "mass_kg": 25,
+              "footprint_m2": 0.3
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:_placing",
+        "physical_model/resource_models/mass.py:evaluate"
+      ],
+      "effect_on_results": "Correct mass and placement-dependent weighted moment accounting.",
+      "resolution": "If organizer interpretation of the 3 t figure changes, revise the authoritative manifest first. Do not silently subtract 25 kg.",
+      "sensitivity": null
+    },
+    {
+      "id": "PHY-10",
+      "topic": "Added mass and weighted stability screen",
+      "classification": "SOURCE_CONFIGURED_RULE",
+      "current_value": "10,000 kg added mass; 12,000 kg-equivalent; deck ×1, hangar/roof ×1.2, mast ×3.",
+      "why": "These quantities are explicit in ship_specs and the challenge model.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/mass",
+          "value": {
+            "margin_kg": 10000,
+            "stability_budget_kg_eq": 12000
+          }
+        },
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/bay1/stability_multiplier",
+          "value": 1
+        },
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/bay2/stability_multiplier",
+          "value": 1
+        },
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/hangar/stability_multiplier",
+          "value": 1.2
+        },
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/roof/stability_multiplier",
+          "value": 1.2
+        },
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/mast3/stability_multiplier",
+          "value": 3
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/mass.py:evaluate"
+      ],
+      "effect_on_results": "Produces a challenge budget check only; naval stability remains NOT_VERIFIED.",
+      "resolution": "No hydrostatic or stability certification can be inferred from these multipliers.",
+      "sensitivity": null
+    },
+    {
+      "id": "MODE-02",
+      "topic": "G5 heat allocation correction",
+      "classification": "DERIVED_FROM_MANIFEST",
+      "current_value": "45 kW full / 8 kW low power go entirely to the selected bay chilled-water path; former 1 kW antenna split removed.",
+      "why": "The supplied G5 cooling rule explicitly says chilled-water load equals electrical kW. An extra antenna split contradicted it.",
+      "source_refs": [
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/cooling",
+          "value": {
+            "type": "chilled_water",
+            "electrical_kw_to_heat_kw": 1.0,
+            "chilled_water_load_rule": "equals_electrical_kw",
+            "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+          }
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "full",
+              "power_kw": {
+                "min": null,
+                "nominal": 45,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous."
+            },
+            {
+              "id": "low_power",
+              "power_kw": {
+                "min": null,
+                "nominal": 8,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": 0.3,
+              "notes": "70% capability loss relative to full mode."
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests",
+        "physical_model/resource_models/cooling.py:evaluate"
+      ],
+      "effect_on_results": "Adds 1 kW to loop load relative to the uploaded implementation: 105 instead of 104 kW in the full-charge combination, 68 instead of 67 after G5 throttle.",
+      "resolution": "If actual antenna power is separately declared later, revise the manifest and balance explicitly; this does not establish zero physical antenna dissipation.",
+      "sensitivity": null
+    },
+    {
+      "id": "MODE-03",
+      "topic": "Operating activity and electrical mode are distinct",
+      "classification": "SOURCE_IMPLEMENTATION_RULE",
+      "current_value": "Updated operation power_mode_id maps G1 active, G2 continuous/winch, G3 standby/charge, G4 standby/initial/followup. G5 permits full or low_power. Null mapping requires explicit runtime selection.",
+      "why": "Consume the explicit operation-to-power mappings in the updated guests. Reject contradictory selections. Read sustained load/duration directly from the selected power mode.",
+      "source_refs": [
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/operational_modes",
+          "value": [
+            {
+              "id": "operating",
+              "allowed_power_mode_ids": [
+                "full",
+                "low_power"
+              ],
+              "requirements": [
+                {
+                  "field": "platform.emission_state",
+                  "operator": "neq",
+                  "value": "silent",
+                  "reason": "G5 excludes emission silence."
+                }
+              ],
+              "conflicts": [],
+              "notes": "Full or low-power operation cannot provide transmitting connectivity during emission silence."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/operational_modes",
+          "value": [
+            {
+              "id": "probe_operation",
+              "power_mode_id": "continuous",
+              "requirements": [
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "lte",
+                  "value": 5,
+                  "reason": null
+                },
+                {
+                  "field": "environment.sea_state",
+                  "operator": "lte",
+                  "value": 4,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.course_keeping",
+                  "operator": "eq",
+                  "value": "steady",
+                  "reason": null
+                },
+                {
+                  "field": "platform.deck_area_around_bay_clear",
+                  "operator": "eq",
+                  "value": true,
+                  "reason": null
+                }
+              ],
+              "conflicts": [],
+              "notes": "Probe deployment conditions."
+            },
+            {
+              "id": "winch_operation",
+              "power_mode_id": "winch_operation",
+              "requirements": [
+                {
+                  "field": "platform.emission_state",
+                  "operator": "neq",
+                  "value": "silent",
+                  "reason": "Silence forbids deck machinery per Annex A.6."
+                }
+              ],
+              "conflicts": [
+                {
+                  "guest_id": "G3",
+                  "guest_mode": "surveying",
+                  "reason": "Winch cannot operate while underwater vehicle listens."
+                },
+                {
+                  "guest_id": "G4",
+                  "guest_mode": "launch_recovery",
+                  "reason": "Winch cannot operate during rescue-drone recovery."
+                }
+              ],
+              "notes": "Winch is deck machinery; nominal electrical mode is 20 kW for 5 minutes."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/operational_modes",
+          "value": [
+            {
+              "id": "surveying",
+              "power_mode_id": null,
+              "requirements": [
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "eq",
+                  "value": 3,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.course_keeping",
+                  "operator": "eq",
+                  "value": "steady",
+                  "reason": null
+                },
+                {
+                  "field": "navigation.noise_level",
+                  "operator": "eq",
+                  "value": "quiet",
+                  "reason": null
+                },
+                {
+                  "field": "platform.deck_machinery_active",
+                  "operator": "eq",
+                  "value": false,
+                  "reason": null
+                }
+              ],
+              "conflicts": [
+                {
+                  "guest_id": "G2",
+                  "guest_mode": "winch_operation",
+                  "reason": "No deck machinery while listening."
+                },
+                {
+                  "guest_id": "G4",
+                  "guest_mode": "launch_recovery",
+                  "reason": "Drone recovery requires manoeuvre freedom and deck activity, incompatible with quiet surveying."
+                }
+              ],
+              "notes": "Each survey leg lasts 40 minutes. Ship-side electrical draw while deployed is not explicitly specified; do not assume the standby value applies."
+            },
+            {
+              "id": "launch_recovery",
+              "power_mode_id": null,
+              "requirements": [
+                {
+                  "field": "platform.stern_ramp_free",
+                  "operator": "eq",
+                  "value": true,
+                  "reason": null
+                },
+                {
+                  "field": "environment.sea_state",
+                  "operator": "lte",
+                  "value": 4,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "gte",
+                  "value": 4,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "lte",
+                  "value": 8,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.course_keeping",
+                  "operator": "eq",
+                  "value": "steady",
+                  "reason": null
+                }
+              ],
+              "conflicts": [
+                {
+                  "guest_id": "G4",
+                  "guest_mode": "launch_recovery",
+                  "reason": "Flight deck and stern ramp cannot operate simultaneously (Annex A.3)."
+                }
+              ],
+              "notes": null
+            },
+            {
+              "id": "standby",
+              "power_mode_id": "standby",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "Cradle standby, 1 kW ship-side demand."
+            },
+            {
+              "id": "charging",
+              "power_mode_id": "charging",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "25 kW noninterruptible charging for 60 minutes after each 40-minute survey leg."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/operational_modes",
+          "value": [
+            {
+              "id": "passive_sensing",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "No course or speed restrictions. Passive sensing remains available in emission silence.",
+              "power_mode_id": "active"
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/operational_modes",
+          "value": [
+            {
+              "id": "launch_recovery",
+              "power_mode_id": null,
+              "requirements": [
+                {
+                  "field": "platform.flight_deck_clear",
+                  "operator": "eq",
+                  "value": true,
+                  "reason": null
+                },
+                {
+                  "field": "environment.wind_knots",
+                  "operator": "lte",
+                  "value": 25,
+                  "reason": null
+                },
+                {
+                  "field": "environment.sea_state",
+                  "operator": "lte",
+                  "value": 4,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "gte",
+                  "value": 5,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "lte",
+                  "value": 12,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.manoeuvre_freedom",
+                  "operator": "eq",
+                  "value": true,
+                  "reason": null
+                },
+                {
+                  "field": "platform.stern_ramp_in_use",
+                  "operator": "eq",
+                  "value": false,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.course_keeping",
+                  "operator": "eq",
+                  "value": "steady",
+                  "reason": "Annex A.3 says flight-deck operations require a steady course once aligned into wind."
+                }
+              ],
+              "conflicts": [
+                {
+                  "guest_id": "G3",
+                  "guest_mode": "launch_recovery",
+                  "reason": "Stern ramp and flight deck are mutually exclusive."
+                },
+                {
+                  "guest_id": "G3",
+                  "guest_mode": "surveying",
+                  "reason": "Survey needs steady quiet 3-kn leg; drone recovery requires 5–12 kn and freedom to manoeuvre."
+                },
+                {
+                  "guest_id": "G2",
+                  "guest_mode": "winch_operation",
+                  "reason": "Deck machinery excluded during recovery."
+                }
+              ],
+              "notes": "Freedom to turn into wind must be available; then establish required steady recovery course."
+            },
+            {
+              "id": "in_flight",
+              "power_mode_id": null,
+              "requirements": [],
+              "conflicts": [],
+              "notes": "Endurance 90 minutes. In emission silence the drone returns home, requiring deck clearance."
+            },
+            {
+              "id": "standby",
+              "power_mode_id": "standby",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "Drone and hangar in standby configuration. 2 kW."
+            },
+            {
+              "id": "charging_initial",
+              "power_mode_id": "charging_initial",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "35 kW charging for the initial 20 minutes."
+            },
+            {
+              "id": "charging_followup",
+              "power_mode_id": "charging_followup",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "10 kW after the initial charging period. Remaining duration unspecified."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "continuous",
+              "power_kw": {
+                "min": null,
+                "nominal": 6,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous base draw."
+            },
+            {
+              "id": "winch_operation",
+              "power_kw": {
+                "min": null,
+                "nominal": 20,
+                "peak": null
+              },
+              "max_duration_minutes": 5,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "20 kW total sustained draw for 5 minutes while winch operates (not +20 kW above baseline)."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 1,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Cradle standby draw."
+            },
+            {
+              "id": "charging",
+              "power_kw": {
+                "min": null,
+                "nominal": 25,
+                "peak": null
+              },
+              "max_duration_minutes": 60,
+              "interruptible": false,
+              "capability_fraction": null,
+              "notes": "Noninterruptible charge after each 40-minute survey leg."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 2,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Standby demand."
+            },
+            {
+              "id": "charging_initial",
+              "power_kw": {
+                "min": null,
+                "nominal": 35,
+                "peak": null
+              },
+              "max_duration_minutes": 20,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "35 kW for 20 minutes."
+            },
+            {
+              "id": "charging_followup",
+              "power_kw": {
+                "min": null,
+                "nominal": 10,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "10 kW after first 20 minutes of charge; remaining duration not specified."
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests",
+        "physical_model/resource_models/operational.py:evaluate"
+      ],
+      "effect_on_results": "Correct load accounting; selecting standby during a launch activity does not establish actual launch electrical demand.",
+      "resolution": "Null mappings remain unresolved; a selected ship-side mode is only a conditional simulation.",
+      "sensitivity": null
+    },
+    {
+      "id": "MODE-04",
+      "topic": "Drone recovery deadline",
+      "classification": "SOURCE_RULE_WITH_LIMITED_IMPLEMENTATION",
+      "current_value": "Read G4 battery threshold/deadline from the event. Evaluate minutes_since_low_battery + eta_to_landing_min <= recovery_deadline_minutes. Missing battery/origin/ETA is UNKNOWN when needed.",
+      "why": "Threshold/deadline is explicit in G4. Supplied ETA alone is not proof of a realizable recovery plan.",
+      "source_refs": [
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/special_events/0",
+          "value": {
+            "type": "battery_emergency",
+            "trigger": {
+              "field": "guest_state.G4.battery_percent",
+              "operator": "lt",
+              "value": 20,
+              "reason": null
+            },
+            "recovery_deadline_minutes": 12,
+            "if_deadline_missed": "ditch"
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/operational.py:evaluate"
+      ],
+      "effect_on_results": "The deadline no longer restarts every snapshot. A supplied ETA does not establish a reachable recovery trajectory.",
+      "resolution": "Persist the threshold-crossing time in the state source and validate the planned recovery transitions.",
+      "sensitivity": null
+    },
+    {
+      "id": "MODE-06",
+      "topic": "Physical versus logical reconfiguration",
+      "classification": "SOURCE_RULE_WITH_LIMITED_IMPLEMENTATION",
+      "current_value": "Select one manifest installation record by operation and component/target; use its crew and duration. G3 swap_vehicle_only keeps the cradle; G4 swap_component targets the drone.",
+      "why": "The updated G3 operation_target removes the vehicle-versus-assembly ambiguity. Port-only and at-sea records are distinct.",
+      "source_refs": [
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/installation",
+          "value": [
+            {
+              "operation": "install_assembly",
+              "component_ids": [
+                "ocean_module"
+              ],
+              "port_only": true,
+              "crew_required": 4,
+              "duration_minutes": 360,
+              "at_sea_window": null,
+              "notes": "Port-only assembly installation."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/installation",
+          "value": [
+            {
+              "operation": "install_assembly",
+              "component_ids": [
+                "vehicle_and_cradle"
+              ],
+              "port_only": true,
+              "crew_required": 4,
+              "duration_minutes": 360,
+              "at_sea_window": null,
+              "notes": "Cradle and vehicle assembly installed in port."
+            },
+            {
+              "operation": "swap_vehicle_only",
+              "operation_target": "vehicle",
+              "component_ids": [
+                "vehicle_and_cradle"
+              ],
+              "port_only": false,
+              "crew_required": 4,
+              "duration_minutes": 45,
+              "at_sea_window": "Annex A.11",
+              "notes": "Only the vehicle may be swapped at sea. The cradle remains installed."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/installation",
+          "value": [
+            {
+              "operation": "install_component",
+              "component_ids": [
+                "hangar"
+              ],
+              "port_only": true,
+              "crew_required": 4,
+              "duration_minutes": 240,
+              "at_sea_window": null,
+              "notes": "Hangar port only."
+            },
+            {
+              "operation": "swap_component",
+              "component_ids": [
+                "drone"
+              ],
+              "port_only": false,
+              "crew_required": 3,
+              "duration_minutes": 30,
+              "at_sea_window": "Annex A.11",
+              "notes": "Drone swappable at sea only in A.11 installation window."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/installation",
+          "value": [
+            {
+              "component_ids": [
+                "compute_node"
+              ],
+              "port_only": true,
+              "crew_required": 4,
+              "duration_minutes": 360,
+              "at_sea_window": null,
+              "notes": "Main module port-only, 6 hours."
+            },
+            {
+              "component_ids": [
+                "antenna"
+              ],
+              "port_only": true,
+              "crew_required": 2,
+              "duration_minutes": 120,
+              "at_sea_window": null,
+              "notes": "Antenna installation port-only, 2 hours."
+            },
+            {
+              "component_ids": [],
+              "port_only": false,
+              "crew_required": null,
+              "duration_minutes": null,
+              "at_sea_window": null,
+              "notes": "At sea, only logical changes such as deploying a new analytics workload; no physical installation."
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/operational.py:_install_checks"
+      ],
+      "effect_on_results": "Insufficient crew or time fails; missing installation time budget is UNKNOWN. Existing roof availability is taken from state, without an invented G4 admission dependency.",
+      "resolution": "Model cranes, fastening/service access and time-varying weather/crew reservations before full installation admission.",
+      "sensitivity": null
+    },
+    {
+      "id": "SRC-COOL",
+      "topic": "Configured cooling curve and routes",
+      "classification": "SOURCE_CONFIGURED_RULE",
+      "current_value": "160 kW at12 C, linearly to120 at30 C; fault removes40%; electric-to-heat1:1; G1 air and G2–G5 loop per manifests.",
+      "why": "Configured source rule, not an additional estimate. Roof/hangar geometry remains separately qualified.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/cooling",
+          "value": {
+            "cold_c": 12,
+            "hot_c": 30,
+            "cold_kw": 160,
+            "hot_kw": 120,
+            "fault_loss_fraction": 0.4
+          }
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/cooling",
+          "value": {
+            "type": "chilled_water",
+            "electrical_kw_to_heat_kw": 1.0,
+            "chilled_water_load_rule": "equals_electrical_kw",
+            "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+          }
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/cooling",
+          "value": {
+            "type": "chilled_water",
+            "electrical_kw_to_heat_kw": 1.0,
+            "chilled_water_load_rule": "equals_electrical_kw",
+            "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+          }
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/cooling",
+          "value": {
+            "type": "chilled_water",
+            "electrical_kw_to_heat_kw": 1.0,
+            "chilled_water_load_rule": "equals_electrical_kw",
+            "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+          }
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/cooling",
+          "value": {
+            "type": "air",
+            "electrical_kw_to_heat_kw": 1.0,
+            "chilled_water_load_rule": "not_on_chilled_water_loop",
+            "notes": "Electrical load converts to heat at 1:1 per Annex A.2. Air-cooled mast guests cannot use a chilled-water manifold."
+          }
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/cooling",
+          "value": {
+            "type": "chilled_water",
+            "electrical_kw_to_heat_kw": 1.0,
+            "chilled_water_load_rule": "equals_electrical_kw",
+            "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/cooling.py:evaluate"
+      ],
+      "effect_on_results": "30 C fault capacity is72 kW. G1 air load does not consume that loop.",
+      "resolution": "Preserve thermal path semantics; no extrapolation outside the provided curve.",
+      "sensitivity": null
+    },
+    {
+      "id": "SRC-MAPPING",
+      "topic": "Placement completeness and power mapping integrity",
+      "classification": "SOURCE_IMPLEMENTATION_RULE",
+      "current_value": "Every assembly component appears exactly once in a chosen configuration; explicit fixed/allowed power references are validated.",
+      "why": "Avoid double-counting or omitting source mass and rejecting updated operation names.",
+      "source_refs": [
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/placement",
+          "value": {
+            "configurations": [
+              {
+                "id": "bay2_mast",
+                "preferred": true,
+                "assignments": [
+                  {
+                    "component_id": "compute_node",
+                    "location": "bay2",
+                    "bay_fraction": 1.0,
+                    "area_m2": null
+                  },
+                  {
+                    "component_id": "antenna",
+                    "location": "mast_slot",
+                    "bay_fraction": null,
+                    "area_m2": 0.3
+                  }
+                ],
+                "requirements": [],
+                "notes": null
+              },
+              {
+                "id": "bay2_hangar_roof",
+                "preferred": true,
+                "assignments": [
+                  {
+                    "component_id": "compute_node",
+                    "location": "bay2",
+                    "bay_fraction": 1.0,
+                    "area_m2": null
+                  },
+                  {
+                    "component_id": "antenna",
+                    "location": "hangar_roof",
+                    "bay_fraction": null,
+                    "area_m2": 0.3
+                  }
+                ],
+                "requirements": [
+                  {
+                    "field": "platform.hangar_roof_available",
+                    "operator": "eq",
+                    "value": true,
+                    "reason": null
+                  },
+                  {
+                    "field": "platform.drone_clearance_verified",
+                    "operator": "eq",
+                    "value": true,
+                    "reason": null
+                  }
+                ],
+                "notes": "Alternative to mast. Antenna uses hangar/flight-deck stability factor ×1.2; check drone clearance."
+              },
+              {
+                "id": "half_bay1_mast",
+                "preferred": false,
+                "assignments": [
+                  {
+                    "component_id": "compute_node",
+                    "location": "bay1",
+                    "bay_fraction": 0.5,
+                    "area_m2": null
+                  },
+                  {
+                    "component_id": "antenna",
+                    "location": "mast_slot",
+                    "bay_fraction": null,
+                    "area_m2": 0.3
+                  }
+                ],
+                "requirements": [],
+                "notes": null
+              },
+              {
+                "id": "half_bay1_hangar_roof",
+                "preferred": false,
+                "assignments": [
+                  {
+                    "component_id": "compute_node",
+                    "location": "bay1",
+                    "bay_fraction": 0.5,
+                    "area_m2": null
+                  },
+                  {
+                    "component_id": "antenna",
+                    "location": "hangar_roof",
+                    "bay_fraction": null,
+                    "area_m2": 0.3
+                  }
+                ],
+                "requirements": [
+                  {
+                    "field": "platform.hangar_roof_available",
+                    "operator": "eq",
+                    "value": true,
+                    "reason": null
+                  },
+                  {
+                    "field": "platform.drone_clearance_verified",
+                    "operator": "eq",
+                    "value": true,
+                    "reason": null
+                  }
+                ],
+                "notes": "Alternative antenna location; check drone clearance."
+              }
+            ]
+          }
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/placement",
+          "value": {
+            "configurations": [
+              {
+                "id": "bay2",
+                "preferred": true,
+                "assignments": [
+                  {
+                    "component_id": "ocean_module",
+                    "location": "bay2",
+                    "bay_fraction": 1.0,
+                    "area_m2": null
+                  }
+                ],
+                "requirements": [],
+                "notes": null
+              },
+              {
+                "id": "half_bay1",
+                "preferred": false,
+                "assignments": [
+                  {
+                    "component_id": "ocean_module",
+                    "location": "bay1",
+                    "bay_fraction": 0.5,
+                    "area_m2": null
+                  }
+                ],
+                "requirements": [],
+                "notes": null
+              }
+            ]
+          }
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/placement",
+          "value": {
+            "configurations": [
+              {
+                "id": "bay1",
+                "preferred": true,
+                "assignments": [
+                  {
+                    "component_id": "vehicle_and_cradle",
+                    "location": "bay1",
+                    "bay_fraction": 1.0,
+                    "area_m2": null
+                  }
+                ],
+                "requirements": [],
+                "notes": "Cradle fills Bay 1; vehicle launches and recovers through the stern ramp."
+              }
+            ]
+          }
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/placement",
+          "value": {
+            "configurations": [
+              {
+                "id": "mast",
+                "preferred": true,
+                "assignments": [
+                  {
+                    "component_id": "radio_sensor",
+                    "location": "mast_slot",
+                    "bay_fraction": null,
+                    "area_m2": 0.5
+                  }
+                ],
+                "requirements": [],
+                "notes": "Only one of three mast positions is initially free; competes with G5 antenna."
+              }
+            ]
+          }
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/placement",
+          "value": {
+            "configurations": [
+              {
+                "id": "flight_deck_hangar",
+                "preferred": true,
+                "assignments": [
+                  {
+                    "component_id": "drone",
+                    "location": "flight_deck_hangar",
+                    "bay_fraction": null,
+                    "area_m2": null
+                  },
+                  {
+                    "component_id": "hangar",
+                    "location": "flight_deck_hangar",
+                    "bay_fraction": null,
+                    "area_m2": null
+                  }
+                ],
+                "requirements": [],
+                "notes": "Hangar holds one VTOL; drone and hangar together weigh 1,040 kg."
+              }
+            ]
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:validate_manifest_references",
+        "physical_model/manifest_adapter.py:_placing"
+      ],
+      "effect_on_results": "Invalid component coverage or contradictory operation power fails input validation before simulation.",
+      "resolution": "Update the authoritative guest file when a component or valid operation changes.",
+      "sensitivity": null
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "PHY-01",
+      "topic": "Guest electrical reserve by speed",
+      "classification": "NARROWED_REFERENCE",
+      "current_value": "Slow/cruise both use 200 kW with two gensets and 100 kW with one.",
+      "why": "These are the selected ship_specs reference budgets. Equal slow/cruise values are a flat demo mapping, not evidence of a speed curve or the lowest capacity throughout the mission.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/electrical/reserve_kw_by_speed",
+          "value": {
+            "slow": {
+              "1": 100,
+              "2": 200
+            },
+            "cruise": {
+              "1": 100,
+              "2": 200
+            }
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/electrical.py:evaluate"
+      ],
+      "effect_on_results": "All electrical margins move directly with this choice; shore-side resources do not validate at-sea admission.",
+      "resolution": "Supply a speed/load-dependent reserve table or evaluate explicit scenarios throughout the envelope.",
+      "sensitivity": {
+        "two_genset_kw": [
+          150,
+          200,
+          250
+        ],
+        "one_genset_kw": [
+          90,
+          100,
+          120
+        ],
+        "basis": "Sensitivity samples within Annex A.1 ranges already referenced by the project; not measurements."
+      }
+    },
+    {
+      "id": "PHY-02",
+      "topic": "Mission-line assignment and outages",
+      "classification": "SCENARIO_ASSIGNMENT",
+      "current_value": "150 kW per port/stbd line is configured; sample G1/G2/G3 port, G4/G5 stbd; both live initially.",
+      "why": "Branch capacities are in ship_specs. Guest cabling and post-trip line survival are choices in runtime, not guest-card requirements.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/electrical/lines_kw",
+          "value": {
+            "port": 150,
+            "stbd": 150
+          }
+        },
+        {
+          "file": "physical_model/data/sample_runtime.json",
+          "pointer": "/guests",
+          "value": {
+            "G1": {
+              "installed": false,
+              "placement": "mast",
+              "power_mode": "active",
+              "operation": "passive_sensing",
+              "power_line": "port"
+            },
+            "G2": {
+              "installed": false,
+              "placement": "bay2",
+              "power_mode": "continuous",
+              "operation": null,
+              "power_line": "port"
+            },
+            "G3": {
+              "installed": true,
+              "placement": "bay1",
+              "power_mode": "standby",
+              "operation": null,
+              "power_line": "port"
+            },
+            "G4": {
+              "installed": true,
+              "placement": "flight_deck_hangar",
+              "power_mode": "standby",
+              "operation": null,
+              "power_line": "stbd"
+            },
+            "G5": {
+              "installed": true,
+              "placement": "bay2_mast",
+              "power_mode": "full",
+              "operation": "operating",
+              "power_line": "stbd"
+            }
+          }
+        },
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/online_power_lines",
+          "value": [
+            "port",
+            "stbd"
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests",
+        "physical_model/resource_models/electrical.py:evaluate"
+      ],
+      "effect_on_results": "A lost or overloaded branch can fail while total power passes.",
+      "resolution": "Provide generator/branch connectivity; set explicit connections and available lines for each scenario.",
+      "sensitivity": {
+        "online_lines": [
+          [
+            "port",
+            "stbd"
+          ],
+          [
+            "port"
+          ],
+          [
+            "stbd"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "PHY-03",
+      "topic": "Electrical peak concurrency and line ceiling",
+      "classification": "MODEL_APPROXIMATION",
+      "current_value": "Declared peaks coincide; no branch overload above 150 kW; duration cap 60 s. Current canonical adapter only evaluates sustained demand (MODE-07).",
+      "why": "Peak schedules and branch transient ratings are absent. Host peak extras are in ship_specs; current guest peaks are null.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/electrical/peak_extra_kw",
+          "value": {
+            "1": 100,
+            "2": 250
+          }
+        },
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/electrical/peak_max_duration_s",
+          "value": 60
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "full",
+              "power_kw": {
+                "min": null,
+                "nominal": 45,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous."
+            },
+            {
+              "id": "low_power",
+              "power_kw": {
+                "min": null,
+                "nominal": 8,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": 0.3,
+              "notes": "70% capability loss relative to full mode."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "continuous",
+              "power_kw": {
+                "min": null,
+                "nominal": 6,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous base draw."
+            },
+            {
+              "id": "winch_operation",
+              "power_kw": {
+                "min": null,
+                "nominal": 20,
+                "peak": null
+              },
+              "max_duration_minutes": 5,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "20 kW total sustained draw for 5 minutes while winch operates (not +20 kW above baseline)."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 1,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Cradle standby draw."
+            },
+            {
+              "id": "charging",
+              "power_kw": {
+                "min": null,
+                "nominal": 25,
+                "peak": null
+              },
+              "max_duration_minutes": 60,
+              "interruptible": false,
+              "capability_fraction": null,
+              "notes": "Noninterruptible charge after each 40-minute survey leg."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "active",
+              "power_kw": {
+                "min": null,
+                "nominal": 1.5,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous; air-cooled."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 2,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Standby demand."
+            },
+            {
+              "id": "charging_initial",
+              "power_kw": {
+                "min": null,
+                "nominal": 35,
+                "peak": null
+              },
+              "max_duration_minutes": 20,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "35 kW for 20 minutes."
+            },
+            {
+              "id": "charging_followup",
+              "power_kw": {
+                "min": null,
+                "nominal": 10,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "10 kW after first 20 minutes of charge; remaining duration not specified."
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/electrical.py:evaluate"
+      ],
+      "effect_on_results": "Can overestimate overlapping declared peaks. It does not establish current G1–G5 peak feasibility.",
+      "resolution": "Supply guest peaks/durations and a schedule; do not turn unknown peak into a source zero.",
+      "sensitivity": null
+    },
+    {
+      "id": "PHY-04",
+      "topic": "Thermal storage omitted from sustained check",
+      "classification": "MODEL_APPROXIMATION",
+      "current_value": "No temporary thermal buffer credit; explicit nonzero peak needs a transient model.",
+      "why": "Snapshot input has no thermal-buffer energy/reuse history.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/cooling",
+          "value": {
+            "cold_c": 12,
+            "hot_c": 30,
+            "cold_kw": 160,
+            "hot_kw": 120,
+            "fault_loss_fraction": 0.4
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/cooling.py:evaluate"
+      ],
+      "effect_on_results": "Sustained headroom is conservative relative to a temporary buffer; no conclusion about admissible short excursions.",
+      "resolution": "Implement buffer energy and cooldown tracking before crediting transient headroom.",
+      "sensitivity": null
+    },
+    {
+      "id": "PHY-05",
+      "topic": "Roof cooling path",
+      "classification": "UNVERIFIED_HOST_PLACEHOLDER",
+      "current_value": "Roof is set to air cooling with 2 kW limit. Bay/hangar loop and mast air paths are recorded separately as source/configured rules.",
+      "why": "G5 permits a roof location but provides no roof heat rating. The revised G5 mapping consumes all declared heat on the loop, so this placeholder is not exercised by default G5.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/roof",
+          "value": {
+            "kind": "deck",
+            "dimensions_m": [
+              2,
+              2,
+              2
+            ],
+            "mass_limit_kg": 100,
+            "units": 1,
+            "stability_multiplier": 1.2,
+            "cooling": "air",
+            "air_heat_limit_kw": 2
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/cooling.py:evaluate"
+      ],
+      "effect_on_results": "Any future roof-dissipated heat check is conditional on an unverified limit.",
+      "resolution": "Obtain a roof equipment thermal limit; do not copy mast limit without disclosure.",
+      "sensitivity": null
+    },
+    {
+      "id": "PHY-06",
+      "topic": "Hangar dimensions and assembly limit",
+      "classification": "UNVERIFIED_HOST_PLACEHOLDER",
+      "current_value": "Host 12×8×4 m / 1500 kg; demo G4 assembly 8×6×3 m; one occupancy unit.",
+      "why": "These numbers exist in ship_specs and profiles, but G4 declares masses, not equipment dimensions. Flight-deck dimensions are not hangar dimensions. A 150 kg drone limit is different from a 1500 kg assembly limit.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/hangar",
+          "value": {
+            "kind": "deck",
+            "dimensions_m": [
+              12,
+              8,
+              4
+            ],
+            "mass_limit_kg": 1500,
+            "units": 1,
+            "stability_multiplier": 1.2,
+            "cooling": "loop"
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G4/dimensions_by_location/hangar",
+          "value": [
+            8,
+            6,
+            3
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/assembly/components",
+          "value": [
+            {
+              "id": "drone",
+              "name": "VTOL rescue drone",
+              "mass_kg": 140,
+              "footprint_m2": null
+            },
+            {
+              "id": "hangar",
+              "name": "Flight-deck hangar",
+              "mass_kg": 900,
+              "footprint_m2": null
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:_placing",
+        "physical_model/resource_models/deck.py:evaluate"
+      ],
+      "effect_on_results": "A geometry PASS is only for the assumed boxes, not verified physical fit.",
+      "resolution": "Obtain actual hangar interior/exterior envelopes and mounting allowance. Keep UNKNOWN in a source-only assessment.",
+      "sensitivity": null
+    },
+    {
+      "id": "PHY-07",
+      "topic": "Roof structure and antenna envelope",
+      "classification": "UNVERIFIED_HOST_PLACEHOLDER",
+      "current_value": "Host roof 2×2×2 m / 100 kg; antenna assumed 0.6×0.6×1 m; canonical area 0.3 m².",
+      "why": "The 0.36 m² example box is not the manifest footprint; its shape/height and host limit are not supplied. Neither may be described as proven conservative.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/roof",
+          "value": {
+            "kind": "deck",
+            "dimensions_m": [
+              2,
+              2,
+              2
+            ],
+            "mass_limit_kg": 100,
+            "units": 1,
+            "stability_multiplier": 1.2,
+            "cooling": "air",
+            "air_heat_limit_kw": 2
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G5/dimensions_by_location/roof",
+          "value": [
+            0.6,
+            0.6,
+            1.0
+          ]
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/assembly/components/1",
+          "value": {
+            "id": "antenna",
+            "name": "External antenna",
+            "mass_kg": 25,
+            "footprint_m2": 0.3
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:_placing",
+        "physical_model/resource_models/deck.py:evaluate",
+        "physical_model/resource_models/operational.py:evaluate"
+      ],
+      "effect_on_results": "Box fit and positive clearance flags do not prove real roof strength or rotor clearance.",
+      "resolution": "Use confirmed dimensions, roof rating and clearance evidence; retain canonical area independently.",
+      "sensitivity": null
+    },
+    {
+      "id": "PHY-08",
+      "topic": "Bay units and assumed equipment boxes",
+      "classification": "MODEL_APPROXIMATION",
+      "current_value": "Bay1 has two units; whole-Bay1 G3 box 6.1×2.4×2.6 m, half-Bay1 G2/G5 box 3.05×2.4×2.6 m; Bay2 boxes 3×2.4×2.6 m.",
+      "why": "Manifest bay fractions determine occupancy; they do not specify exact guest dimensions. Axis-aligned length packing is a simple screen with no service/installation clearances.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/bay1",
+          "value": {
+            "kind": "deck",
+            "dimensions_m": [
+              6.1,
+              2.4,
+              2.6
+            ],
+            "mass_limit_kg": 8000,
+            "units": 2,
+            "stability_multiplier": 1,
+            "cooling": "loop"
+          }
+        },
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/positions/bay2",
+          "value": {
+            "kind": "deck",
+            "dimensions_m": [
+              3,
+              2.4,
+              2.6
+            ],
+            "mass_limit_kg": 4000,
+            "units": 1,
+            "stability_multiplier": 1,
+            "cooling": "loop"
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G2/dimensions_by_location",
+          "value": {
+            "bay1": [
+              3.05,
+              2.4,
+              2.6
+            ],
+            "bay2": [
+              3,
+              2.4,
+              2.6
+            ]
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G3/dimensions_by_location",
+          "value": {
+            "bay1": [
+              6.1,
+              2.4,
+              2.6
+            ]
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G5/dimensions_by_location",
+          "value": {
+            "bay1": [
+              3.05,
+              2.4,
+              2.6
+            ],
+            "bay2": [
+              3,
+              2.4,
+              2.6
+            ],
+            "roof": [
+              0.6,
+              0.6,
+              1.0
+            ]
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:_placing",
+        "physical_model/resource_models/deck.py:evaluate"
+      ],
+      "effect_on_results": "Declared slots may fit while true geometry is unknown. Assumed boxes exactly fill bay envelopes and leave no proven service clearance.",
+      "resolution": "Measure module envelopes; separate occupancy checks from geometry evidence.",
+      "sensitivity": null
+    },
+    {
+      "id": "SYS-01",
+      "topic": "Guest compute demand profiles",
+      "classification": "SYNTHETIC_DEMO_INPUT",
+      "current_value": "Mode-specific cores/RAM/accelerators/storage are in resource_profiles; all five source compute declarations are null.",
+      "why": "These are arbitrary executable test loads, not benchmarks or justified vendor estimates. They are retained to keep the demonstration runnable and labeled as assumptions.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G5/compute_by_mode",
+          "value": {
+            "full": {
+              "cores": 20,
+              "ram_gb": 40,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            },
+            "low_power": {
+              "cores": 4,
+              "ram_gb": 8,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            }
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G2/compute_by_mode",
+          "value": {
+            "continuous": {
+              "cores": 4,
+              "ram_gb": 8,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            },
+            "winch_operation": {
+              "cores": 4,
+              "ram_gb": 8,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            }
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G3/compute_by_mode",
+          "value": {
+            "standby": {
+              "cores": 1,
+              "ram_gb": 2,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            },
+            "charging": {
+              "cores": 8,
+              "ram_gb": 16,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            },
+            "surveying": {
+              "cores": 8,
+              "ram_gb": 16,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            }
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G1/compute_by_mode",
+          "value": {
+            "active": {
+              "cores": 2,
+              "ram_gb": 4,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            }
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G4/compute_by_mode",
+          "value": {
+            "standby": {
+              "cores": 2,
+              "ram_gb": 4,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            },
+            "charging_initial": {
+              "cores": 8,
+              "ram_gb": 16,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            },
+            "charging_followup": {
+              "cores": 2,
+              "ram_gb": 4,
+              "accelerators": 0,
+              "storage_tb": 0.1
+            }
+          }
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests",
+        "physical_model/resource_models/compute.py:evaluate"
+      ],
+      "effect_on_results": "Compute PASS is conditional on substituted demands. Deployed G3 now uses the intended surveying compute profile.",
+      "resolution": "Benchmark each mode or supply actual guest requirements; unknown values must not be presented as zero.",
+      "sensitivity": {
+        "demonstration_load_scale": [
+          0.5,
+          1,
+          2
+        ],
+        "basis": "Optional analyst stress multipliers, not a physical uncertainty range."
+      }
+    },
+    {
+      "id": "SYS-02",
+      "topic": "Compute reservation implementation",
+      "classification": "MODEL_APPROXIMATION",
+      "current_value": "80% guest CPU/RAM per node; 80% shared storage; node4 accelerator reserved; integer guest total also limited on surviving hardware.",
+      "why": "The reserve fraction is configured. Applying it to each node and storage and reserving an entire accelerator are implementation choices that may strand otherwise usable resources.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/compute",
+          "value": {
+            "guest_fraction": 0.8,
+            "nodes": {
+              "node1": {
+                "cores": 32,
+                "ram_gb": 128,
+                "accelerators": 1,
+                "guest_accelerators": 1
+              },
+              "node2": {
+                "cores": 32,
+                "ram_gb": 128,
+                "accelerators": 1,
+                "guest_accelerators": 1
+              },
+              "node3": {
+                "cores": 32,
+                "ram_gb": 128,
+                "accelerators": 1,
+                "guest_accelerators": 1
+              },
+              "node4": {
+                "cores": 32,
+                "ram_gb": 128,
+                "accelerators": 1,
+                "guest_accelerators": 0
+              }
+            },
+            "shared_storage_tb": 20
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/compute.py:evaluate"
+      ],
+      "effect_on_results": "At four online nodes: 102.4 cores, 409.6 GB RAM, 16 TB, at most three whole guest accelerators; node4 allows none.",
+      "resolution": "Confirm reservation granularity and actual accelerator partitioning.",
+      "sensitivity": null
+    },
+    {
+      "id": "SYS-03",
+      "topic": "Guest compute-node placement",
+      "classification": "SCENARIO_ASSIGNMENT",
+      "current_value": "G1→node1; G2/G3→node2; G4→node3; G5→node4.",
+      "why": "Reproducible fixture choices; no guest requires these physical nodes in its manifest.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G5/compute_node",
+          "value": "node4"
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G2/compute_node",
+          "value": "node2"
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G3/compute_node",
+          "value": "node2"
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G1/compute_node",
+          "value": "node1"
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G4/compute_node",
+          "value": "node3"
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests"
+      ],
+      "effect_on_results": "Node overload may occur even with total rack headroom; reassignment can change feasibility.",
+      "resolution": "Have the placement engine evaluate alternative eligible nodes.",
+      "sensitivity": null
+    },
+    {
+      "id": "COM-01",
+      "topic": "Backbone aggregation and link upper bounds",
+      "classification": "NARROWED_REFERENCE",
+      "current_value": "Configured maxima: 20,000 Mbps backbone; 8 SATCOM; 20 LOS; 0.005 acoustic.",
+      "why": "SATCOM/LOS/acoustic use chosen upper bounds; 20,000 Mbps assumes both 10 Gbps backbone links can be pooled. Redundancy alone does not establish aggregation.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/datalinks",
+          "value": {
+            "backbone": {
+              "max_mbps": 20000
+            },
+            "satcom": {
+              "max_mbps": 8
+            },
+            "los": {
+              "max_mbps": 20
+            },
+            "acoustic": {
+              "max_mbps": 0.005
+            }
+          }
+        },
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/links",
+          "value": {
+            "backbone": {
+              "connected": true,
+              "available_mbps": 20000,
+              "latency_ms": 1
+            },
+            "satcom": {
+              "connected": true,
+              "available_mbps": 8,
+              "latency_ms": 800
+            },
+            "los": {
+              "connected": true,
+              "available_mbps": 20,
+              "latency_ms": 10
+            },
+            "acoustic": {
+              "connected": true,
+              "available_mbps": 0.005,
+              "latency_ms": 60000
+            }
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/datalinks.py:evaluate"
+      ],
+      "effect_on_results": "Overstates availability if links are redundant or degraded; live capacities are independent inputs.",
+      "resolution": "Confirm topology. Use explicit runtime effective capacities.",
+      "sensitivity": {
+        "backbone_mbps": [
+          10000,
+          20000
+        ],
+        "satcom_mbps": [
+          2,
+          4,
+          8
+        ],
+        "los_mbps": [
+          1,
+          5,
+          20
+        ],
+        "acoustic_mbps": [
+          0.001,
+          0.003,
+          0.005
+        ],
+        "basis": "Reference-range/topology scenarios, not measurements."
+      }
+    },
+    {
+      "id": "COM-02",
+      "topic": "G1/G2 unspecified shore transport",
+      "classification": "SCENARIO_ASSIGNMENT",
+      "current_value": "Default profile routes G1 0.2 and G2 0.5 Mbps to SATCOM; profile can select LOS. Silence suppresses these transmissions.",
+      "why": "Manifests leave shore transport unspecified. G1 supports passive sensing in silence but does not establish buffering. G2 buffering is stated but capacity/duration are unknown.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G1/shore_transport",
+          "value": "satcom"
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G2/shore_transport",
+          "value": "satcom"
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/data_links/1",
+          "value": {
+            "type": "shore_link_transport_unspecified",
+            "bandwidth_mbps": {
+              "min": null,
+              "nominal": 0.2,
+              "max": null
+            },
+            "disabled_in_emission_silence": true,
+            "notes": "200 kbit/s shore demand. Transport is not specified; passive sensing itself remains compatible with silence."
+          }
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/data_links/1",
+          "value": {
+            "type": "shore_link_transport_unspecified",
+            "bandwidth_mbps": {
+              "min": null,
+              "nominal": 0.5,
+              "max": null
+            },
+            "disabled_in_emission_silence": true,
+            "notes": "500 kbit/s buffered transfer to shore; transport unspecified."
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests"
+      ],
+      "effect_on_results": "Selected shared link can saturate; zero transmission in silence does not prove data retention or delivery.",
+      "resolution": "Select real transport and define loss/buffering policy explicitly.",
+      "sensitivity": {
+        "shore_transport": [
+          "satcom",
+          "los"
+        ]
+      }
+    },
+    {
+      "id": "COM-03",
+      "topic": "G3 acoustic guest demand",
+      "classification": "SYNTHETIC_DEMO_INPUT",
+      "current_value": "0.003 Mbps during surveying.",
+      "why": "The manifest provides no acoustic demand. A middle-of-host-range throughput is an arbitrary test load; host capability is not a guest requirement.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/acoustic_guest_demand_mbps",
+          "value": 0.003
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/data_links/1",
+          "value": {
+            "type": "submerged_acoustic",
+            "bandwidth_mbps": {
+              "min": null,
+              "nominal": null,
+              "max": null
+            },
+            "disabled_in_emission_silence": false,
+            "notes": "Uses acoustic link while submerged; guest-specific bandwidth demand not specified. Annex A provides host acoustic link characteristics."
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests"
+      ],
+      "effect_on_results": "Acoustic bandwidth feasibility is conditional; host state may be lower or disconnected.",
+      "resolution": "Measure/control the guest messaging load; source-supported demand remains UNKNOWN.",
+      "sensitivity": {
+        "demo_demand_mbps": [
+          0.001,
+          0.003,
+          0.005
+        ],
+        "basis": "Illustrative workload samples, not known demand bounds."
+      }
+    },
+    {
+      "id": "COM-04",
+      "topic": "G4 selected video bitrate",
+      "classification": "NARROWED_REFERENCE",
+      "current_value": "10 Mbps selected within source range 5–20 Mbps.",
+      "why": "Nominal is null; 10 is a chosen test point and is not the midpoint (12.5).",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/g4_los_nominal_mbps",
+          "value": 10
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/data_links/0",
+          "value": {
+            "type": "line_of_sight_video",
+            "bandwidth_mbps": {
+              "min": 5,
+              "nominal": null,
+              "max": 20
+            },
+            "disabled_in_emission_silence": true,
+            "notes": "LOS video rate 5–20 Mbit/s; unavailable in emission silence."
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests"
+      ],
+      "effect_on_results": "Actual selected video mode may pass or fail at the available LOS capacity.",
+      "resolution": "Select a supported encoder bitrate or reserve the declared maximum for admission.",
+      "sensitivity": {
+        "demand_mbps": [
+          5,
+          10,
+          20
+        ]
+      }
+    },
+    {
+      "id": "COM-05",
+      "topic": "G5 SATCOM reservation by power mode",
+      "classification": "CONSERVATIVE_BOUND",
+      "current_value": "Reserve the manifest maximum (currently 6 Mbps) in both full and low-power modes. Former 1.8 Mbps value removed.",
+      "why": "The 0.3 capability fraction does not quantify bandwidth. Using the declared upper bound avoids inventing a linear scaling benefit.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G5/satcom_demand_policy",
+          "value": "manifest_maximum_for_each_mode"
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/data_links",
+          "value": [
+            {
+              "type": "satcom",
+              "bandwidth_mbps": {
+                "min": null,
+                "nominal": null,
+                "max": 6
+              },
+              "disabled_in_emission_silence": true,
+              "notes": "Consumes up to 6 Mbit/s of the ship's shared up-to-8-Mbit/s SATCOM."
+            },
+            {
+              "type": "backbone",
+              "bandwidth_mbps": {
+                "min": null,
+                "nominal": 1000,
+                "max": null
+              },
+              "disabled_in_emission_silence": false,
+              "notes": null
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/power_modes/1/capability_fraction",
+          "value": 0.3
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests"
+      ],
+      "effect_on_results": "No guaranteed SATCOM relief is claimed from power throttling; low-power actual demand stays unknown.",
+      "resolution": "Supply a measured mode-specific bandwidth profile to replace the bound.",
+      "sensitivity": null
+    },
+    {
+      "id": "COM-06",
+      "topic": "Guest latency tolerances",
+      "classification": "SYNTHETIC_DEMO_INPUT",
+      "current_value": "Tolerance inputs: backbone 1 ms, SATCOM 800 ms, LOS 20 ms, acoustic 60000 ms; example LOS observed latency is separately 10 ms.",
+      "why": "Ship-link latency describes transport performance, not the guest maximum acceptable delay. All source processing deadlines are also null and distinct from transport tolerance.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/link_latency_ms",
+          "value": {
+            "backbone": 1,
+            "satcom": 800,
+            "los": 20,
+            "acoustic": 60000
+          }
+        },
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/links",
+          "value": {
+            "backbone": {
+              "connected": true,
+              "available_mbps": 20000,
+              "latency_ms": 1
+            },
+            "satcom": {
+              "connected": true,
+              "available_mbps": 8,
+              "latency_ms": 800
+            },
+            "los": {
+              "connected": true,
+              "available_mbps": 20,
+              "latency_ms": 10
+            },
+            "acoustic": {
+              "connected": true,
+              "available_mbps": 0.005,
+              "latency_ms": 60000
+            }
+          }
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests",
+        "physical_model/resource_models/datalinks.py:evaluate"
+      ],
+      "effect_on_results": "Latency PASS only compares simulated observations against assumed tolerances; it cannot establish application deadlines.",
+      "resolution": "Declare guest message deadlines, jitter and data-freshness requirements; measure transport performance independently.",
+      "sensitivity": null
+    },
+    {
+      "id": "MODE-01",
+      "topic": "G3 deployed survey electrical load",
+      "classification": "SYNTHETIC_DEMO_INPUT",
+      "current_value": "Explicit profile survey_power_kw=1.0, separate from canonical standby=1 kW and charging=25 kW.",
+      "why": "G3 explicitly says deployed ship-side power is unspecified. The profile value is a demo placeholder, not supported merely because standby has the same number.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/guest_resource_profiles/G3/survey_power_kw",
+          "value": 1
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 1,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Cradle standby draw."
+            },
+            {
+              "id": "charging",
+              "power_kw": {
+                "min": null,
+                "nominal": 25,
+                "peak": null
+              },
+              "max_duration_minutes": 60,
+              "interruptible": false,
+              "capability_fraction": null,
+              "notes": "Noninterruptible charge after each 40-minute survey leg."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/operational_modes/0/notes",
+          "value": "Each survey leg lasts 40 minutes. Ship-side electrical draw while deployed is not explicitly specified; do not assume the standby value applies."
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests"
+      ],
+      "effect_on_results": "Power and loop margins during surveying depend directly on this estimate. Charging plus surveying is rejected.",
+      "resolution": "Obtain deployed-load requirements or keep source-supported power UNKNOWN. No justified numerical survey-power range is available.",
+      "sensitivity": null
+    },
+    {
+      "id": "MODE-07",
+      "topic": "Canonical peak scope restriction",
+      "classification": "MODEL_SCOPE_RESTRICTION",
+      "current_value": "For null source peaks the sustained simulation uses zero extra peak, while source evidence stays UNKNOWN. A supplied peak is read; any positive extra peak needs a separate peak_duration_s_by_mode profile entry.",
+      "why": "The previous register omitted this behavior. Zero is not a physical declaration of no startup/peak load.",
+      "source_refs": [
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "full",
+              "power_kw": {
+                "min": null,
+                "nominal": 45,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous."
+            },
+            {
+              "id": "low_power",
+              "power_kw": {
+                "min": null,
+                "nominal": 8,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": 0.3,
+              "notes": "70% capability loss relative to full mode."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "continuous",
+              "power_kw": {
+                "min": null,
+                "nominal": 6,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous base draw."
+            },
+            {
+              "id": "winch_operation",
+              "power_kw": {
+                "min": null,
+                "nominal": 20,
+                "peak": null
+              },
+              "max_duration_minutes": 5,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "20 kW total sustained draw for 5 minutes while winch operates (not +20 kW above baseline)."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 1,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Cradle standby draw."
+            },
+            {
+              "id": "charging",
+              "power_kw": {
+                "min": null,
+                "nominal": 25,
+                "peak": null
+              },
+              "max_duration_minutes": 60,
+              "interruptible": false,
+              "capability_fraction": null,
+              "notes": "Noninterruptible charge after each 40-minute survey leg."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "active",
+              "power_kw": {
+                "min": null,
+                "nominal": 1.5,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous; air-cooled."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 2,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Standby demand."
+            },
+            {
+              "id": "charging_initial",
+              "power_kw": {
+                "min": null,
+                "nominal": 35,
+                "peak": null
+              },
+              "max_duration_minutes": 20,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "35 kW for 20 minutes."
+            },
+            {
+              "id": "charging_followup",
+              "power_kw": {
+                "min": null,
+                "nominal": 10,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "10 kW after first 20 minutes of charge; remaining duration not specified."
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests"
+      ],
+      "effect_on_results": "A simulated electrical PASS cannot establish peak adequacy; report source evidence UNKNOWN.",
+      "resolution": "Provide real peak power and duration evidence. A sustained-mode duration is never reused as an electrical-peak duration.",
+      "sensitivity": null
+    },
+    {
+      "id": "TIME-01",
+      "topic": "Illustrative execution-time evidence",
+      "classification": "SYNTHETIC_DEMO_INPUT",
+      "current_value": "3000/200/500/6000/20 ms estimates, verified=false; host deadlines remain 30000/2000/5000/60000/200 ms.",
+      "why": "No target-machine measurements or WCET arguments are included. The previous Qualcomm claim had no evidence in these files and is removed.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/timing",
+          "value": {
+            "admission": {
+              "worst_case_ms": 3000.0,
+              "verified": false
+            },
+            "arbitration": {
+              "worst_case_ms": 200.0,
+              "verified": false
+            },
+            "first_shed": {
+              "worst_case_ms": 500.0,
+              "verified": false
+            },
+            "full_shed": {
+              "worst_case_ms": 6000.0,
+              "verified": false
+            },
+            "safety_command": {
+              "worst_case_ms": 20.0,
+              "verified": false
+            }
+          }
+        },
+        {
+          "file": "physical_model/data/ship_specs.json",
+          "pointer": "/timing_ms",
+          "value": {
+            "admission": 30000,
+            "arbitration": 2000,
+            "first_shed": 5000,
+            "full_shed": 60000,
+            "safety_command": 200
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/timing.py:evaluate",
+        "physical_model/resource_models/__init__.py:evaluate_all"
+      ],
+      "effect_on_results": "Physical simulation status excludes timing. UNKNOWN timing must still gate any final deadline-dependent decision.",
+      "resolution": "Collect independently supported timing evidence on the intended platform; do not merely flip verified to true.",
+      "sensitivity": null
+    },
+    {
+      "id": "STATE-01",
+      "topic": "Demonstration operating snapshot",
+      "classification": "SCENARIO_ASSIGNMENT",
+      "current_value": "Base snapshot: 24 C, sea state 3, wind 22 kn, speed 3 kn, steady/quiet, crew14; runtime overlays scenario fields.",
+      "why": "These are declared fictional inputs, not measured state or proof of the entire mission envelope. Original reference to Annex B for Scenario B was imprecise.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/seawater_c",
+          "value": 24
+        },
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/sea_state",
+          "value": 3
+        },
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/wind_kn",
+          "value": 22
+        },
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/speed_kn",
+          "value": 3
+        },
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/crew",
+          "value": 14
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/ship_state.py:ShipState",
+        "physical_model/snapshot.py:build_snapshot"
+      ],
+      "effect_on_results": "A single favorable snapshot can pass while degraded or hot cases fail.",
+      "resolution": "Evaluate each selected mission state and record what is varied; verify reachable combinations.",
+      "sensitivity": null
+    },
+    {
+      "id": "STATE-02",
+      "topic": "Simulated connectivity and positive readiness flags",
+      "classification": "SCENARIO_ASSIGNMENT",
+      "current_value": "Connected links and capacities/latencies are synthetic; sample runtime asserts roof availability, drone clearance and manoeuvre freedom.",
+      "why": "The program checks input assertions; it does not establish that these conditions are true or geometrically supported.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/example_state.json",
+          "pointer": "/links",
+          "value": {
+            "backbone": {
+              "connected": true,
+              "available_mbps": 20000,
+              "latency_ms": 1
+            },
+            "satcom": {
+              "connected": true,
+              "available_mbps": 8,
+              "latency_ms": 800
+            },
+            "los": {
+              "connected": true,
+              "available_mbps": 20,
+              "latency_ms": 10
+            },
+            "acoustic": {
+              "connected": true,
+              "available_mbps": 0.005,
+              "latency_ms": 60000
+            }
+          }
+        },
+        {
+          "file": "physical_model/data/sample_runtime.json",
+          "pointer": "/hangar_roof_available",
+          "value": true
+        },
+        {
+          "file": "physical_model/data/sample_runtime.json",
+          "pointer": "/drone_clearance_verified",
+          "value": true
+        },
+        {
+          "file": "physical_model/data/sample_runtime.json",
+          "pointer": "/manoeuvre_freedom",
+          "value": true
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/ship_state.py:ShipState",
+        "physical_model/snapshot.py:build_snapshot"
+      ],
+      "effect_on_results": "Default true readiness flags may permit operations that lack evidence.",
+      "resolution": "Use measured/simulated truth with timestamps and quality; missing clearance must not be replaced by an assumed true.",
+      "sensitivity": null
+    },
+    {
+      "id": "MODE-05",
+      "topic": "Crew timing ranges",
+      "classification": "MODEL_APPROXIMATION",
+      "current_value": "14 crew: clear deck 3–5 min, confirm 15–60 s. 6: 8–12 min / 60–180 s. 0: no manual clearing/confirmation.",
+      "why": "These inherited planning ranges are not structured requirements in ship_specs or the supplied G1–G5 files. They are now editable in operational_policy rather than hidden constants.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/operational_policy/deck_clearance_minutes",
+          "value": {
+            "14": [
+              3,
+              5
+            ],
+            "6": [
+              8,
+              12
+            ],
+            "0": null
+          }
+        },
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/operational_policy/human_confirmation_seconds",
+          "value": {
+            "14": [
+              15,
+              60
+            ],
+            "6": [
+              60,
+              180
+            ],
+            "0": null
+          }
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/operational.py:evaluate"
+      ],
+      "effect_on_results": "Pre-cleared deck is necessary but not sufficient proof of autonomous recovery permission.",
+      "resolution": "Provide explicit automation policy and crew task scheduling; no automatic authority inferred.",
+      "sensitivity": null
+    },
+    {
+      "id": "MODE-08",
+      "topic": "Operations with null power mapping",
+      "classification": "SCENARIO_ASSIGNMENT",
+      "current_value": "G3 survey/launch and G4 flight/recovery have null power_mode_id. An explicit runtime power_mode is required. G3 deployed power additionally uses MODE-01 until a source mapping is supplied.",
+      "why": "Null means not specified. It cannot be auto-filled from an operation name or treated as zero load.",
+      "source_refs": [
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/operational_modes",
+          "value": [
+            {
+              "id": "surveying",
+              "power_mode_id": null,
+              "requirements": [
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "eq",
+                  "value": 3,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.course_keeping",
+                  "operator": "eq",
+                  "value": "steady",
+                  "reason": null
+                },
+                {
+                  "field": "navigation.noise_level",
+                  "operator": "eq",
+                  "value": "quiet",
+                  "reason": null
+                },
+                {
+                  "field": "platform.deck_machinery_active",
+                  "operator": "eq",
+                  "value": false,
+                  "reason": null
+                }
+              ],
+              "conflicts": [
+                {
+                  "guest_id": "G2",
+                  "guest_mode": "winch_operation",
+                  "reason": "No deck machinery while listening."
+                },
+                {
+                  "guest_id": "G4",
+                  "guest_mode": "launch_recovery",
+                  "reason": "Drone recovery requires manoeuvre freedom and deck activity, incompatible with quiet surveying."
+                }
+              ],
+              "notes": "Each survey leg lasts 40 minutes. Ship-side electrical draw while deployed is not explicitly specified; do not assume the standby value applies."
+            },
+            {
+              "id": "launch_recovery",
+              "power_mode_id": null,
+              "requirements": [
+                {
+                  "field": "platform.stern_ramp_free",
+                  "operator": "eq",
+                  "value": true,
+                  "reason": null
+                },
+                {
+                  "field": "environment.sea_state",
+                  "operator": "lte",
+                  "value": 4,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "gte",
+                  "value": 4,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "lte",
+                  "value": 8,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.course_keeping",
+                  "operator": "eq",
+                  "value": "steady",
+                  "reason": null
+                }
+              ],
+              "conflicts": [
+                {
+                  "guest_id": "G4",
+                  "guest_mode": "launch_recovery",
+                  "reason": "Flight deck and stern ramp cannot operate simultaneously (Annex A.3)."
+                }
+              ],
+              "notes": null
+            },
+            {
+              "id": "standby",
+              "power_mode_id": "standby",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "Cradle standby, 1 kW ship-side demand."
+            },
+            {
+              "id": "charging",
+              "power_mode_id": "charging",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "25 kW noninterruptible charging for 60 minutes after each 40-minute survey leg."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/operational_modes",
+          "value": [
+            {
+              "id": "launch_recovery",
+              "power_mode_id": null,
+              "requirements": [
+                {
+                  "field": "platform.flight_deck_clear",
+                  "operator": "eq",
+                  "value": true,
+                  "reason": null
+                },
+                {
+                  "field": "environment.wind_knots",
+                  "operator": "lte",
+                  "value": 25,
+                  "reason": null
+                },
+                {
+                  "field": "environment.sea_state",
+                  "operator": "lte",
+                  "value": 4,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "gte",
+                  "value": 5,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.speed_knots",
+                  "operator": "lte",
+                  "value": 12,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.manoeuvre_freedom",
+                  "operator": "eq",
+                  "value": true,
+                  "reason": null
+                },
+                {
+                  "field": "platform.stern_ramp_in_use",
+                  "operator": "eq",
+                  "value": false,
+                  "reason": null
+                },
+                {
+                  "field": "navigation.course_keeping",
+                  "operator": "eq",
+                  "value": "steady",
+                  "reason": "Annex A.3 says flight-deck operations require a steady course once aligned into wind."
+                }
+              ],
+              "conflicts": [
+                {
+                  "guest_id": "G3",
+                  "guest_mode": "launch_recovery",
+                  "reason": "Stern ramp and flight deck are mutually exclusive."
+                },
+                {
+                  "guest_id": "G3",
+                  "guest_mode": "surveying",
+                  "reason": "Survey needs steady quiet 3-kn leg; drone recovery requires 5–12 kn and freedom to manoeuvre."
+                },
+                {
+                  "guest_id": "G2",
+                  "guest_mode": "winch_operation",
+                  "reason": "Deck machinery excluded during recovery."
+                }
+              ],
+              "notes": "Freedom to turn into wind must be available; then establish required steady recovery course."
+            },
+            {
+              "id": "in_flight",
+              "power_mode_id": null,
+              "requirements": [],
+              "conflicts": [],
+              "notes": "Endurance 90 minutes. In emission silence the drone returns home, requiring deck clearance."
+            },
+            {
+              "id": "standby",
+              "power_mode_id": "standby",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "Drone and hangar in standby configuration. 2 kW."
+            },
+            {
+              "id": "charging_initial",
+              "power_mode_id": "charging_initial",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "35 kW charging for the initial 20 minutes."
+            },
+            {
+              "id": "charging_followup",
+              "power_mode_id": "charging_followup",
+              "requirements": [],
+              "conflicts": [],
+              "notes": "10 kW after the initial charging period. Remaining duration unspecified."
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/manifest_adapter.py:normalize_guests"
+      ],
+      "effect_on_results": "Selected nominal power permits conditional demonstration; it does not prove actual operation power or temporal feasibility.",
+      "resolution": "Supply measured operation power profiles and allowed combinations.",
+      "sensitivity": null
+    },
+    {
+      "id": "OP-01",
+      "topic": "Inherited operational screening policy",
+      "classification": "UNVERIFIED_HOST_PLACEHOLDER",
+      "current_value": {
+        "status": "Inherited demonstration screening constants; not supplied as structured host specifications. See OP-01.",
+        "at_sea_installation": {
+          "max_sea_state": 3,
+          "max_wind_kn": 20,
+          "min_speed_kn": 4,
+          "max_speed_kn": 8
+        },
+        "drone_mass_limit_kg": 150,
+        "g4_endurance_minutes": 90,
+        "crew_levels": [
+          0,
+          6,
+          14
+        ],
+        "deck_clearance_minutes": {
+          "14": [
+            3,
+            5
+          ],
+          "6": [
+            8,
+            12
+          ],
+          "0": null
+        },
+        "human_confirmation_seconds": {
+          "14": [
+            15,
+            60
+          ],
+          "6": [
+            60,
+            180
+          ],
+          "0": null
+        }
+      },
+      "why": "150 kg drone limit and at-sea weather limits were constants in the uploaded engine but are absent as structured ship_specs requirements. G4 endurance 90 min is in its free-text operation note. Values are retained visibly in profiles; this is not independent source verification.",
+      "source_refs": [
+        {
+          "file": "physical_model/data/resource_profiles.json",
+          "pointer": "/operational_policy",
+          "value": {
+            "status": "Inherited demonstration screening constants; not supplied as structured host specifications. See OP-01.",
+            "at_sea_installation": {
+              "max_sea_state": 3,
+              "max_wind_kn": 20,
+              "min_speed_kn": 4,
+              "max_speed_kn": 8
+            },
+            "drone_mass_limit_kg": 150,
+            "g4_endurance_minutes": 90,
+            "crew_levels": [
+              0,
+              6,
+              14
+            ],
+            "deck_clearance_minutes": {
+              "14": [
+                3,
+                5
+              ],
+              "6": [
+                8,
+                12
+              ],
+              "0": null
+            },
+            "human_confirmation_seconds": {
+              "14": [
+                15,
+                60
+              ],
+              "6": [
+                60,
+                180
+              ],
+              "0": null
+            }
+          }
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/operational_modes/1/notes",
+          "value": "Endurance 90 minutes. In emission silence the drone returns home, requiring deck clearance."
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/installation",
+          "value": [
+            {
+              "operation": "install_assembly",
+              "component_ids": [
+                "vehicle_and_cradle"
+              ],
+              "port_only": true,
+              "crew_required": 4,
+              "duration_minutes": 360,
+              "at_sea_window": null,
+              "notes": "Cradle and vehicle assembly installed in port."
+            },
+            {
+              "operation": "swap_vehicle_only",
+              "operation_target": "vehicle",
+              "component_ids": [
+                "vehicle_and_cradle"
+              ],
+              "port_only": false,
+              "crew_required": 4,
+              "duration_minutes": 45,
+              "at_sea_window": "Annex A.11",
+              "notes": "Only the vehicle may be swapped at sea. The cradle remains installed."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/installation",
+          "value": [
+            {
+              "operation": "install_component",
+              "component_ids": [
+                "hangar"
+              ],
+              "port_only": true,
+              "crew_required": 4,
+              "duration_minutes": 240,
+              "at_sea_window": null,
+              "notes": "Hangar port only."
+            },
+            {
+              "operation": "swap_component",
+              "component_ids": [
+                "drone"
+              ],
+              "port_only": false,
+              "crew_required": 3,
+              "duration_minutes": 30,
+              "at_sea_window": "Annex A.11",
+              "notes": "Drone swappable at sea only in A.11 installation window."
+            }
+          ]
+        }
+      ],
+      "implementation_refs": [
+        "physical_model/resource_models/operational.py:evaluate",
+        "physical_model/resource_models/operational.py:_install_checks"
+      ],
+      "effect_on_results": "Changes can alter eligibility of swaps, drone mass and endurance screening. Crew planning ranges are explained in MODE-05.",
+      "resolution": "Add supported structured operational limits to the authoritative host data and remove the corresponding profile constants.",
+      "sensitivity": null
+    }
+  ],
+  "unresolved_inputs": [
+    {
+      "id": "U01",
+      "topic": "All guest compute requirements",
+      "source_refs": [
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/compute",
+          "value": {
+            "cpu_cores": null,
+            "ram_gb": null,
+            "accelerator_units": null,
+            "storage_gb": null
+          }
+        }
+      ],
+      "action": "Benchmark or obtain declared demands; demo profiles are not evidence."
+    },
+    {
+      "id": "U02",
+      "topic": "All guest electrical peak/minimum needs",
+      "source_refs": [
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "full",
+              "power_kw": {
+                "min": null,
+                "nominal": 45,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous."
+            },
+            {
+              "id": "low_power",
+              "power_kw": {
+                "min": null,
+                "nominal": 8,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": 0.3,
+              "notes": "70% capability loss relative to full mode."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "continuous",
+              "power_kw": {
+                "min": null,
+                "nominal": 6,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous base draw."
+            },
+            {
+              "id": "winch_operation",
+              "power_kw": {
+                "min": null,
+                "nominal": 20,
+                "peak": null
+              },
+              "max_duration_minutes": 5,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "20 kW total sustained draw for 5 minutes while winch operates (not +20 kW above baseline)."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 1,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Cradle standby draw."
+            },
+            {
+              "id": "charging",
+              "power_kw": {
+                "min": null,
+                "nominal": 25,
+                "peak": null
+              },
+              "max_duration_minutes": 60,
+              "interruptible": false,
+              "capability_fraction": null,
+              "notes": "Noninterruptible charge after each 40-minute survey leg."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "active",
+              "power_kw": {
+                "min": null,
+                "nominal": 1.5,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Continuous; air-cooled."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/power_modes",
+          "value": [
+            {
+              "id": "standby",
+              "power_kw": {
+                "min": null,
+                "nominal": 2,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "Standby demand."
+            },
+            {
+              "id": "charging_initial",
+              "power_kw": {
+                "min": null,
+                "nominal": 35,
+                "peak": null
+              },
+              "max_duration_minutes": 20,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "35 kW for 20 minutes."
+            },
+            {
+              "id": "charging_followup",
+              "power_kw": {
+                "min": null,
+                "nominal": 10,
+                "peak": null
+              },
+              "max_duration_minutes": null,
+              "interruptible": null,
+              "capability_fraction": null,
+              "notes": "10 kW after first 20 minutes of charge; remaining duration not specified."
+            }
+          ]
+        }
+      ],
+      "action": "Preserve null; sustained check does not validate peaks."
+    },
+    {
+      "id": "U03",
+      "topic": "Processing and per-link latency requirements",
+      "source_refs": [
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        },
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/response_time",
+          "value": {
+            "max_processing_latency_ms": null
+          }
+        }
+      ],
+      "action": "Guest processing deadline and link tolerance require separate inputs."
+    },
+    {
+      "id": "U04",
+      "topic": "G3 deployed power/acoustic demand",
+      "source_refs": [
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/documented_unknowns",
+          "value": [
+            "Separate vehicle/cradle masses and footprint not provided.",
+            "Ship-side power draw during deployed surveying not provided.",
+            "Per-guest acoustic bandwidth, compute and response time not specified."
+          ]
+        }
+      ],
+      "action": "Do not infer requirements from standby or host acoustic capacity."
+    },
+    {
+      "id": "U05",
+      "topic": "Equipment dimensions and actual hangar/roof limits",
+      "source_refs": [
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/assembly/components",
+          "value": [
+            {
+              "id": "ocean_module",
+              "name": "Ocean/weather assembly: winch and probe",
+              "mass_kg": 3500,
+              "footprint_m2": null
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G3_seabed_inspection_vehicle_and_cradle.json",
+          "pointer": "/assembly/components",
+          "value": [
+            {
+              "id": "vehicle_and_cradle",
+              "name": "UUV and cradle assembly",
+              "mass_kg": 5500,
+              "footprint_m2": null
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/assembly/components",
+          "value": [
+            {
+              "id": "drone",
+              "name": "VTOL rescue drone",
+              "mass_kg": 140,
+              "footprint_m2": null
+            },
+            {
+              "id": "hangar",
+              "name": "Flight-deck hangar",
+              "mass_kg": 900,
+              "footprint_m2": null
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/assembly/components",
+          "value": [
+            {
+              "id": "compute_node",
+              "name": "Emergency communications / edge compute module",
+              "mass_kg": 3000,
+              "footprint_m2": null
+            },
+            {
+              "id": "antenna",
+              "name": "External antenna",
+              "mass_kg": 25,
+              "footprint_m2": 0.3
+            }
+          ]
+        }
+      ],
+      "action": "Replace unverified boxes/limits with supported data."
+    },
+    {
+      "id": "U06",
+      "topic": "G1/G2 shore transport and buffering",
+      "source_refs": [
+        {
+          "file": "data/guests/G1_passive_radio_sensor.json",
+          "pointer": "/resources/data_links",
+          "value": [
+            {
+              "type": "backbone",
+              "bandwidth_mbps": {
+                "min": null,
+                "nominal": 50,
+                "max": null
+              },
+              "disabled_in_emission_silence": false,
+              "notes": null
+            },
+            {
+              "type": "shore_link_transport_unspecified",
+              "bandwidth_mbps": {
+                "min": null,
+                "nominal": 0.2,
+                "max": null
+              },
+              "disabled_in_emission_silence": true,
+              "notes": "200 kbit/s shore demand. Transport is not specified; passive sensing itself remains compatible with silence."
+            }
+          ]
+        },
+        {
+          "file": "data/guests/G2_ocean_and_weather_module.json",
+          "pointer": "/resources/data_links",
+          "value": [
+            {
+              "type": "backbone",
+              "bandwidth_mbps": {
+                "min": null,
+                "nominal": 5,
+                "max": null
+              },
+              "disabled_in_emission_silence": false,
+              "notes": null
+            },
+            {
+              "type": "shore_link_transport_unspecified",
+              "bandwidth_mbps": {
+                "min": null,
+                "nominal": 0.5,
+                "max": null
+              },
+              "disabled_in_emission_silence": true,
+              "notes": "500 kbit/s buffered transfer to shore; transport unspecified."
+            }
+          ]
+        }
+      ],
+      "action": "G1 buffering not established; G2 capacity/duration unknown."
+    },
+    {
+      "id": "U07",
+      "topic": "G4 charging followup and low-G5 bandwidth",
+      "source_refs": [
+        {
+          "file": "data/guests/G4_vtol_rescue_drone_and_hangar.json",
+          "pointer": "/resources/power_modes/2",
+          "value": {
+            "id": "charging_followup",
+            "power_kw": {
+              "min": null,
+              "nominal": 10,
+              "peak": null
+            },
+            "max_duration_minutes": null,
+            "interruptible": null,
+            "capability_fraction": null,
+            "notes": "10 kW after first 20 minutes of charge; remaining duration not specified."
+          }
+        },
+        {
+          "file": "data/guests/G5_emergency_communications_and_edge_compute_node.json",
+          "pointer": "/resources/data_links",
+          "value": [
+            {
+              "type": "satcom",
+              "bandwidth_mbps": {
+                "min": null,
+                "nominal": null,
+                "max": 6
+              },
+              "disabled_in_emission_silence": true,
+              "notes": "Consumes up to 6 Mbit/s of the ship's shared up-to-8-Mbit/s SATCOM."
+            },
+            {
+              "type": "backbone",
+              "bandwidth_mbps": {
+                "min": null,
+                "nominal": 1000,
+                "max": null
+              },
+              "disabled_in_emission_silence": false,
+              "notes": null
+            }
+          ]
+        }
+      ],
+      "action": "No duration/rate scaling invented; explicit selected upper-bound policy only."
+    }
+  ],
+  "findings": [
+    {
+      "id": "FIX01",
+      "severity": "high",
+      "finding": "G5 heat split contradicted its chilled-water load rule.",
+      "resolution": "Corrected adapter; removed antenna_heat_kw profiles."
+    },
+    {
+      "id": "FIX02",
+      "severity": "high",
+      "finding": "70% capability loss was used to invent 1.8 Mbps low-power bandwidth.",
+      "resolution": "Removed; reserve manifest upper bound for both modes and label actual low-power rate unresolved."
+    },
+    {
+      "id": "FIX03",
+      "severity": "medium",
+      "finding": "G1 buffering and source-derived guest latency requirements were asserted without support.",
+      "resolution": "Corrected register, README, code comment and data contract."
+    },
+    {
+      "id": "FIX04",
+      "severity": "high",
+      "finding": "Several G1–G5 link requirements were duplicated as constants in adapter.",
+      "resolution": "Adapter now reads canonical numeric rates; profile only supplies missing choices."
+    },
+    {
+      "id": "FIX05",
+      "severity": "medium",
+      "finding": "Surveying compute profile for G3 was present but unused when power_mode=standby.",
+      "resolution": "Select explicit surveying compute profile; put survey power in editable profile."
+    },
+    {
+      "id": "FIX06",
+      "severity": "high",
+      "finding": "assumption_ids_used omitted baseline geometry, latency, host reserve and zero-peak scope.",
+      "resolution": "Expanded conservative trace list and explicit source-evidence gaps. Baseline IDs may also appear for inactive subchecks; they are context, not proof of execution."
+    },
+    {
+      "id": "FIX07",
+      "severity": "medium",
+      "finding": "All source rules and demo inputs were labeled assumptions; unused shape profiles obscured active choices.",
+      "resolution": "Classified records separately; removed unreachable per-guest dimension entries."
+    },
+    {
+      "id": "LIMIT02",
+      "severity": "high",
+      "finding": "A physical PASS can rely on synthetic geometry, compute and latency plus unverified timing.",
+      "resolution": "Canonical reports now include CONDITIONAL_SIMULATION, source_evidence_status UNKNOWN and full_admission_status NOT_EVALUATED."
+    },
+    {
+      "id": "FIX08",
+      "severity": "high",
+      "finding": "Updated guest operation power references and corrected conflict IDs were not integrated.",
+      "resolution": "Replaced all five guest copies byte-for-byte with the newly attached files; validate and use their fixed/allowed power mappings."
+    },
+    {
+      "id": "FIX09",
+      "severity": "high",
+      "finding": "Battery deadline was checked against a fresh 12-minute ETA budget every snapshot.",
+      "resolution": "Use source event limits and require elapsed time since threshold crossing; missing evidence stays UNKNOWN."
+    },
+    {
+      "id": "FIX10",
+      "severity": "medium",
+      "finding": "G5 roof placement incorrectly required G4 to be installed despite the source allowing an existing roof.",
+      "resolution": "Use the canonical roof-availability and drone-clearance conditions."
+    },
+    {
+      "id": "FIX11",
+      "severity": "medium",
+      "finding": "Installation action labels and durations were ignored; some operational source values were hard-coded.",
+      "resolution": "Match updated operation/target records and their crew/time demands. Read drone mass, battery deadline, charge duration and radar loss from source data. Expose remaining policy constants in profiles."
+    },
+    {
+      "id": "FIX12",
+      "severity": "medium",
+      "finding": "The requested ship_state.py, constraints.py and snapshot.py interfaces were absent.",
+      "resolution": "Added immutable state updates, constraint aggregation and deterministic traceable snapshots while preserving evaluate_canonical."
+    },
+    {
+      "id": "LIMIT01",
+      "severity": "high",
+      "finding": "Snapshot checks do not schedule trajectories, thermal buffering, cranes, crew tasks, autonomy permissions, recovery alignment or the full mission envelope.",
+      "resolution": "Expose NOT_EVALUATED full admission and UNKNOWN source evidence; downstream decision/timeline engine must cover these."
+    }
+  ],
+  "summary": {
+    "assumption_or_scenario_records": 25,
+    "source_rule_records": 8,
+    "unresolved_input_groups": 7,
+    "classification_counts": {
+      "NARROWED_REFERENCE": 3,
+      "SCENARIO_ASSIGNMENT": 6,
+      "MODEL_APPROXIMATION": 5,
+      "UNVERIFIED_HOST_PLACEHOLDER": 4,
+      "SYNTHETIC_DEMO_INPUT": 5,
+      "CONSERVATIVE_BOUND": 1,
+      "MODEL_SCOPE_RESTRICTION": 1,
+      "DERIVED_FROM_MANIFEST": 2,
+      "SOURCE_CONFIGURED_RULE": 2,
+      "SOURCE_IMPLEMENTATION_RULE": 2,
+      "SOURCE_RULE_WITH_LIMITED_IMPLEMENTATION": 2
+    }
+  },
+  "integration": "assumptions.json is the reviewable evidence register; executable values live in resource_profiles.json and ship_specs.json. Guest files override demo fields where source values exist. Use ShipState and snapshot.build_snapshot for live dict inputs, or snapshot.load_snapshot for files. After deliberate source edits review this ledger, refresh affected source_refs/hashes, regenerate docs, then run scripts/audit_assumptions.py. Do not blindly refresh source hashes to conceal stale assumptions."
+}

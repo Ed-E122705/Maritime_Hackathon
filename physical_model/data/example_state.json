@@ -1,0 +1,71 @@
+{
+  "gensets_online": 2,
+  "speed_band": "slow",
+  "speed_kn": 3,
+  "online_power_lines": [
+    "port",
+    "stbd"
+  ],
+  "seawater_c": 24,
+  "cooling_fault": false,
+  "active_operations": [],
+  "sea_state": 3,
+  "wind_kn": 22,
+  "course": "steady",
+  "deck_state": "clear",
+  "emission": "normal",
+  "noise": "quiet",
+  "deck_machinery": false,
+  "layered_water": false,
+  "crew": 14,
+  "links": {
+    "backbone": {
+      "connected": true,
+      "available_mbps": 20000,
+      "latency_ms": 1
+    },
+    "satcom": {
+      "connected": true,
+      "available_mbps": 8,
+      "latency_ms": 800
+    },
+    "los": {
+      "connected": true,
+      "available_mbps": 20,
+      "latency_ms": 10
+    },
+    "acoustic": {
+      "connected": true,
+      "available_mbps": 0.005,
+      "latency_ms": 60000
+    }
+  },
+  "compute_nodes_online": [
+    "node1",
+    "node2",
+    "node3",
+    "node4"
+  ],
+  "timing": {
+    "admission": {
+      "worst_case_ms": 3000.0,
+      "verified": false
+    },
+    "arbitration": {
+      "worst_case_ms": 200.0,
+      "verified": false
+    },
+    "first_shed": {
+      "worst_case_ms": 500.0,
+      "verified": false
+    },
+    "full_shed": {
+      "worst_case_ms": 6000.0,
+      "verified": false
+    },
+    "safety_command": {
+      "worst_case_ms": 20.0,
+      "verified": false
+    }
+  }
+}
