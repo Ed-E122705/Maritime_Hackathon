@@ -1,0 +1,163 @@
+{
+  "id": "G4",
+  "name": "VTOL drone and hangar",
+  "installed": true,
+  "mass_kg": 1040,
+  "power_line": "stbd",
+  "placements": [
+    {
+      "location": "hangar",
+      "mass_kg": 1040,
+      "dimensions_m": [
+        8,
+        6,
+        3
+      ],
+      "units": 1
+    }
+  ],
+  "mode": "standby",
+  "modes": {
+    "standby": {
+      "power_kw": 2,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "hangar",
+          "kw": 2
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 0,
+          "max_latency_ms": 1,
+          "required": false
+        },
+        "satcom": {
+          "mbps": 0,
+          "max_latency_ms": 800,
+          "required": false
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 2,
+        "ram_gb": 4,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node3",
+            "cores": 2,
+            "ram_gb": 4,
+            "accelerators": 0
+          }
+        ]
+      }
+    },
+    "recovery": {
+      "power_kw": 35,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "hangar",
+          "kw": 35
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 0,
+          "max_latency_ms": 1,
+          "required": false
+        },
+        "satcom": {
+          "mbps": 0,
+          "max_latency_ms": 800,
+          "required": false
+        },
+        "los": {
+          "mbps": 10,
+          "max_latency_ms": 20,
+          "required": true
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 8,
+        "ram_gb": 16,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node3",
+            "cores": 8,
+            "ram_gb": 16,
+            "accelerators": 0
+          }
+        ]
+      }
+    },
+    "charged": {
+      "power_kw": 10,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "hangar",
+          "kw": 10
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 0,
+          "max_latency_ms": 1,
+          "required": false
+        },
+        "satcom": {
+          "mbps": 0,
+          "max_latency_ms": 800,
+          "required": false
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 2,
+        "ram_gb": 4,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node3",
+            "cores": 2,
+            "ram_gb": 4,
+            "accelerators": 0
+          }
+        ]
+      }
+    }
+  }
+}

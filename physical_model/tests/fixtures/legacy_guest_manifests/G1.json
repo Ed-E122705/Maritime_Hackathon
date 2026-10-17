@@ -1,0 +1,64 @@
+{
+  "id": "G1",
+  "name": "Passive radio sensor",
+  "installed": true,
+  "mass_kg": 45,
+  "power_line": "port",
+  "placements": [
+    {
+      "location": "mast3",
+      "mass_kg": 45,
+      "area_m2": 0.5
+    }
+  ],
+  "mode": "sensing",
+  "modes": {
+    "sensing": {
+      "power_kw": 1.5,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "mast3",
+          "kw": 1.5
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 50,
+          "max_latency_ms": 1,
+          "required": true
+        },
+        "satcom": {
+          "mbps": 0.2,
+          "max_latency_ms": 800,
+          "required": true
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 2,
+        "ram_gb": 4,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node1",
+            "cores": 2,
+            "ram_gb": 4,
+            "accelerators": 0
+          }
+        ]
+      }
+    }
+  }
+}

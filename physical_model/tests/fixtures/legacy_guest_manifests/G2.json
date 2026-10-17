@@ -1,0 +1,116 @@
+{
+  "id": "G2",
+  "name": "Ocean and weather module",
+  "installed": true,
+  "mass_kg": 3500,
+  "power_line": "port",
+  "placements": [
+    {
+      "location": "bay2",
+      "mass_kg": 3500,
+      "dimensions_m": [
+        3,
+        2.4,
+        2.6
+      ],
+      "units": 1
+    }
+  ],
+  "mode": "continuous",
+  "modes": {
+    "continuous": {
+      "power_kw": 6,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "bay2",
+          "kw": 6
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 5,
+          "max_latency_ms": 1,
+          "required": true
+        },
+        "satcom": {
+          "mbps": 0.5,
+          "max_latency_ms": 800,
+          "required": true
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 4,
+        "ram_gb": 8,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node2",
+            "cores": 4,
+            "ram_gb": 8,
+            "accelerators": 0
+          }
+        ]
+      }
+    },
+    "winch": {
+      "power_kw": 20,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "bay2",
+          "kw": 20
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 5,
+          "max_latency_ms": 1,
+          "required": true
+        },
+        "satcom": {
+          "mbps": 0.5,
+          "max_latency_ms": 800,
+          "required": true
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 4,
+        "ram_gb": 8,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node2",
+            "cores": 4,
+            "ram_gb": 8,
+            "accelerators": 0
+          }
+        ]
+      }
+    }
+  }
+}

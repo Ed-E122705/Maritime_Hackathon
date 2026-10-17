@@ -1,0 +1,129 @@
+{
+  "id": "G5",
+  "name": "Emergency comms and edge node",
+  "installed": true,
+  "mass_kg": 3000,
+  "power_line": "stbd",
+  "placements": [
+    {
+      "location": "bay2",
+      "mass_kg": 2975,
+      "dimensions_m": [
+        3,
+        2.4,
+        2.6
+      ],
+      "units": 1
+    },
+    {
+      "location": "mast3",
+      "mass_kg": 25,
+      "area_m2": 0.3
+    }
+  ],
+  "mode": "normal",
+  "modes": {
+    "normal": {
+      "power_kw": 45,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "bay2",
+          "kw": 44
+        },
+        {
+          "location": "mast3",
+          "kw": 1
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 1000,
+          "max_latency_ms": 1,
+          "required": true
+        },
+        "satcom": {
+          "mbps": 6,
+          "max_latency_ms": 800,
+          "required": true
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 20,
+        "ram_gb": 40,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node4",
+            "cores": 20,
+            "ram_gb": 40,
+            "accelerators": 0
+          }
+        ]
+      }
+    },
+    "low_power": {
+      "power_kw": 8,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "bay2",
+          "kw": 7
+        },
+        {
+          "location": "mast3",
+          "kw": 1
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 1000,
+          "max_latency_ms": 1,
+          "required": true
+        },
+        "satcom": {
+          "mbps": 1.8,
+          "max_latency_ms": 800,
+          "required": true
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 4,
+        "ram_gb": 8,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node4",
+            "cores": 4,
+            "ram_gb": 8,
+            "accelerators": 0
+          }
+        ]
+      }
+    }
+  }
+}

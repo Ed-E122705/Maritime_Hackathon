@@ -1,0 +1,163 @@
+{
+  "id": "G3",
+  "name": "Seabed vehicle and cradle",
+  "installed": true,
+  "mass_kg": 5500,
+  "power_line": "port",
+  "placements": [
+    {
+      "location": "bay1",
+      "mass_kg": 5500,
+      "dimensions_m": [
+        6.1,
+        2.4,
+        2.6
+      ],
+      "units": 2
+    }
+  ],
+  "mode": "survey",
+  "modes": {
+    "survey": {
+      "power_kw": 1,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "bay1",
+          "kw": 1
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 0,
+          "max_latency_ms": 1,
+          "required": false
+        },
+        "satcom": {
+          "mbps": 0,
+          "max_latency_ms": 800,
+          "required": false
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0.003,
+          "max_latency_ms": 60000,
+          "required": true
+        }
+      },
+      "compute": {
+        "cores": 8,
+        "ram_gb": 16,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node2",
+            "cores": 8,
+            "ram_gb": 16,
+            "accelerators": 0
+          }
+        ]
+      }
+    },
+    "charging": {
+      "power_kw": 25,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "bay1",
+          "kw": 25
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 100,
+          "max_latency_ms": 1,
+          "required": true
+        },
+        "satcom": {
+          "mbps": 0,
+          "max_latency_ms": 800,
+          "required": false
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 8,
+        "ram_gb": 16,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node2",
+            "cores": 8,
+            "ram_gb": 16,
+            "accelerators": 0
+          }
+        ]
+      }
+    },
+    "standby": {
+      "power_kw": 1,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "bay1",
+          "kw": 1
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 0,
+          "max_latency_ms": 1,
+          "required": false
+        },
+        "satcom": {
+          "mbps": 0,
+          "max_latency_ms": 800,
+          "required": false
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 1,
+        "ram_gb": 2,
+        "accelerators": 0,
+        "storage_tb": 0.1,
+        "allocations": [
+          {
+            "node": "node2",
+            "cores": 1,
+            "ram_gb": 2,
+            "accelerators": 0
+          }
+        ]
+      }
+    }
+  }
+}
