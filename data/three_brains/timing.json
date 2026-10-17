@@ -1,0 +1,24 @@
+{
+  "timing": {
+    "admission": {
+      "worst_case_ms": 3000.0,
+      "verified": false
+    },
+    "arbitration": {
+      "worst_case_ms": 200.0,
+      "verified": false
+    },
+    "first_shed": {
+      "worst_case_ms": 500.0,
+      "verified": false
+    },
+    "full_shed": {
+      "worst_case_ms": 6000.0,
+      "verified": false
+    },
+    "safety_command": {
+      "worst_case_ms": 20.0,
+      "verified": false
+    }
+  }
+}

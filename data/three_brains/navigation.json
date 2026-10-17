@@ -1,0 +1,7 @@
+{
+  "speed_kn": 3,
+  "speed_band": "slow",
+  "course": "steady",
+  "noise": "quiet",
+  "manoeuvre_freedom": true
+}

@@ -1,0 +1,44 @@
+{
+  "gensets_online": 2,
+  "online_power_lines": [
+    "port",
+    "stbd"
+  ],
+  "cooling_fault": false,
+  "deck_state": "clear",
+  "deck_machinery": false,
+  "emission": "normal",
+  "links": {
+    "backbone": {
+      "connected": true,
+      "available_mbps": 20000,
+      "latency_ms": 1
+    },
+    "satcom": {
+      "connected": true,
+      "available_mbps": 8,
+      "latency_ms": 800
+    },
+    "los": {
+      "connected": true,
+      "available_mbps": 20,
+      "latency_ms": 10
+    },
+    "acoustic": {
+      "connected": true,
+      "available_mbps": 0.005,
+      "latency_ms": 60000
+    }
+  },
+  "compute_nodes_online": [
+    "node1",
+    "node2",
+    "node3",
+    "node4"
+  ],
+  "stern_ramp_free": true,
+  "hangar_roof_available": true,
+  "drone_clearance_verified": true,
+  "deck_area_around_bay_clear": true,
+  "own_radar_transmitting_nearby": false
+}
