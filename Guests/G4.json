@@ -1,0 +1,275 @@
+{
+  "schema_version": "1.0",
+  "id": "G4",
+  "name": "VTOL rescue drone and hangar",
+  "source": {
+    "document": "Fincantieri Software-Defined Vessel SHORT, Technical Annex B (guest cards) and B.0 (ontology); Annex A (host-wide conditions)",
+    "guest_card": "G4",
+    "assumptions_added": []
+  },
+  "capability": {
+    "description": "Search-and-rescue airborne capability.",
+    "value_by_mission": {
+      "rescue": "high",
+      "patrol": "medium",
+      "survey": "low",
+      "disaster_relief": null,
+      "default": null
+    }
+  },
+  "criticality": {
+    "safety_critical": false,
+    "mission_criticality": "resolved_from_external_mission_priority_file"
+  },
+  "assembly": {
+    "atomic_for_admission_and_shedding": true,
+    "components": [
+      {
+        "id": "drone",
+        "name": "VTOL rescue drone",
+        "mass_kg": 140,
+        "footprint_m2": null
+      },
+      {
+        "id": "hangar",
+        "name": "Flight-deck hangar",
+        "mass_kg": 900,
+        "footprint_m2": null
+      }
+    ],
+    "requires": [
+      {
+        "type": "part_of",
+        "parent_guest": "G4",
+        "components": [
+          "drone",
+          "hangar"
+        ],
+        "notes": "Single guest, even though drone may be swapped at sea."
+      }
+    ],
+    "excludes": []
+  },
+  "placement": {
+    "configurations": [
+      {
+        "id": "flight_deck_hangar",
+        "preferred": true,
+        "assignments": [
+          {
+            "component_id": "drone",
+            "location": "flight_deck_hangar",
+            "bay_fraction": null,
+            "area_m2": null
+          },
+          {
+            "component_id": "hangar",
+            "location": "flight_deck_hangar",
+            "bay_fraction": null,
+            "area_m2": null
+          }
+        ],
+        "requirements": [],
+        "notes": "Hangar holds one VTOL; drone and hangar together weigh 1,040 kg."
+      }
+    ]
+  },
+  "resources": {
+    "power_modes": [
+      {
+        "id": "standby",
+        "power_kw": {
+          "min": null,
+          "nominal": 2,
+          "peak": null
+        },
+        "max_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": null,
+        "notes": "Standby demand."
+      },
+      {
+        "id": "charging_initial",
+        "power_kw": {
+          "min": null,
+          "nominal": 35,
+          "peak": null
+        },
+        "max_duration_minutes": 20,
+        "interruptible": null,
+        "capability_fraction": null,
+        "notes": "35 kW for 20 minutes."
+      },
+      {
+        "id": "charging_followup",
+        "power_kw": {
+          "min": null,
+          "nominal": 10,
+          "peak": null
+        },
+        "max_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": null,
+        "notes": "10 kW after first 20 minutes of charge; remaining duration not specified."
+      }
+    ],
+    "cooling": {
+      "type": "chilled_water",
+      "electrical_kw_to_heat_kw": 1.0,
+      "chilled_water_load_rule": "equals_electrical_kw",
+      "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+    },
+    "data_links": [
+      {
+        "type": "line_of_sight_video",
+        "bandwidth_mbps": {
+          "min": 5,
+          "nominal": null,
+          "max": 20
+        },
+        "disabled_in_emission_silence": true,
+        "notes": "LOS video rate 5–20 Mbit/s; unavailable in emission silence."
+      }
+    ],
+    "compute": {
+      "cpu_cores": null,
+      "ram_gb": null,
+      "accelerator_units": null,
+      "storage_gb": null
+    },
+    "response_time": {
+      "max_processing_latency_ms": null
+    }
+  },
+  "operational_modes": [
+    {
+      "id": "launch_recovery",
+      "requirements": [
+        {
+          "field": "platform.flight_deck_clear",
+          "operator": "eq",
+          "value": true,
+          "reason": null
+        },
+        {
+          "field": "environment.wind_knots",
+          "operator": "lte",
+          "value": 25,
+          "reason": null
+        },
+        {
+          "field": "environment.sea_state",
+          "operator": "lte",
+          "value": 4,
+          "reason": null
+        },
+        {
+          "field": "navigation.speed_knots",
+          "operator": "gte",
+          "value": 5,
+          "reason": null
+        },
+        {
+          "field": "navigation.speed_knots",
+          "operator": "lte",
+          "value": 12,
+          "reason": null
+        },
+        {
+          "field": "navigation.manoeuvre_freedom",
+          "operator": "eq",
+          "value": true,
+          "reason": null
+        },
+        {
+          "field": "platform.stern_ramp_in_use",
+          "operator": "eq",
+          "value": false,
+          "reason": null
+        },
+        {
+          "field": "navigation.course_keeping",
+          "operator": "eq",
+          "value": "steady",
+          "reason": "Annex A.3 says flight-deck operations require a steady course once aligned into wind."
+        }
+      ],
+      "conflicts": [
+        {
+          "guest_id": "G3",
+          "guest_mode": "launch_recovery",
+          "reason": "Stern ramp and flight deck are mutually exclusive."
+        },
+        {
+          "guest_id": "G3",
+          "guest_mode": "surveying",
+          "reason": "Survey needs steady quiet 3-kn leg; drone recovery requires 5–12 kn and freedom to manoeuvre."
+        },
+        {
+          "guest_id": "G2",
+          "guest_mode": "winch_operation",
+          "reason": "Deck machinery excluded during recovery."
+        }
+      ],
+      "notes": "Freedom to turn into wind must be available; then establish required steady recovery course."
+    },
+    {
+      "id": "in_flight",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "Endurance 90 minutes. In emission silence the drone returns home, requiring deck clearance."
+    }
+  ],
+  "installation": [
+    {
+      "component_ids": [
+        "hangar"
+      ],
+      "port_only": true,
+      "crew_required": 4,
+      "duration_minutes": 240,
+      "at_sea_window": null,
+      "notes": "Hangar port only."
+    },
+    {
+      "component_ids": [
+        "drone"
+      ],
+      "port_only": false,
+      "crew_required": 3,
+      "duration_minutes": 30,
+      "at_sea_window": "Annex A.11",
+      "notes": "Drone swappable at sea only in A.11 installation window."
+    }
+  ],
+  "special_events": [
+    {
+      "type": "battery_emergency",
+      "trigger": {
+        "field": "guest_state.G4.battery_percent",
+        "operator": "lt",
+        "value": 20,
+        "reason": null
+      },
+      "recovery_deadline_minutes": 12,
+      "if_deadline_missed": "ditch"
+    },
+    {
+      "type": "emission_silence",
+      "trigger": {
+        "field": "platform.emission_state",
+        "operator": "eq",
+        "value": "silent",
+        "reason": null
+      },
+      "action": "return_home",
+      "additional_requirement": "flight deck clear"
+    }
+  ],
+  "policy_hints": [],
+  "documented_unknowns": [
+    "Hangar footprint and per-guest compute/processing latency not provided.",
+    "Battery charge profile after first 20 minutes not completely specified."
+  ],
+  "notes": []
+}

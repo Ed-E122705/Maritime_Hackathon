@@ -1,0 +1,293 @@
+{
+  "schema_version": "1.0",
+  "id": "G5",
+  "name": "Emergency communications and edge compute node",
+  "source": {
+    "document": "Fincantieri Software-Defined Vessel SHORT, Technical Annex B (guest cards) and B.0 (ontology); Annex A (host-wide conditions)",
+    "guest_card": "G5",
+    "assumptions_added": []
+  },
+  "capability": {
+    "description": "Restores coastal connectivity and provides edge analytics.",
+    "value_by_mission": {
+      "rescue": "high",
+      "disaster_relief": "high",
+      "default": "low",
+      "survey": null,
+      "patrol": null
+    }
+  },
+  "criticality": {
+    "safety_critical": false,
+    "mission_criticality": "resolved_from_external_mission_priority_file"
+  },
+  "assembly": {
+    "atomic_for_admission_and_shedding": true,
+    "components": [
+      {
+        "id": "compute_node",
+        "name": "Emergency communications / edge compute module",
+        "mass_kg": 3000,
+        "footprint_m2": null
+      },
+      {
+        "id": "antenna",
+        "name": "External antenna",
+        "mass_kg": 25,
+        "footprint_m2": 0.3
+      }
+    ],
+    "requires": [
+      {
+        "type": "part_of",
+        "parent_guest": "G5",
+        "components": [
+          "compute_node",
+          "antenna"
+        ],
+        "notes": "Must admit or shed both components together; antenna may mount on mast or existing hangar roof."
+      }
+    ],
+    "excludes": []
+  },
+  "placement": {
+    "configurations": [
+      {
+        "id": "bay2_mast",
+        "preferred": true,
+        "assignments": [
+          {
+            "component_id": "compute_node",
+            "location": "bay2",
+            "bay_fraction": 1.0,
+            "area_m2": null
+          },
+          {
+            "component_id": "antenna",
+            "location": "mast_slot",
+            "bay_fraction": null,
+            "area_m2": 0.3
+          }
+        ],
+        "requirements": [],
+        "notes": null
+      },
+      {
+        "id": "bay2_hangar_roof",
+        "preferred": true,
+        "assignments": [
+          {
+            "component_id": "compute_node",
+            "location": "bay2",
+            "bay_fraction": 1.0,
+            "area_m2": null
+          },
+          {
+            "component_id": "antenna",
+            "location": "hangar_roof",
+            "bay_fraction": null,
+            "area_m2": 0.3
+          }
+        ],
+        "requirements": [
+          {
+            "field": "platform.hangar_roof_available",
+            "operator": "eq",
+            "value": true,
+            "reason": null
+          },
+          {
+            "field": "platform.drone_clearance_verified",
+            "operator": "eq",
+            "value": true,
+            "reason": null
+          }
+        ],
+        "notes": "Alternative to mast. Antenna uses hangar/flight-deck stability factor ×1.2; check drone clearance."
+      },
+      {
+        "id": "half_bay1_mast",
+        "preferred": false,
+        "assignments": [
+          {
+            "component_id": "compute_node",
+            "location": "bay1",
+            "bay_fraction": 0.5,
+            "area_m2": null
+          },
+          {
+            "component_id": "antenna",
+            "location": "mast_slot",
+            "bay_fraction": null,
+            "area_m2": 0.3
+          }
+        ],
+        "requirements": [],
+        "notes": null
+      },
+      {
+        "id": "half_bay1_hangar_roof",
+        "preferred": false,
+        "assignments": [
+          {
+            "component_id": "compute_node",
+            "location": "bay1",
+            "bay_fraction": 0.5,
+            "area_m2": null
+          },
+          {
+            "component_id": "antenna",
+            "location": "hangar_roof",
+            "bay_fraction": null,
+            "area_m2": 0.3
+          }
+        ],
+        "requirements": [
+          {
+            "field": "platform.hangar_roof_available",
+            "operator": "eq",
+            "value": true,
+            "reason": null
+          },
+          {
+            "field": "platform.drone_clearance_verified",
+            "operator": "eq",
+            "value": true,
+            "reason": null
+          }
+        ],
+        "notes": "Alternative antenna location; check drone clearance."
+      }
+    ]
+  },
+  "resources": {
+    "power_modes": [
+      {
+        "id": "full",
+        "power_kw": {
+          "min": null,
+          "nominal": 45,
+          "peak": null
+        },
+        "max_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": null,
+        "notes": "Continuous."
+      },
+      {
+        "id": "low_power",
+        "power_kw": {
+          "min": null,
+          "nominal": 8,
+          "peak": null
+        },
+        "max_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": 0.3,
+        "notes": "70% capability loss relative to full mode."
+      }
+    ],
+    "cooling": {
+      "type": "chilled_water",
+      "electrical_kw_to_heat_kw": 1.0,
+      "chilled_water_load_rule": "equals_electrical_kw",
+      "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+    },
+    "data_links": [
+      {
+        "type": "satcom",
+        "bandwidth_mbps": {
+          "min": null,
+          "nominal": null,
+          "max": 6
+        },
+        "disabled_in_emission_silence": true,
+        "notes": "Consumes up to 6 Mbit/s of the ship's shared up-to-8-Mbit/s SATCOM."
+      },
+      {
+        "type": "backbone",
+        "bandwidth_mbps": {
+          "min": null,
+          "nominal": 1000,
+          "max": null
+        },
+        "disabled_in_emission_silence": false,
+        "notes": null
+      }
+    ],
+    "compute": {
+      "cpu_cores": null,
+      "ram_gb": null,
+      "accelerator_units": null,
+      "storage_gb": null
+    },
+    "response_time": {
+      "max_processing_latency_ms": null
+    }
+  },
+  "operational_modes": [
+    {
+      "id": "operating",
+      "requirements": [
+        {
+          "field": "platform.emission_state",
+          "operator": "neq",
+          "value": "silent",
+          "reason": "G5 excludes emission silence."
+        }
+      ],
+      "conflicts": [],
+      "notes": "Full or low-power operation cannot provide transmitting connectivity during emission silence."
+    }
+  ],
+  "installation": [
+    {
+      "component_ids": [
+        "compute_node"
+      ],
+      "port_only": true,
+      "crew_required": 4,
+      "duration_minutes": 360,
+      "at_sea_window": null,
+      "notes": "Main module port-only, 6 hours."
+    },
+    {
+      "component_ids": [
+        "antenna"
+      ],
+      "port_only": true,
+      "crew_required": 2,
+      "duration_minutes": 120,
+      "at_sea_window": null,
+      "notes": "Antenna installation port-only, 2 hours."
+    },
+    {
+      "component_ids": [],
+      "port_only": false,
+      "crew_required": null,
+      "duration_minutes": null,
+      "at_sea_window": null,
+      "notes": "At sea, only logical changes such as deploying a new analytics workload; no physical installation."
+    }
+  ],
+  "special_events": [],
+  "policy_hints": [
+    {
+      "type": "shedding_preference",
+      "mission": "default",
+      "rank": "first_to_shed",
+      "notes": "Default degradation policy hint from Annex B; mission file still governs priority."
+    },
+    {
+      "type": "shedding_preference",
+      "mission": "disaster_relief",
+      "rank": "last_to_shed",
+      "notes": "Disaster-relief mission exception from Annex B."
+    }
+  ],
+  "documented_unknowns": [
+    "Power line, compute resource allocation, and per-guest response deadline not given.",
+    "Physical module footprint and physical prerequisite for alternate hangar-roof placement need verification in the ship state."
+  ],
+  "notes": []
+}
