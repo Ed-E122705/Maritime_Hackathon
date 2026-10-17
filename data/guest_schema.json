@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/vesselos/guest_schema.json",
+  "title": "VesselOS guest manifest v1.0",
+  "description": "Shared machine-readable format for the five Annex B guest cards. Null denotes unspecified, not zero.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "source",
+    "capability",
+    "criticality",
+    "assembly",
+    "placement",
+    "resources",
+    "operational_modes",
+    "installation",
+    "special_events",
+    "policy_hints",
+    "documented_unknowns",
+    "notes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^G[1-9][0-9]*$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "document",
+        "guest_card",
+        "assumptions_added"
+      ]
+    },
+    "capability": {
+      "type": "object",
+      "required": [
+        "description",
+        "value_by_mission"
+      ]
+    },
+    "criticality": {
+      "type": "object",
+      "required": [
+        "safety_critical",
+        "mission_criticality"
+      ],
+      "properties": {
+        "safety_critical": {
+          "type": "boolean"
+        },
+        "mission_criticality": {
+          "type": "string"
+        }
+      }
+    },
+    "assembly": {
+      "type": "object",
+      "required": [
+        "atomic_for_admission_and_shedding",
+        "components",
+        "requires",
+        "excludes"
+      ],
+      "properties": {
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "mass_kg",
+              "footprint_m2"
+            ]
+          }
+        },
+        "requires": {
+          "type": "array"
+        },
+        "excludes": {
+          "type": "array"
+        }
+      }
+    },
+    "placement": {
+      "type": "object",
+      "required": [
+        "configurations"
+      ],
+      "properties": {
+        "configurations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "preferred",
+              "assignments",
+              "requirements",
+              "notes"
+            ]
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "required": [
+        "power_modes",
+        "cooling",
+        "data_links",
+        "compute",
+        "response_time"
+      ],
+      "properties": {
+        "power_modes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "power_kw",
+              "max_duration_minutes",
+              "interruptible",
+              "capability_fraction",
+              "notes"
+            ],
+            "properties": {
+              "power_kw": {
+                "type": "object",
+                "required": [
+                  "min",
+                  "nominal",
+                  "peak"
+                ],
+                "properties": {
+                  "min": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "nominal": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "peak": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "cooling": {
+          "type": "object"
+        },
+        "data_links": {
+          "type": "array"
+        },
+        "compute": {
+          "type": "object"
+        },
+        "response_time": {
+          "type": "object"
+        }
+      }
+    },
+    "operational_modes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "requirements",
+          "conflicts"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "power_mode_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "allowed_power_mode_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "requirements": {
+            "type": "array"
+          },
+          "conflicts": {
+            "type": "array"
+          }
+        }
+      }
+    },
+    "installation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "component_ids",
+          "port_only",
+          "crew_required",
+          "duration_minutes"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string"
+          },
+          "operation_target": {
+            "type": "string"
+          },
+          "component_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "port_only": {
+            "type": "boolean"
+          },
+          "crew_required": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "duration_minutes": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "special_events": {
+      "type": "array"
+    },
+    "policy_hints": {
+      "type": "array"
+    },
+    "documented_unknowns": {
+      "type": "array"
+    },
+    "notes": {
+      "type": "array"
+    }
+  },
+  "additionalProperties": false
+}

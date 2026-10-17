@@ -1,0 +1,684 @@
+{
+  "meaning": "Explicit demonstration scenarios, not confidence intervals. Source evidence remains incomplete.",
+  "cases": [
+    {
+      "case": "charge_gensets2_24C_fault0_full",
+      "varied_inputs": {
+        "gensets_online": 2,
+        "seawater_c": 24,
+        "cooling_fault": false,
+        "guests": {
+          "G5": {
+            "power_mode": "full"
+          }
+        }
+      },
+      "physical_simulation_status": "PASS",
+      "assessment_status": "UNKNOWN",
+      "electrical": {
+        "demand_kw": 105.0,
+        "capacity_kw": 200.0,
+        "remaining_kw": 95.0,
+        "peak_demand_kw": 105.0,
+        "line_demands_kw": {
+          "port": 25.0,
+          "stbd": 80.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 105.0,
+        "loop_demand_kw": 105.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 28.333333333333343,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 1100.0,
+          "satcom": 6.0,
+          "los": 0.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "a0c8277d0751af4592ba4ff5c88c3534fba00f42798f02ca5e424d6531bb3ef0",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "charge_gensets1_30C_fault1_full",
+      "varied_inputs": {
+        "gensets_online": 1,
+        "seawater_c": 30,
+        "cooling_fault": true,
+        "guests": {
+          "G5": {
+            "power_mode": "full"
+          }
+        }
+      },
+      "physical_simulation_status": "FAIL",
+      "assessment_status": "FAIL",
+      "electrical": {
+        "demand_kw": 105.0,
+        "capacity_kw": 100.0,
+        "remaining_kw": -5.0,
+        "peak_demand_kw": 105.0,
+        "line_demands_kw": {
+          "port": 25.0,
+          "stbd": 80.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 105.0,
+        "loop_demand_kw": 105.0,
+        "capacity_kw": 72.0,
+        "remaining_kw": -33.0,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 1100.0,
+          "satcom": 6.0,
+          "los": 0.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [
+        {
+          "name": "continuous_reserve",
+          "status": "FAIL",
+          "demand": 105.0,
+          "capacity": 100.0,
+          "remaining": -5.0,
+          "unit": "kW",
+          "source": "A.1 / selected speed",
+          "reason": "continuous_reserve: requires 105 kW; capacity 100 kW; exceeds by 5 kW.",
+          "resource": "electrical",
+          "constraint_id": "electrical.continuous_reserve"
+        },
+        {
+          "name": "coincident_peak",
+          "status": "FAIL",
+          "demand": 105.0,
+          "capacity": 100.0,
+          "remaining": -5.0,
+          "unit": "kW",
+          "source": "A.1",
+          "reason": "coincident_peak: requires 105 kW; capacity 100 kW; exceeds by 5 kW.",
+          "resource": "electrical",
+          "constraint_id": "electrical.coincident_peak"
+        },
+        {
+          "name": "chilled_water_continuous",
+          "status": "FAIL",
+          "demand": 105.0,
+          "capacity": 72.0,
+          "remaining": -33.0,
+          "unit": "kW",
+          "source": "A.2",
+          "reason": "chilled_water_continuous: requires 105 kW; capacity 72 kW; exceeds by 33 kW.",
+          "resource": "cooling",
+          "constraint_id": "cooling.chilled_water_continuous"
+        }
+      ],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "8dbe1a168a57c46d5021f6704f54866adceb2fe8c8c751ca9bcebe0651520829",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "charge_gensets1_30C_fault1_low_power",
+      "varied_inputs": {
+        "gensets_online": 1,
+        "seawater_c": 30,
+        "cooling_fault": true,
+        "guests": {
+          "G5": {
+            "power_mode": "low_power"
+          }
+        }
+      },
+      "physical_simulation_status": "PASS",
+      "assessment_status": "UNKNOWN",
+      "electrical": {
+        "demand_kw": 68.0,
+        "capacity_kw": 100.0,
+        "remaining_kw": 32.0,
+        "peak_demand_kw": 68.0,
+        "line_demands_kw": {
+          "port": 25.0,
+          "stbd": 43.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 68.0,
+        "loop_demand_kw": 68.0,
+        "capacity_kw": 72.0,
+        "remaining_kw": 4.0,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 1100.0,
+          "satcom": 6.0,
+          "los": 0.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "988a9d417db1ba3afaa23307f933fd1ba66bb4ad06d767576bd24b7fe061a0ab",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "charge_gensets1_24C_fault0_low_power",
+      "varied_inputs": {
+        "gensets_online": 1,
+        "seawater_c": 24,
+        "cooling_fault": false,
+        "guests": {
+          "G5": {
+            "power_mode": "low_power"
+          }
+        }
+      },
+      "physical_simulation_status": "PASS",
+      "assessment_status": "UNKNOWN",
+      "electrical": {
+        "demand_kw": 68.0,
+        "capacity_kw": 100.0,
+        "remaining_kw": 32.0,
+        "peak_demand_kw": 68.0,
+        "line_demands_kw": {
+          "port": 25.0,
+          "stbd": 43.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 68.0,
+        "loop_demand_kw": 68.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 65.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 1100.0,
+          "satcom": 6.0,
+          "los": 0.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "528b678193e36a4e859072738a1484d6efea848ddeacb34fcc92791e3daef919",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "g5_low_satcom_2Mbps",
+      "varied_inputs": {
+        "links": {
+          "satcom": {
+            "available_mbps": 2
+          }
+        }
+      },
+      "physical_simulation_status": "FAIL",
+      "assessment_status": "FAIL",
+      "electrical": {
+        "demand_kw": 68.0,
+        "capacity_kw": 100.0,
+        "remaining_kw": 32.0,
+        "peak_demand_kw": 68.0,
+        "line_demands_kw": {
+          "port": 25.0,
+          "stbd": 43.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 68.0,
+        "loop_demand_kw": 68.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 65.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 1100.0,
+          "satcom": 6.0,
+          "los": 0.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 2.0,
+          "los": 20.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [
+        {
+          "name": "satcom.bandwidth",
+          "status": "FAIL",
+          "demand": 6.0,
+          "capacity": 2.0,
+          "remaining": -4.0,
+          "unit": "Mbps",
+          "source": "A.5 / observed state",
+          "reason": "satcom.bandwidth: requires 6 Mbps; capacity 2 Mbps; exceeds by 4 Mbps.",
+          "resource": "datalinks",
+          "constraint_id": "datalinks.satcom.bandwidth"
+        }
+      ],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "7030b7bbde465528319c10e71e598faeb4e8c901a7ae835091f59d00471c28a0",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "g5_low_satcom_8Mbps",
+      "varied_inputs": {
+        "links": {
+          "satcom": {
+            "available_mbps": 8
+          }
+        }
+      },
+      "physical_simulation_status": "PASS",
+      "assessment_status": "UNKNOWN",
+      "electrical": {
+        "demand_kw": 68.0,
+        "capacity_kw": 100.0,
+        "remaining_kw": 32.0,
+        "peak_demand_kw": 68.0,
+        "line_demands_kw": {
+          "port": 25.0,
+          "stbd": 43.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 68.0,
+        "loop_demand_kw": 68.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 65.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 1100.0,
+          "satcom": 6.0,
+          "los": 0.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "528b678193e36a4e859072738a1484d6efea848ddeacb34fcc92791e3daef919",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "g4_video_5Mbps_on_10Mbps_link",
+      "varied_inputs": {
+        "g4_los_nominal_mbps": 5,
+        "available_los_mbps": 10
+      },
+      "physical_simulation_status": "PASS",
+      "assessment_status": "UNKNOWN",
+      "electrical": {
+        "demand_kw": 2.0,
+        "capacity_kw": 200.0,
+        "remaining_kw": 198.0,
+        "peak_demand_kw": 2.0,
+        "line_demands_kw": {
+          "port": 0.0,
+          "stbd": 2.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 2.0,
+        "loop_demand_kw": 2.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 131.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 0.0,
+          "satcom": 0.0,
+          "los": 5.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 10.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "899850e9a1869809628a6a103e8a4139468e137a25174cce1fa8e25d9ca1ccc2",
+        "profiles": "c893008aa36e7e083270af1e5857091db896f89e0bd6a3c0a484ccbb1d61d914",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "g4_video_10Mbps_on_10Mbps_link",
+      "varied_inputs": {
+        "g4_los_nominal_mbps": 10,
+        "available_los_mbps": 10
+      },
+      "physical_simulation_status": "PASS",
+      "assessment_status": "UNKNOWN",
+      "electrical": {
+        "demand_kw": 2.0,
+        "capacity_kw": 200.0,
+        "remaining_kw": 198.0,
+        "peak_demand_kw": 2.0,
+        "line_demands_kw": {
+          "port": 0.0,
+          "stbd": 2.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 2.0,
+        "loop_demand_kw": 2.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 131.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 0.0,
+          "satcom": 0.0,
+          "los": 10.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 10.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "899850e9a1869809628a6a103e8a4139468e137a25174cce1fa8e25d9ca1ccc2",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "g4_video_20Mbps_on_10Mbps_link",
+      "varied_inputs": {
+        "g4_los_nominal_mbps": 20,
+        "available_los_mbps": 10
+      },
+      "physical_simulation_status": "FAIL",
+      "assessment_status": "FAIL",
+      "electrical": {
+        "demand_kw": 2.0,
+        "capacity_kw": 200.0,
+        "remaining_kw": 198.0,
+        "peak_demand_kw": 2.0,
+        "line_demands_kw": {
+          "port": 0.0,
+          "stbd": 2.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 2.0,
+        "loop_demand_kw": 2.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 131.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 0.0,
+          "satcom": 0.0,
+          "los": 20.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 10.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [
+        {
+          "name": "los.bandwidth",
+          "status": "FAIL",
+          "demand": 20.0,
+          "capacity": 10.0,
+          "remaining": -10.0,
+          "unit": "Mbps",
+          "source": "A.5 / observed state",
+          "reason": "los.bandwidth: requires 20 Mbps; capacity 10 Mbps; exceeds by 10 Mbps.",
+          "resource": "datalinks",
+          "constraint_id": "datalinks.los.bandwidth"
+        }
+      ],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "899850e9a1869809628a6a103e8a4139468e137a25174cce1fa8e25d9ca1ccc2",
+        "profiles": "e316f670c2294e4039e16120bd29ab6152eaca264cf89015fe587d7414735e6d",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "g3_acoustic_capacity_0.001Mbps",
+      "varied_inputs": {
+        "links": {
+          "acoustic": {
+            "available_mbps": 0.001
+          }
+        }
+      },
+      "physical_simulation_status": "FAIL",
+      "assessment_status": "FAIL",
+      "electrical": {
+        "demand_kw": 1.0,
+        "capacity_kw": 200.0,
+        "remaining_kw": 199.0,
+        "peak_demand_kw": 1.0,
+        "line_demands_kw": {
+          "port": 1.0,
+          "stbd": 0.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 1.0,
+        "loop_demand_kw": 1.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 132.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 0.0,
+          "satcom": 0.0,
+          "los": 0.0,
+          "acoustic": 0.003
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.001
+        }
+      },
+      "constraint_violations": [
+        {
+          "name": "acoustic.bandwidth",
+          "status": "FAIL",
+          "demand": 0.003,
+          "capacity": 0.001,
+          "remaining": -0.002,
+          "unit": "Mbps",
+          "source": "A.5 / observed state",
+          "reason": "acoustic.bandwidth: requires 0.003 Mbps; capacity 0.001 Mbps; exceeds by 0.002 Mbps.",
+          "resource": "datalinks",
+          "constraint_id": "datalinks.acoustic.bandwidth"
+        }
+      ],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "37c6762907ea8859400240384687692b6a53adb521872955e4ef4881670112fb",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "g3_acoustic_capacity_0.003Mbps",
+      "varied_inputs": {
+        "links": {
+          "acoustic": {
+            "available_mbps": 0.003
+          }
+        }
+      },
+      "physical_simulation_status": "PASS",
+      "assessment_status": "UNKNOWN",
+      "electrical": {
+        "demand_kw": 1.0,
+        "capacity_kw": 200.0,
+        "remaining_kw": 199.0,
+        "peak_demand_kw": 1.0,
+        "line_demands_kw": {
+          "port": 1.0,
+          "stbd": 0.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 1.0,
+        "loop_demand_kw": 1.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 132.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 0.0,
+          "satcom": 0.0,
+          "los": 0.0,
+          "acoustic": 0.003
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.003
+        }
+      },
+      "constraint_violations": [],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "ebb48c7f0dda45772e213e621d8a3d4faa567ef06d18e1be9508323a74109b96",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    },
+    {
+      "case": "g3_acoustic_capacity_0.005Mbps",
+      "varied_inputs": {
+        "links": {
+          "acoustic": {
+            "available_mbps": 0.005
+          }
+        }
+      },
+      "physical_simulation_status": "PASS",
+      "assessment_status": "UNKNOWN",
+      "electrical": {
+        "demand_kw": 1.0,
+        "capacity_kw": 200.0,
+        "remaining_kw": 199.0,
+        "peak_demand_kw": 1.0,
+        "line_demands_kw": {
+          "port": 1.0,
+          "stbd": 0.0
+        }
+      },
+      "cooling": {
+        "total_heat_kw": 1.0,
+        "loop_demand_kw": 1.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 132.33333333333334,
+        "transient_buffer_credited": false
+      },
+      "datalinks": {
+        "demand_mbps": {
+          "backbone": 0.0,
+          "satcom": 0.0,
+          "los": 0.0,
+          "acoustic": 0.003
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.005
+        }
+      },
+      "constraint_violations": [],
+      "input_sha256": {
+        "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+        "state": "75aefee9ecb2d100986d2b6b2d1f36c3363daa0e4cbd5cdf7196665c1151c045",
+        "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+        "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+      }
+    }
+  ]
+}
