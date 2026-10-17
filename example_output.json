@@ -1,0 +1,1408 @@
+{
+  "status": "PASS",
+  "feasible": true,
+  "physical_feasible": true,
+  "timing_status": "UNKNOWN",
+  "timing_verified": false,
+  "resources": {
+    "electrical": {
+      "resource": "electrical",
+      "status": "PASS",
+      "feasible": true,
+      "checks": [
+        {
+          "name": "G3.peak_duration",
+          "status": "PASS",
+          "reason": "G3: peak duration 0 s, permitted up to 60 s; sustained demand belongs in power_kw.",
+          "source": "A.1"
+        },
+        {
+          "name": "G4.peak_duration",
+          "status": "PASS",
+          "reason": "G4: peak duration 0 s, permitted up to 60 s; sustained demand belongs in power_kw.",
+          "source": "A.1"
+        },
+        {
+          "name": "G5.peak_duration",
+          "status": "PASS",
+          "reason": "G5: peak duration 0 s, permitted up to 60 s; sustained demand belongs in power_kw.",
+          "source": "A.1"
+        },
+        {
+          "name": "continuous_reserve",
+          "status": "PASS",
+          "demand": 48.0,
+          "capacity": 200.0,
+          "remaining": 152.0,
+          "unit": "kW",
+          "source": "A.1 / selected speed",
+          "reason": "continuous_reserve: requires 48 kW; capacity 200 kW; margin 152 kW."
+        },
+        {
+          "name": "coincident_peak",
+          "status": "PASS",
+          "demand": 48.0,
+          "capacity": 450.0,
+          "remaining": 402.0,
+          "unit": "kW",
+          "source": "A.1",
+          "reason": "coincident_peak: requires 48 kW; capacity 450 kW; margin 402 kW."
+        },
+        {
+          "name": "port.continuous",
+          "status": "PASS",
+          "demand": 1.0,
+          "capacity": 150.0,
+          "remaining": 149.0,
+          "unit": "kW",
+          "source": "A.1",
+          "reason": "port.continuous: requires 1 kW; capacity 150 kW; margin 149 kW."
+        },
+        {
+          "name": "port.peak",
+          "status": "PASS",
+          "demand": 1.0,
+          "capacity": 150.0,
+          "remaining": 149.0,
+          "unit": "kW",
+          "source": "A.1; conservative line peak cap",
+          "reason": "port.peak: requires 1 kW; capacity 150 kW; margin 149 kW."
+        },
+        {
+          "name": "stbd.continuous",
+          "status": "PASS",
+          "demand": 47.0,
+          "capacity": 150.0,
+          "remaining": 103.0,
+          "unit": "kW",
+          "source": "A.1",
+          "reason": "stbd.continuous: requires 47 kW; capacity 150 kW; margin 103 kW."
+        },
+        {
+          "name": "stbd.peak",
+          "status": "PASS",
+          "demand": 47.0,
+          "capacity": 150.0,
+          "remaining": 103.0,
+          "unit": "kW",
+          "source": "A.1; conservative line peak cap",
+          "reason": "stbd.peak: requires 47 kW; capacity 150 kW; margin 103 kW."
+        }
+      ],
+      "binding_constraints": [],
+      "reason": "All modeled checks pass.",
+      "details": {
+        "demand_kw": 48.0,
+        "capacity_kw": 200.0,
+        "remaining_kw": 152.0,
+        "peak_demand_kw": 48.0,
+        "line_demands_kw": {
+          "port": 1.0,
+          "stbd": 47.0
+        }
+      }
+    },
+    "cooling": {
+      "resource": "cooling",
+      "status": "PASS",
+      "feasible": true,
+      "checks": [
+        {
+          "name": "G3.heat_balance",
+          "status": "PASS",
+          "reason": "G3: 1 kW electric must equal 1 kW declared heat under A.2.",
+          "source": "A.2"
+        },
+        {
+          "name": "G4.heat_balance",
+          "status": "PASS",
+          "reason": "G4: 2 kW electric must equal 2 kW declared heat under A.2.",
+          "source": "A.2"
+        },
+        {
+          "name": "G5.heat_balance",
+          "status": "PASS",
+          "reason": "G5: 45 kW electric must equal 45 kW declared heat under A.2.",
+          "source": "A.2"
+        },
+        {
+          "name": "chilled_water_continuous",
+          "status": "PASS",
+          "demand": 48.0,
+          "capacity": 133.33333333333334,
+          "remaining": 85.33333333333334,
+          "unit": "kW",
+          "source": "A.2",
+          "reason": "chilled_water_continuous: requires 48 kW; capacity 133.333 kW; margin 85.3333 kW."
+        }
+      ],
+      "binding_constraints": [],
+      "reason": "All modeled checks pass.",
+      "details": {
+        "total_heat_kw": 48.0,
+        "loop_demand_kw": 48.0,
+        "capacity_kw": 133.33333333333334,
+        "remaining_kw": 85.33333333333334,
+        "transient_buffer_credited": false
+      }
+    },
+    "deck": {
+      "resource": "deck",
+      "status": "PASS",
+      "feasible": true,
+      "checks": [
+        {
+          "name": "G3.bay1.length",
+          "status": "PASS",
+          "demand": 6.1,
+          "capacity": 6.1,
+          "remaining": 0.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G3.bay1.length: requires 6.1 m; capacity 6.1 m; margin 0 m."
+        },
+        {
+          "name": "G3.bay1.width",
+          "status": "PASS",
+          "demand": 2.4,
+          "capacity": 2.4,
+          "remaining": 0.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G3.bay1.width: requires 2.4 m; capacity 2.4 m; margin 0 m."
+        },
+        {
+          "name": "G3.bay1.height",
+          "status": "PASS",
+          "demand": 2.6,
+          "capacity": 2.6,
+          "remaining": 0.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G3.bay1.height: requires 2.6 m; capacity 2.6 m; margin 0 m."
+        },
+        {
+          "name": "G4.hangar.length",
+          "status": "PASS",
+          "demand": 8.0,
+          "capacity": 12.0,
+          "remaining": 4.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G4.hangar.length: requires 8 m; capacity 12 m; margin 4 m."
+        },
+        {
+          "name": "G4.hangar.width",
+          "status": "PASS",
+          "demand": 6.0,
+          "capacity": 8.0,
+          "remaining": 2.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G4.hangar.width: requires 6 m; capacity 8 m; margin 2 m."
+        },
+        {
+          "name": "G4.hangar.height",
+          "status": "PASS",
+          "demand": 3.0,
+          "capacity": 4.0,
+          "remaining": 1.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G4.hangar.height: requires 3 m; capacity 4 m; margin 1 m."
+        },
+        {
+          "name": "G5.bay2.length",
+          "status": "PASS",
+          "demand": 3.0,
+          "capacity": 3.0,
+          "remaining": 0.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G5.bay2.length: requires 3 m; capacity 3 m; margin 0 m."
+        },
+        {
+          "name": "G5.bay2.width",
+          "status": "PASS",
+          "demand": 2.4,
+          "capacity": 2.4,
+          "remaining": 0.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G5.bay2.width: requires 2.4 m; capacity 2.4 m; margin 0 m."
+        },
+        {
+          "name": "G5.bay2.height",
+          "status": "PASS",
+          "demand": 2.6,
+          "capacity": 2.6,
+          "remaining": 0.0,
+          "unit": "m",
+          "source": "A.3 / declared envelope",
+          "reason": "G5.bay2.height: requires 2.6 m; capacity 2.6 m; margin 0 m."
+        },
+        {
+          "name": "bay1.packed_length",
+          "status": "PASS",
+          "demand": 6.1,
+          "capacity": 6.1,
+          "remaining": 0.0,
+          "unit": "m",
+          "source": "axis-aligned bay packing assumption",
+          "reason": "bay1.packed_length: requires 6.1 m; capacity 6.1 m; margin 0 m."
+        },
+        {
+          "name": "bay1.mass",
+          "status": "PASS",
+          "demand": 5500.0,
+          "capacity": 8000.0,
+          "remaining": 2500.0,
+          "unit": "kg",
+          "source": "A.3 / assumption",
+          "reason": "bay1.mass: requires 5500 kg; capacity 8000 kg; margin 2500 kg."
+        },
+        {
+          "name": "bay1.occupancy",
+          "status": "PASS",
+          "demand": 2.0,
+          "capacity": 2.0,
+          "remaining": 0.0,
+          "unit": "units",
+          "source": "A.3",
+          "reason": "bay1.occupancy: requires 2 units; capacity 2 units; margin 0 units."
+        },
+        {
+          "name": "bay2.packed_length",
+          "status": "PASS",
+          "demand": 3.0,
+          "capacity": 3.0,
+          "remaining": 0.0,
+          "unit": "m",
+          "source": "axis-aligned bay packing assumption",
+          "reason": "bay2.packed_length: requires 3 m; capacity 3 m; margin 0 m."
+        },
+        {
+          "name": "bay2.mass",
+          "status": "PASS",
+          "demand": 3000.0,
+          "capacity": 4000.0,
+          "remaining": 1000.0,
+          "unit": "kg",
+          "source": "A.3 / assumption",
+          "reason": "bay2.mass: requires 3000 kg; capacity 4000 kg; margin 1000 kg."
+        },
+        {
+          "name": "bay2.occupancy",
+          "status": "PASS",
+          "demand": 1.0,
+          "capacity": 1.0,
+          "remaining": 0.0,
+          "unit": "units",
+          "source": "A.3",
+          "reason": "bay2.occupancy: requires 1 units; capacity 1 units; margin 0 units."
+        },
+        {
+          "name": "hangar.mass",
+          "status": "PASS",
+          "demand": 1040.0,
+          "capacity": 1500.0,
+          "remaining": 460.0,
+          "unit": "kg",
+          "source": "A.3 / assumption",
+          "reason": "hangar.mass: requires 1040 kg; capacity 1500 kg; margin 460 kg."
+        },
+        {
+          "name": "hangar.occupancy",
+          "status": "PASS",
+          "demand": 1.0,
+          "capacity": 1.0,
+          "remaining": 0.0,
+          "unit": "units",
+          "source": "A.3",
+          "reason": "hangar.occupancy: requires 1 units; capacity 1 units; margin 0 units."
+        },
+        {
+          "name": "flight_ramp_exclusion",
+          "status": "PASS",
+          "reason": "Flight deck and ramp operations cannot run together.",
+          "source": "A.3"
+        }
+      ],
+      "binding_constraints": [],
+      "reason": "All modeled checks pass.",
+      "details": {
+        "occupancy_units": {
+          "bay1": 2.0,
+          "hangar": 1.0,
+          "bay2": 1.0
+        },
+        "mass_by_position_kg": {
+          "bay1": 5500.0,
+          "hangar": 1040.0,
+          "bay2": 3000.0
+        }
+      }
+    },
+    "mast": {
+      "resource": "mast",
+      "status": "PASS",
+      "feasible": true,
+      "checks": [
+        {
+          "name": "G5.mast3.unreserved",
+          "status": "PASS",
+          "reason": "G5: mast3 is available to guests.",
+          "source": "A.3"
+        },
+        {
+          "name": "mast3.occupancy",
+          "status": "PASS",
+          "demand": 1.0,
+          "capacity": 1.0,
+          "remaining": 0.0,
+          "unit": "guest",
+          "source": "A.3",
+          "reason": "mast3.occupancy: requires 1 guest; capacity 1 guest; margin 0 guest."
+        },
+        {
+          "name": "mast3.mass",
+          "status": "PASS",
+          "demand": 25.0,
+          "capacity": 60.0,
+          "remaining": 35.0,
+          "unit": "kg",
+          "source": "A.3",
+          "reason": "mast3.mass: requires 25 kg; capacity 60 kg; margin 35 kg."
+        },
+        {
+          "name": "mast3.area",
+          "status": "PASS",
+          "demand": 0.3,
+          "capacity": 0.6,
+          "remaining": 0.3,
+          "unit": "m2",
+          "source": "A.3",
+          "reason": "mast3.area: requires 0.3 m2; capacity 0.6 m2; margin 0.3 m2."
+        }
+      ],
+      "binding_constraints": [],
+      "reason": "All modeled checks pass.",
+      "details": {
+        "free_guest_positions": [],
+        "occupied_guest_positions": [
+          "mast3"
+        ]
+      }
+    },
+    "mass": {
+      "resource": "mass",
+      "status": "PASS",
+      "feasible": true,
+      "checks": [
+        {
+          "name": "added_mass",
+          "status": "PASS",
+          "demand": 9565.0,
+          "capacity": 10000.0,
+          "remaining": 435.0,
+          "unit": "kg",
+          "source": "A.4",
+          "reason": "added_mass: requires 9565 kg; capacity 10000 kg; margin 435 kg."
+        },
+        {
+          "name": "stability_budget",
+          "status": "PASS",
+          "demand": 9823.0,
+          "capacity": 12000.0,
+          "remaining": 2177.0,
+          "unit": "kg-eq",
+          "source": "A.4",
+          "reason": "stability_budget: requires 9823 kg-eq; capacity 12000 kg-eq; margin 2177 kg-eq."
+        },
+        {
+          "name": "G3.mass_balance",
+          "status": "PASS",
+          "reason": "G3: component mass 5500 kg must equal declared 5500 kg.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G4.mass_balance",
+          "status": "PASS",
+          "reason": "G4: component mass 1040 kg must equal declared 1040 kg.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G5.mass_balance",
+          "status": "PASS",
+          "reason": "G5: component mass 3025 kg must equal declared 3025 kg.",
+          "source": "manifest integrity"
+        }
+      ],
+      "binding_constraints": [],
+      "reason": "All modeled checks pass.",
+      "details": {
+        "demand_kg": 9565.0,
+        "capacity_kg": 10000,
+        "equivalent_kg": 9823.0,
+        "parts": [
+          {
+            "guest_id": "G3",
+            "location": "bay1",
+            "mass_kg": 5500.0,
+            "equivalent_kg": 5500.0
+          },
+          {
+            "guest_id": "G4",
+            "location": "hangar",
+            "mass_kg": 1040.0,
+            "equivalent_kg": 1248.0
+          },
+          {
+            "guest_id": "G5",
+            "location": "bay2",
+            "mass_kg": 3000.0,
+            "equivalent_kg": 3000.0
+          },
+          {
+            "guest_id": "G5",
+            "location": "mast3",
+            "mass_kg": 25.0,
+            "equivalent_kg": 75.0
+          }
+        ],
+        "naval_stability": "NOT_VERIFIED"
+      }
+    },
+    "datalinks": {
+      "resource": "datalinks",
+      "status": "PASS",
+      "feasible": true,
+      "checks": [
+        {
+          "name": "backbone.reported_capacity",
+          "status": "PASS",
+          "demand": 20000.0,
+          "capacity": 20000.0,
+          "remaining": 0.0,
+          "unit": "Mbps",
+          "source": "A.5 / narrowed upper bound",
+          "reason": "backbone.reported_capacity: requires 20000 Mbps; capacity 20000 Mbps; margin 0 Mbps."
+        },
+        {
+          "name": "G3.backbone.available",
+          "status": "PASS",
+          "reason": "G3: backbone required but effective capacity is 20000 Mbps.",
+          "source": "A.5 / state"
+        },
+        {
+          "name": "G3.backbone.latency",
+          "status": "PASS",
+          "demand": 1.0,
+          "capacity": 1.0,
+          "remaining": 0.0,
+          "unit": "ms",
+          "source": "COM-06 / synthetic guest tolerance",
+          "reason": "G3.backbone.latency: requires 1 ms; capacity 1 ms; margin 0 ms."
+        },
+        {
+          "name": "G5.backbone.available",
+          "status": "PASS",
+          "reason": "G5: backbone required but effective capacity is 20000 Mbps.",
+          "source": "A.5 / state"
+        },
+        {
+          "name": "G5.backbone.latency",
+          "status": "PASS",
+          "demand": 1.0,
+          "capacity": 1.0,
+          "remaining": 0.0,
+          "unit": "ms",
+          "source": "COM-06 / synthetic guest tolerance",
+          "reason": "G5.backbone.latency: requires 1 ms; capacity 1 ms; margin 0 ms."
+        },
+        {
+          "name": "satcom.reported_capacity",
+          "status": "PASS",
+          "demand": 8.0,
+          "capacity": 8.0,
+          "remaining": 0.0,
+          "unit": "Mbps",
+          "source": "A.5 / narrowed upper bound",
+          "reason": "satcom.reported_capacity: requires 8 Mbps; capacity 8 Mbps; margin 0 Mbps."
+        },
+        {
+          "name": "G5.satcom.available",
+          "status": "PASS",
+          "reason": "G5: satcom required but effective capacity is 8 Mbps.",
+          "source": "A.5 / state"
+        },
+        {
+          "name": "G5.satcom.latency",
+          "status": "PASS",
+          "demand": 800.0,
+          "capacity": 800.0,
+          "remaining": 0.0,
+          "unit": "ms",
+          "source": "COM-06 / synthetic guest tolerance",
+          "reason": "G5.satcom.latency: requires 800 ms; capacity 800 ms; margin 0 ms."
+        },
+        {
+          "name": "los.reported_capacity",
+          "status": "PASS",
+          "demand": 20.0,
+          "capacity": 20.0,
+          "remaining": 0.0,
+          "unit": "Mbps",
+          "source": "A.5 / narrowed upper bound",
+          "reason": "los.reported_capacity: requires 20 Mbps; capacity 20 Mbps; margin 0 Mbps."
+        },
+        {
+          "name": "acoustic.reported_capacity",
+          "status": "PASS",
+          "demand": 0.005,
+          "capacity": 0.005,
+          "remaining": 0.0,
+          "unit": "Mbps",
+          "source": "A.5 / narrowed upper bound",
+          "reason": "acoustic.reported_capacity: requires 0.005 Mbps; capacity 0.005 Mbps; margin 0 Mbps."
+        },
+        {
+          "name": "acoustic.bandwidth",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 0.005,
+          "remaining": 0.005,
+          "unit": "Mbps",
+          "source": "A.5 / observed state",
+          "reason": "acoustic.bandwidth: requires 0 Mbps; capacity 0.005 Mbps; margin 0.005 Mbps."
+        },
+        {
+          "name": "backbone.bandwidth",
+          "status": "PASS",
+          "demand": 1100.0,
+          "capacity": 20000.0,
+          "remaining": 18900.0,
+          "unit": "Mbps",
+          "source": "A.5 / observed state",
+          "reason": "backbone.bandwidth: requires 1100 Mbps; capacity 20000 Mbps; margin 18900 Mbps."
+        },
+        {
+          "name": "los.bandwidth",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 20.0,
+          "remaining": 20.0,
+          "unit": "Mbps",
+          "source": "A.5 / observed state",
+          "reason": "los.bandwidth: requires 0 Mbps; capacity 20 Mbps; margin 20 Mbps."
+        },
+        {
+          "name": "satcom.bandwidth",
+          "status": "PASS",
+          "demand": 6.0,
+          "capacity": 8.0,
+          "remaining": 2.0,
+          "unit": "Mbps",
+          "source": "A.5 / observed state",
+          "reason": "satcom.bandwidth: requires 6 Mbps; capacity 8 Mbps; margin 2 Mbps."
+        }
+      ],
+      "binding_constraints": [],
+      "reason": "All modeled checks pass.",
+      "details": {
+        "demand_mbps": {
+          "backbone": 1100.0,
+          "satcom": 6.0,
+          "los": 0.0,
+          "acoustic": 0.0
+        },
+        "effective_capacity_mbps": {
+          "backbone": 20000.0,
+          "satcom": 8.0,
+          "los": 20.0,
+          "acoustic": 0.005
+        }
+      }
+    },
+    "compute": {
+      "resource": "compute",
+      "status": "PASS",
+      "feasible": true,
+      "checks": [
+        {
+          "name": "rack.accelerator_reserve",
+          "status": "PASS",
+          "demand": 3.0,
+          "capacity": 3.2,
+          "remaining": 0.20000000000000018,
+          "unit": "accelerators",
+          "source": "A.7 / whole device reserve",
+          "reason": "rack.accelerator_reserve: requires 3 accelerators; capacity 3.2 accelerators; margin 0.2 accelerators."
+        },
+        {
+          "name": "G3.cores.allocation_balance",
+          "status": "PASS",
+          "reason": "G3: cores allocation 1 must equal demand 1.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G3.ram_gb.allocation_balance",
+          "status": "PASS",
+          "reason": "G3: ram_gb allocation 2 must equal demand 2.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G3.accelerators.allocation_balance",
+          "status": "PASS",
+          "reason": "G3: accelerators allocation 0 must equal demand 0.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G4.cores.allocation_balance",
+          "status": "PASS",
+          "reason": "G4: cores allocation 2 must equal demand 2.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G4.ram_gb.allocation_balance",
+          "status": "PASS",
+          "reason": "G4: ram_gb allocation 4 must equal demand 4.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G4.accelerators.allocation_balance",
+          "status": "PASS",
+          "reason": "G4: accelerators allocation 0 must equal demand 0.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G5.cores.allocation_balance",
+          "status": "PASS",
+          "reason": "G5: cores allocation 20 must equal demand 20.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G5.ram_gb.allocation_balance",
+          "status": "PASS",
+          "reason": "G5: ram_gb allocation 40 must equal demand 40.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "G5.accelerators.allocation_balance",
+          "status": "PASS",
+          "reason": "G5: accelerators allocation 0 must equal demand 0.",
+          "source": "manifest integrity"
+        },
+        {
+          "name": "node1.cores",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 25.6,
+          "remaining": 25.6,
+          "unit": "cores",
+          "source": "A.7 / node placement",
+          "reason": "node1.cores: requires 0 cores; capacity 25.6 cores; margin 25.6 cores."
+        },
+        {
+          "name": "node1.ram_gb",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 102.4,
+          "remaining": 102.4,
+          "unit": "ram_gb",
+          "source": "A.7 / node placement",
+          "reason": "node1.ram_gb: requires 0 ram_gb; capacity 102.4 ram_gb; margin 102.4 ram_gb."
+        },
+        {
+          "name": "node1.accelerators",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 1.0,
+          "remaining": 1.0,
+          "unit": "accelerators",
+          "source": "A.7 / node placement",
+          "reason": "node1.accelerators: requires 0 accelerators; capacity 1 accelerators; margin 1 accelerators."
+        },
+        {
+          "name": "node2.cores",
+          "status": "PASS",
+          "demand": 1.0,
+          "capacity": 25.6,
+          "remaining": 24.6,
+          "unit": "cores",
+          "source": "A.7 / node placement",
+          "reason": "node2.cores: requires 1 cores; capacity 25.6 cores; margin 24.6 cores."
+        },
+        {
+          "name": "node2.ram_gb",
+          "status": "PASS",
+          "demand": 2.0,
+          "capacity": 102.4,
+          "remaining": 100.4,
+          "unit": "ram_gb",
+          "source": "A.7 / node placement",
+          "reason": "node2.ram_gb: requires 2 ram_gb; capacity 102.4 ram_gb; margin 100.4 ram_gb."
+        },
+        {
+          "name": "node2.accelerators",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 1.0,
+          "remaining": 1.0,
+          "unit": "accelerators",
+          "source": "A.7 / node placement",
+          "reason": "node2.accelerators: requires 0 accelerators; capacity 1 accelerators; margin 1 accelerators."
+        },
+        {
+          "name": "node3.cores",
+          "status": "PASS",
+          "demand": 2.0,
+          "capacity": 25.6,
+          "remaining": 23.6,
+          "unit": "cores",
+          "source": "A.7 / node placement",
+          "reason": "node3.cores: requires 2 cores; capacity 25.6 cores; margin 23.6 cores."
+        },
+        {
+          "name": "node3.ram_gb",
+          "status": "PASS",
+          "demand": 4.0,
+          "capacity": 102.4,
+          "remaining": 98.4,
+          "unit": "ram_gb",
+          "source": "A.7 / node placement",
+          "reason": "node3.ram_gb: requires 4 ram_gb; capacity 102.4 ram_gb; margin 98.4 ram_gb."
+        },
+        {
+          "name": "node3.accelerators",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 1.0,
+          "remaining": 1.0,
+          "unit": "accelerators",
+          "source": "A.7 / node placement",
+          "reason": "node3.accelerators: requires 0 accelerators; capacity 1 accelerators; margin 1 accelerators."
+        },
+        {
+          "name": "node4.cores",
+          "status": "PASS",
+          "demand": 20.0,
+          "capacity": 25.6,
+          "remaining": 5.600000000000001,
+          "unit": "cores",
+          "source": "A.7 / node placement",
+          "reason": "node4.cores: requires 20 cores; capacity 25.6 cores; margin 5.6 cores."
+        },
+        {
+          "name": "node4.ram_gb",
+          "status": "PASS",
+          "demand": 40.0,
+          "capacity": 102.4,
+          "remaining": 62.400000000000006,
+          "unit": "ram_gb",
+          "source": "A.7 / node placement",
+          "reason": "node4.ram_gb: requires 40 ram_gb; capacity 102.4 ram_gb; margin 62.4 ram_gb."
+        },
+        {
+          "name": "node4.accelerators",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 0.0,
+          "remaining": 0.0,
+          "unit": "accelerators",
+          "source": "A.7 / node placement",
+          "reason": "node4.accelerators: requires 0 accelerators; capacity 0 accelerators; margin 0 accelerators."
+        },
+        {
+          "name": "online_rack.accelerators",
+          "status": "PASS",
+          "demand": 0.0,
+          "capacity": 3.2,
+          "remaining": 3.2,
+          "unit": "accelerators",
+          "source": "A.7 / reserve on surviving hardware",
+          "reason": "online_rack.accelerators: requires 0 accelerators; capacity 3.2 accelerators; margin 3.2 accelerators."
+        },
+        {
+          "name": "shared_storage",
+          "status": "PASS",
+          "demand": 0.30000000000000004,
+          "capacity": 16.0,
+          "remaining": 15.7,
+          "unit": "TB",
+          "source": "A.7 / reserve applied",
+          "reason": "shared_storage: requires 0.3 TB; capacity 16 TB; margin 15.7 TB."
+        }
+      ],
+      "binding_constraints": [],
+      "reason": "All modeled checks pass.",
+      "details": {
+        "node_demands": {
+          "node1": {
+            "cores": 0.0,
+            "ram_gb": 0.0,
+            "accelerators": 0.0
+          },
+          "node2": {
+            "cores": 1.0,
+            "ram_gb": 2.0,
+            "accelerators": 0.0
+          },
+          "node3": {
+            "cores": 2.0,
+            "ram_gb": 4.0,
+            "accelerators": 0.0
+          },
+          "node4": {
+            "cores": 20.0,
+            "ram_gb": 40.0,
+            "accelerators": 0.0
+          }
+        },
+        "guest_capacity_by_online_node": {
+          "node1": {
+            "cores": 25.6,
+            "ram_gb": 102.4,
+            "accelerators": 1.0
+          },
+          "node2": {
+            "cores": 25.6,
+            "ram_gb": 102.4,
+            "accelerators": 1.0
+          },
+          "node3": {
+            "cores": 25.6,
+            "ram_gb": 102.4,
+            "accelerators": 1.0
+          },
+          "node4": {
+            "cores": 25.6,
+            "ram_gb": 102.4,
+            "accelerators": 0.0
+          }
+        },
+        "storage_demand_tb": 0.30000000000000004,
+        "storage_capacity_tb": 16.0
+      }
+    },
+    "timing": {
+      "resource": "timing",
+      "status": "UNKNOWN",
+      "feasible": false,
+      "checks": [
+        {
+          "name": "admission",
+          "status": "UNKNOWN",
+          "reason": "admission: 3000 ms is an unverified estimate.",
+          "source": "missing evidence"
+        },
+        {
+          "name": "admission",
+          "status": "PASS",
+          "demand": 3000.0,
+          "capacity": 30000.0,
+          "remaining": 27000.0,
+          "unit": "ms",
+          "source": "A.8 / supplied timing evidence",
+          "reason": "admission: requires 3000 ms; capacity 30000 ms; margin 27000 ms."
+        },
+        {
+          "name": "arbitration",
+          "status": "UNKNOWN",
+          "reason": "arbitration: 200 ms is an unverified estimate.",
+          "source": "missing evidence"
+        },
+        {
+          "name": "arbitration",
+          "status": "PASS",
+          "demand": 200.0,
+          "capacity": 2000.0,
+          "remaining": 1800.0,
+          "unit": "ms",
+          "source": "A.8 / supplied timing evidence",
+          "reason": "arbitration: requires 200 ms; capacity 2000 ms; margin 1800 ms."
+        },
+        {
+          "name": "first_shed",
+          "status": "UNKNOWN",
+          "reason": "first_shed: 500 ms is an unverified estimate.",
+          "source": "missing evidence"
+        },
+        {
+          "name": "first_shed",
+          "status": "PASS",
+          "demand": 500.0,
+          "capacity": 5000.0,
+          "remaining": 4500.0,
+          "unit": "ms",
+          "source": "A.8 / supplied timing evidence",
+          "reason": "first_shed: requires 500 ms; capacity 5000 ms; margin 4500 ms."
+        },
+        {
+          "name": "full_shed",
+          "status": "UNKNOWN",
+          "reason": "full_shed: 6000 ms is an unverified estimate.",
+          "source": "missing evidence"
+        },
+        {
+          "name": "full_shed",
+          "status": "PASS",
+          "demand": 6000.0,
+          "capacity": 60000.0,
+          "remaining": 54000.0,
+          "unit": "ms",
+          "source": "A.8 / supplied timing evidence",
+          "reason": "full_shed: requires 6000 ms; capacity 60000 ms; margin 54000 ms."
+        },
+        {
+          "name": "safety_command",
+          "status": "UNKNOWN",
+          "reason": "safety_command: 20 ms is an unverified estimate.",
+          "source": "missing evidence"
+        },
+        {
+          "name": "safety_command",
+          "status": "PASS",
+          "demand": 20.0,
+          "capacity": 200.0,
+          "remaining": 180.0,
+          "unit": "ms",
+          "source": "A.8 / supplied timing evidence",
+          "reason": "safety_command: requires 20 ms; capacity 200 ms; margin 180 ms."
+        },
+        {
+          "name": "G3.processing_latency",
+          "status": "UNKNOWN",
+          "reason": "Guest processing-latency requirement is not declared.",
+          "source": "missing evidence"
+        },
+        {
+          "name": "G4.processing_latency",
+          "status": "UNKNOWN",
+          "reason": "Guest processing-latency requirement is not declared.",
+          "source": "missing evidence"
+        },
+        {
+          "name": "G5.processing_latency",
+          "status": "UNKNOWN",
+          "reason": "Guest processing-latency requirement is not declared.",
+          "source": "missing evidence"
+        }
+      ],
+      "binding_constraints": [
+        "admission",
+        "arbitration",
+        "first_shed",
+        "full_shed",
+        "safety_command",
+        "G3.processing_latency",
+        "G4.processing_latency",
+        "G5.processing_latency"
+      ],
+      "reason": "admission: 3000 ms is an unverified estimate. arbitration: 200 ms is an unverified estimate. first_shed: 500 ms is an unverified estimate. full_shed: 6000 ms is an unverified estimate. safety_command: 20 ms is an unverified estimate. Guest processing-latency requirement is not declared. Guest processing-latency requirement is not declared. Guest processing-latency requirement is not declared.",
+      "details": {
+        "meaning": "Evidence screening only; not a schedulability proof."
+      }
+    },
+    "operational": {
+      "resource": "operational",
+      "status": "PASS",
+      "feasible": true,
+      "checks": [
+        {
+          "name": "G4.drone_mass",
+          "status": "PASS",
+          "reason": "Drone mass 140 kg must fit the declared hangar limit.",
+          "source": "G4 assembly / OP-01"
+        },
+        {
+          "name": "G5.platform.emission_state.neq",
+          "status": "PASS",
+          "reason": "G5: platform.emission_state 'normal' must be neq 'silent'.",
+          "source": "Annex B / canonical manifest"
+        }
+      ],
+      "binding_constraints": [],
+      "reason": "All modeled checks pass.",
+      "details": {
+        "capability_modifiers": {},
+        "declared_mode_capability_fractions": {
+          "G3": null,
+          "G4": null,
+          "G5": null
+        },
+        "active_guest_operations": {
+          "G3": null,
+          "G4": null,
+          "G5": "operating"
+        },
+        "crew": 14,
+        "deck_clearance_window_minutes": [
+          3,
+          5
+        ],
+        "human_confirmation_window_s": [
+          15,
+          60
+        ],
+        "note": "Deck clearance/confirmation windows are planning constraints, not completed actions."
+      }
+    }
+  },
+  "scope": "Chosen operating snapshot with disclosed estimates; no full-envelope admission or transition scheduling.",
+  "overall_model_status": "UNKNOWN",
+  "constraint_violations": [],
+  "unresolved_constraints": [
+    {
+      "name": "admission",
+      "status": "UNKNOWN",
+      "reason": "admission: 3000 ms is an unverified estimate.",
+      "source": "missing evidence",
+      "resource": "timing",
+      "constraint_id": "timing.admission"
+    },
+    {
+      "name": "arbitration",
+      "status": "UNKNOWN",
+      "reason": "arbitration: 200 ms is an unverified estimate.",
+      "source": "missing evidence",
+      "resource": "timing",
+      "constraint_id": "timing.arbitration"
+    },
+    {
+      "name": "first_shed",
+      "status": "UNKNOWN",
+      "reason": "first_shed: 500 ms is an unverified estimate.",
+      "source": "missing evidence",
+      "resource": "timing",
+      "constraint_id": "timing.first_shed"
+    },
+    {
+      "name": "full_shed",
+      "status": "UNKNOWN",
+      "reason": "full_shed: 6000 ms is an unverified estimate.",
+      "source": "missing evidence",
+      "resource": "timing",
+      "constraint_id": "timing.full_shed"
+    },
+    {
+      "name": "safety_command",
+      "status": "UNKNOWN",
+      "reason": "safety_command: 20 ms is an unverified estimate.",
+      "source": "missing evidence",
+      "resource": "timing",
+      "constraint_id": "timing.safety_command"
+    },
+    {
+      "name": "G3.processing_latency",
+      "status": "UNKNOWN",
+      "reason": "Guest processing-latency requirement is not declared.",
+      "source": "missing evidence",
+      "resource": "timing",
+      "constraint_id": "timing.G3.processing_latency"
+    },
+    {
+      "name": "G4.processing_latency",
+      "status": "UNKNOWN",
+      "reason": "Guest processing-latency requirement is not declared.",
+      "source": "missing evidence",
+      "resource": "timing",
+      "constraint_id": "timing.G4.processing_latency"
+    },
+    {
+      "name": "G5.processing_latency",
+      "status": "UNKNOWN",
+      "reason": "Guest processing-latency requirement is not declared.",
+      "source": "missing evidence",
+      "resource": "timing",
+      "constraint_id": "timing.G5.processing_latency"
+    }
+  ],
+  "schema_version": "vessel-snapshot/2",
+  "assessment_basis": "CONDITIONAL_SIMULATION",
+  "assumption_ids_used": [
+    "COM-01",
+    "COM-05",
+    "COM-06",
+    "MODE-05",
+    "MODE-07",
+    "OP-01",
+    "PHY-01",
+    "PHY-02",
+    "PHY-03",
+    "PHY-04",
+    "PHY-06",
+    "PHY-08",
+    "STATE-01",
+    "STATE-02",
+    "SYS-01",
+    "SYS-02",
+    "SYS-03",
+    "TIME-01"
+  ],
+  "source_evidence_status": "UNKNOWN",
+  "source_evidence_gaps": {
+    "G3": [
+      "Guest compute requirements are incomplete; simulation profile values are substituted.",
+      "Peak demand/duration not established; zero extra peak only scopes this demo to sustained load.",
+      "Per-link maximum permitted latency is not declared; profile tolerances are assumptions.",
+      "Guest processing-latency limit is unknown.",
+      "Equipment bounding dimensions are synthetic; physical fit is conditional."
+    ],
+    "G4": [
+      "Guest compute requirements are incomplete; simulation profile values are substituted.",
+      "Peak demand/duration not established; zero extra peak only scopes this demo to sustained load.",
+      "Per-link maximum permitted latency is not declared; profile tolerances are assumptions.",
+      "Guest processing-latency limit is unknown.",
+      "Equipment bounding dimensions are synthetic; physical fit is conditional."
+    ],
+    "G5": [
+      "Guest compute requirements are incomplete; simulation profile values are substituted.",
+      "Peak demand/duration not established; zero extra peak only scopes this demo to sustained load.",
+      "Per-link maximum permitted latency is not declared; profile tolerances are assumptions.",
+      "Guest processing-latency limit is unknown.",
+      "Equipment bounding dimensions are synthetic; physical fit is conditional."
+    ]
+  },
+  "host_evidence_gaps": [
+    "Host hangar/roof dimensions and limits are unverified screening placeholders.",
+    "Backbone aggregation and reserve-by-speed mapping are selected model choices.",
+    "Reported environment and link state need external verification; the mission envelope is not evaluated."
+  ],
+  "full_admission_status": "NOT_EVALUATED",
+  "installed_guest_ids": [
+    "G3",
+    "G4",
+    "G5"
+  ],
+  "guest_resources": {
+    "G3": {
+      "mass_kg": 5500.0,
+      "placements": [
+        {
+          "location": "bay1",
+          "mass_kg": 5500.0,
+          "dimensions_m": [
+            6.1,
+            2.4,
+            2.6
+          ],
+          "units": 2
+        }
+      ],
+      "power_line": "port",
+      "power_mode": "standby",
+      "operation": null,
+      "resources": {
+        "power_kw": 1.0,
+        "peak_extra_kw": 0,
+        "peak_duration_s": 0,
+        "heat_paths": [
+          {
+            "location": "bay1",
+            "kw": 1.0
+          }
+        ],
+        "datalinks": {
+          "backbone": {
+            "mbps": 100.0,
+            "max_latency_ms": 1,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": true
+          },
+          "satcom": {
+            "mbps": 0,
+            "max_latency_ms": 800,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          },
+          "los": {
+            "mbps": 0,
+            "max_latency_ms": 20,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          },
+          "acoustic": {
+            "mbps": 0,
+            "max_latency_ms": 60000,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          }
+        },
+        "compute": {
+          "cores": 1.0,
+          "ram_gb": 2.0,
+          "accelerators": 0.0,
+          "storage_tb": 0.1,
+          "allocations": [
+            {
+              "node": "node2",
+              "cores": 1.0,
+              "ram_gb": 2.0,
+              "accelerators": 0.0
+            }
+          ]
+        },
+        "sustained_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": null
+      }
+    },
+    "G4": {
+      "mass_kg": 1040.0,
+      "placements": [
+        {
+          "location": "hangar",
+          "mass_kg": 1040.0,
+          "dimensions_m": [
+            8,
+            6,
+            3
+          ],
+          "units": 1
+        }
+      ],
+      "power_line": "stbd",
+      "power_mode": "standby",
+      "operation": null,
+      "resources": {
+        "power_kw": 2.0,
+        "peak_extra_kw": 0,
+        "peak_duration_s": 0,
+        "heat_paths": [
+          {
+            "location": "hangar",
+            "kw": 2.0
+          }
+        ],
+        "datalinks": {
+          "backbone": {
+            "mbps": 0,
+            "max_latency_ms": 1,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          },
+          "satcom": {
+            "mbps": 0,
+            "max_latency_ms": 800,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          },
+          "los": {
+            "mbps": 0,
+            "max_latency_ms": 20,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          },
+          "acoustic": {
+            "mbps": 0,
+            "max_latency_ms": 60000,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          }
+        },
+        "compute": {
+          "cores": 2.0,
+          "ram_gb": 4.0,
+          "accelerators": 0.0,
+          "storage_tb": 0.1,
+          "allocations": [
+            {
+              "node": "node3",
+              "cores": 2.0,
+              "ram_gb": 4.0,
+              "accelerators": 0.0
+            }
+          ]
+        },
+        "sustained_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": null
+      }
+    },
+    "G5": {
+      "mass_kg": 3025.0,
+      "placements": [
+        {
+          "location": "bay2",
+          "mass_kg": 3000.0,
+          "dimensions_m": [
+            3,
+            2.4,
+            2.6
+          ],
+          "units": 1
+        },
+        {
+          "location": "mast3",
+          "mass_kg": 25.0,
+          "area_m2": 0.3
+        }
+      ],
+      "power_line": "stbd",
+      "power_mode": "full",
+      "operation": "operating",
+      "resources": {
+        "power_kw": 45.0,
+        "peak_extra_kw": 0,
+        "peak_duration_s": 0,
+        "heat_paths": [
+          {
+            "location": "bay2",
+            "kw": 45.0
+          }
+        ],
+        "datalinks": {
+          "backbone": {
+            "mbps": 1000.0,
+            "max_latency_ms": 1,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": true
+          },
+          "satcom": {
+            "mbps": 6.0,
+            "max_latency_ms": 800,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": true
+          },
+          "los": {
+            "mbps": 0,
+            "max_latency_ms": 20,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          },
+          "acoustic": {
+            "mbps": 0,
+            "max_latency_ms": 60000,
+            "latency_source": "COM-06 / synthetic guest tolerance",
+            "required": false
+          }
+        },
+        "compute": {
+          "cores": 20.0,
+          "ram_gb": 40.0,
+          "accelerators": 0.0,
+          "storage_tb": 0.1,
+          "allocations": [
+            {
+              "node": "node4",
+              "cores": 20.0,
+              "ram_gb": 40.0,
+              "accelerators": 0.0
+            }
+          ]
+        },
+        "sustained_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": null
+      }
+    }
+  },
+  "input_sha256": {
+    "specs": "130b4e60b26a74da5e82d7fde5beaf05de64cc721d91da7a138639026c4fe727",
+    "state": "08716e73625519512a3543865236e25c42935fab1533d085afd1dd6c2216cc72",
+    "profiles": "02929f32bb04aabf696dc23a42fd512f0fc4318e9d40c038b1b1365daf1a251a",
+    "guests": "0c4911e93dcf3b9008dc3386af88cb28a6e355c50fe4f99aafaa0f7e00d158e8"
+  },
+  "assessment_status": "UNKNOWN"
+}

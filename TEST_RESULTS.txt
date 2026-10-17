@@ -1,0 +1,145 @@
+Validation against the updated G1 (1).json–G5 (1).json.
+Python: 3.12.14
+Full jsonschema dependency installed: False
+
+$ /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3 -m unittest discover -s physical_model/tests -v
+test_baseline_separates_timing (test_canonical_integration.CanonicalIntegrationTests.test_baseline_separates_timing) ... ok
+test_crew_at_sea_installation (test_canonical_integration.CanonicalIntegrationTests.test_crew_at_sea_installation) ... ok
+test_degraded_cooling (test_canonical_integration.CanonicalIntegrationTests.test_degraded_cooling) ... ok
+test_g2_winch_requires_activity_and_duration (test_canonical_integration.CanonicalIntegrationTests.test_g2_winch_requires_activity_and_duration) ... ok
+test_g3_noninterruptible_charge (test_canonical_integration.CanonicalIntegrationTests.test_g3_noninterruptible_charge) ... ok
+test_g3_survey_and_g4_recovery_incompatible (test_canonical_integration.CanonicalIntegrationTests.test_g3_survey_and_g4_recovery_incompatible) ... ok
+test_g4_charge_over_twenty_minutes (test_canonical_integration.CanonicalIntegrationTests.test_g4_charge_over_twenty_minutes) ... ok
+test_g4_deadline_if_battery_low (test_canonical_integration.CanonicalIntegrationTests.test_g4_deadline_if_battery_low) ... ok
+test_g4_no_recovery_below_5_kn (test_canonical_integration.CanonicalIntegrationTests.test_g4_no_recovery_below_5_kn) ... ok
+test_g4_recovery_differs_from_charging (test_canonical_integration.CanonicalIntegrationTests.test_g4_recovery_differs_from_charging) ... ok
+test_g5_mass_includes_separate_antenna (test_canonical_integration.CanonicalIntegrationTests.test_g5_mass_includes_separate_antenna) ... ok
+test_g5_roof_requires_available_roof_and_clearance (test_canonical_integration.CanonicalIntegrationTests.test_g5_roof_requires_available_roof_and_clearance) ... ok
+test_generator_failure_105kw (test_canonical_integration.CanonicalIntegrationTests.test_generator_failure_105kw) ... ok
+test_missing_assumption_not_zero (test_canonical_integration.CanonicalIntegrationTests.test_missing_assumption_not_zero) ... ok
+test_never_mutate_canonical (test_canonical_integration.CanonicalIntegrationTests.test_never_mutate_canonical) ... ok
+test_no_port_only_bay_install_at_sea (test_canonical_integration.CanonicalIntegrationTests.test_no_port_only_bay_install_at_sea) ... ok
+test_original_manifests_unmodified (test_canonical_integration.CanonicalIntegrationTests.test_original_manifests_unmodified) ... ok
+test_radar_reduces_g1_capability (test_canonical_integration.CanonicalIntegrationTests.test_radar_reduces_g1_capability) ... ok
+test_schema_all_five (test_canonical_integration.CanonicalIntegrationTests.test_schema_all_five) ... ok
+test_silence_g1_passive_allowed_and_no_satcom_demand (test_canonical_integration.CanonicalIntegrationTests.test_silence_g1_passive_allowed_and_no_satcom_demand) ... ok
+test_silence_g2_buffered_no_satcom (test_canonical_integration.CanonicalIntegrationTests.test_silence_g2_buffered_no_satcom) ... ok
+test_silence_g5_excluded (test_canonical_integration.CanonicalIntegrationTests.test_silence_g5_excluded) ... ok
+test_zero_crew_already_clear_possible (test_canonical_integration.CanonicalIntegrationTests.test_zero_crew_already_clear_possible) ... ok
+test_compose_state (test_canonical_integration.ThreeBrainTests.test_compose_state) ... ok
+test_conflicting_owners_rejected (test_canonical_integration.ThreeBrainTests.test_conflicting_owners_rejected) ... ok
+test_acoustic_drop (test_resource_models.ResourceTests.test_acoustic_drop) ... ok
+test_baseline (test_resource_models.ResourceTests.test_baseline) ... ok
+test_compute_allocation_balance (test_resource_models.ResourceTests.test_compute_allocation_balance) ... ok
+test_compute_fragmentation (test_resource_models.ResourceTests.test_compute_fragmentation) ... ok
+test_compute_node_failure (test_resource_models.ResourceTests.test_compute_node_failure) ... ok
+test_cooling_boundary (test_resource_models.ResourceTests.test_cooling_boundary) ... ok
+test_cooling_curve_and_fault (test_resource_models.ResourceTests.test_cooling_curve_and_fault) ... ok
+test_cooling_temperature_outside_curve (test_resource_models.ResourceTests.test_cooling_temperature_outside_curve) ... ok
+test_deck_bay_occupancy (test_resource_models.ResourceTests.test_deck_bay_occupancy) ... ok
+test_deck_dimensions (test_resource_models.ResourceTests.test_deck_dimensions) ... ok
+test_deck_flight_conditions (test_resource_models.ResourceTests.test_deck_flight_conditions) ... ok
+test_duplicate_ids (test_resource_models.ResourceTests.test_duplicate_ids) ... ok
+test_false_half_bay_claim (test_resource_models.ResourceTests.test_false_half_bay_claim) ... ok
+test_fractional_accelerator (test_resource_models.ResourceTests.test_fractional_accelerator) ... ok
+test_generator_down (test_resource_models.ResourceTests.test_generator_down) ... ok
+test_gpu_reserve_after_node_failure (test_resource_models.ResourceTests.test_gpu_reserve_after_node_failure) ... ok
+test_heat_balance (test_resource_models.ResourceTests.test_heat_balance) ... ok
+test_invalid_numeric (test_resource_models.ResourceTests.test_invalid_numeric) ... ok
+test_line_saturation_with_total_margin (test_resource_models.ResourceTests.test_line_saturation_with_total_margin) ... ok
+test_link_latency (test_resource_models.ResourceTests.test_link_latency) ... ok
+test_lost_line (test_resource_models.ResourceTests.test_lost_line) ... ok
+test_mass_component_consistency (test_resource_models.ResourceTests.test_mass_component_consistency) ... ok
+test_mast_air_limit (test_resource_models.ResourceTests.test_mast_air_limit) ... ok
+test_mast_scarcity (test_resource_models.ResourceTests.test_mast_scarcity) ... ok
+test_missing_demand (test_resource_models.ResourceTests.test_missing_demand) ... ok
+test_missing_resources_never_pass (test_resource_models.ResourceTests.test_missing_resources_never_pass) ... ok
+test_no_link_pooling (test_resource_models.ResourceTests.test_no_link_pooling) ... ok
+test_no_mutation_and_replay (test_resource_models.ResourceTests.test_no_mutation_and_replay) ... ok
+test_not_installed_does_not_consume (test_resource_models.ResourceTests.test_not_installed_does_not_consume) ... ok
+test_over_mass_starting_fixture (test_resource_models.ResourceTests.test_over_mass_starting_fixture) ... ok
+test_peak_is_bounded (test_resource_models.ResourceTests.test_peak_is_bounded) ... ok
+test_reserved_mast (test_resource_models.ResourceTests.test_reserved_mast) ... ok
+test_shared_storage_reserve (test_resource_models.ResourceTests.test_shared_storage_reserve) ... ok
+test_silence_radio_blackout (test_resource_models.ResourceTests.test_silence_radio_blackout) ... ok
+test_timing_evidence (test_resource_models.ResourceTests.test_timing_evidence) ... ok
+test_unknown_placement (test_resource_models.ResourceTests.test_unknown_placement) ... ok
+test_unsupported_speed (test_resource_models.ResourceTests.test_unsupported_speed) ... ok
+test_battery_deadline_uses_elapsed_time_and_source_event (test_updated_guests.UpdatedGuestTests.test_battery_deadline_uses_elapsed_time_and_source_event) ... ok
+test_compute_source_overrides_profiles_and_decimal_storage_conversion (test_updated_guests.UpdatedGuestTests.test_compute_source_overrides_profiles_and_decimal_storage_conversion) ... ok
+test_declared_survey_mapping_replaces_synthetic_power (test_updated_guests.UpdatedGuestTests.test_declared_survey_mapping_replaces_synthetic_power) ... ok
+test_drone_mass_and_charge_duration_are_not_hardcoded (test_updated_guests.UpdatedGuestTests.test_drone_mass_and_charge_duration_are_not_hardcoded) ... ok
+test_duplicate_assembly_assignment_is_rejected (test_updated_guests.UpdatedGuestTests.test_duplicate_assembly_assignment_is_rejected) ... ok
+test_explicit_operation_mappings_infer_only_declared_mode (test_updated_guests.UpdatedGuestTests.test_explicit_operation_mappings_infer_only_declared_mode) ... ok
+test_g5_allowed_power_mapping_is_enforced (test_updated_guests.UpdatedGuestTests.test_g5_allowed_power_mapping_is_enforced) ... ok
+test_g5_cooling_and_bandwidth_do_not_follow_invented_scaling (test_updated_guests.UpdatedGuestTests.test_g5_cooling_and_bandwidth_do_not_follow_invented_scaling) ... ok
+test_guest_processing_requirement_is_separate_from_host_timings (test_updated_guests.UpdatedGuestTests.test_guest_processing_requirement_is_separate_from_host_timings) ... ok
+test_installation_uses_updated_vehicle_target_and_duration (test_updated_guests.UpdatedGuestTests.test_installation_uses_updated_vehicle_target_and_duration) ... ok
+test_invalid_or_missing_state_cannot_pass (test_updated_guests.UpdatedGuestTests.test_invalid_or_missing_state_cannot_pass) ... ok
+test_missing_compute_field_is_not_zero (test_updated_guests.UpdatedGuestTests.test_missing_compute_field_is_not_zero) ... ok
+test_null_operation_mapping_does_not_guess_power (test_updated_guests.UpdatedGuestTests.test_null_operation_mapping_does_not_guess_power) ... ok
+test_physical_pass_preserves_evidence_unknown (test_updated_guests.UpdatedGuestTests.test_physical_pass_preserves_evidence_unknown) ... ok
+test_real_peak_requires_separate_duration_evidence (test_updated_guests.UpdatedGuestTests.test_real_peak_requires_separate_duration_evidence) ... ok
+test_snapshot_does_not_mutate_and_is_replayable (test_updated_guests.UpdatedGuestTests.test_snapshot_does_not_mutate_and_is_replayable) ... ok
+test_source_backbone_and_shore_rates_propagate (test_updated_guests.UpdatedGuestTests.test_source_backbone_and_shore_rates_propagate) ... ok
+test_state_updates_copy_nested_values_and_preserve_siblings (test_updated_guests.UpdatedGuestTests.test_state_updates_copy_nested_values_and_preserve_siblings) ... ok
+test_survey_estimate_and_compute_are_independent_of_standby (test_updated_guests.UpdatedGuestTests.test_survey_estimate_and_compute_are_independent_of_standby) ... ok
+test_uninstalled_candidate_installation_can_be_checked_in_port (test_updated_guests.UpdatedGuestTests.test_uninstalled_candidate_installation_can_be_checked_in_port) ... ok
+test_updated_conflict_id_is_evaluated (test_updated_guests.UpdatedGuestTests.test_updated_conflict_id_is_evaluated) ... ok
+test_video_selection_respects_source_range (test_updated_guests.UpdatedGuestTests.test_video_selection_respects_source_range) ... ok
+test_winch_cannot_use_continuous_power (test_updated_guests.UpdatedGuestTests.test_winch_cannot_use_continuous_power) ... ok
+
+----------------------------------------------------------------------
+Ran 85 tests in 0.108s
+
+OK
+Exit status: 0
+
+$ /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3 scripts/render_assumption_docs.py --check
+Assumption documents match the register.
+Exit status: 0
+
+$ /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3 scripts/audit_assumptions.py
+PASS: 6 source hashes, 144 source pointers, 33 register records, 6 report traces, and generated docs.
+Exit status: 0
+
+$ /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3 scripts/run_sensitivity.py
+Wrote 12 evaluated sensitivity cases.
+charge_gensets2_24C_fault0_full PASS
+charge_gensets1_30C_fault1_full FAIL
+charge_gensets1_30C_fault1_low_power PASS
+charge_gensets1_24C_fault0_low_power PASS
+g5_low_satcom_2Mbps FAIL
+g5_low_satcom_8Mbps PASS
+g4_video_5Mbps_on_10Mbps_link PASS
+g4_video_10Mbps_on_10Mbps_link PASS
+g4_video_20Mbps_on_10Mbps_link FAIL
+g3_acoustic_capacity_0.001Mbps FAIL
+g3_acoustic_capacity_0.003Mbps PASS
+g3_acoustic_capacity_0.005Mbps PASS
+Exit status: 0
+
+$ /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3 run_example.py --output example_output.json
+Installed: G3, G4, G5
+Conditional simulation snapshot: PASS
+Source evidence: UNKNOWN
+Full admission: NOT_EVALUATED
+Execution-time evidence: UNKNOWN
+  electrical   PASS    
+  cooling      PASS    
+  deck         PASS    
+  mast         PASS    
+  mass         PASS    
+  datalinks    PASS    
+  compute      PASS    
+  timing       UNKNOWN admission, arbitration, first_shed
+  operational  PASS    
+Assumptions active: COM-01, COM-05, COM-06, MODE-05, MODE-07, OP-01, PHY-01, PHY-02, PHY-03, PHY-04, PHY-06, PHY-08, STATE-01, STATE-02, SYS-01, SYS-02, SYS-03, TIME-01
+See data/ASSUMPTIONS_AND_JUSTIFICATIONS.md for limitations and provenance.
+Exit status: 0
+
+$ /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3 -m physical_model.snapshot --runtime scenarios/B_after_G5_throttle.json --output data/THROTTLED_SNAPSHOT.json
+Exit status: 0
+
+PASS: all five updated guest copies match attached bytes. Supplied ship_specs.json matches original ZIP bytes.
+This is software regression evidence, not a runtime latency benchmark or real-vessel certification.
