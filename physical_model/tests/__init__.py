@@ -1,0 +1,1 @@
+"""Resource-model test suite."""
