@@ -1,0 +1,264 @@
+
+{
+  "schema_version": "1.0",
+  "id": "G3",
+  "name": "Seabed inspection vehicle and cradle",
+  "source": {
+    "document": "Fincantieri Software-Defined Vessel SHORT, Technical Annex B (guest cards) and B.0 (ontology); Annex A (host-wide conditions)",
+    "guest_card": "G3",
+    "assumptions_added": []
+  },
+  "capability": {
+    "description": "Inspects seabed cables and pipelines.",
+    "value_by_mission": {
+      "survey": "high",
+      "rescue": "low",
+      "patrol": null,
+      "disaster_relief": null,
+      "default": null
+    }
+  },
+  "criticality": {
+    "safety_critical": false,
+    "mission_criticality": "resolved_from_external_mission_priority_file"
+  },
+  "assembly": {
+    "atomic_for_admission_and_shedding": true,
+    "components": [
+      {
+        "id": "vehicle_and_cradle",
+        "name": "UUV and cradle assembly",
+        "mass_kg": 5500,
+        "footprint_m2": null
+      }
+    ],
+    "requires": [],
+    "excludes": []
+  },
+  "placement": {
+    "configurations": [
+      {
+        "id": "bay1",
+        "preferred": true,
+        "assignments": [
+          {
+            "component_id": "vehicle_and_cradle",
+            "location": "bay1",
+            "bay_fraction": 1.0,
+            "area_m2": null
+          }
+        ],
+        "requirements": [],
+        "notes": "Cradle fills Bay 1; vehicle launches and recovers through the stern ramp."
+      }
+    ]
+  },
+  "resources": {
+    "power_modes": [
+      {
+        "id": "standby",
+        "power_kw": {
+          "min": null,
+          "nominal": 1,
+          "peak": null
+        },
+        "max_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": null,
+        "notes": "Cradle standby draw."
+      },
+      {
+        "id": "charging",
+        "power_kw": {
+          "min": null,
+          "nominal": 25,
+          "peak": null
+        },
+        "max_duration_minutes": 60,
+        "interruptible": false,
+        "capability_fraction": null,
+        "notes": "Noninterruptible charge after each 40-minute survey leg."
+      }
+    ],
+    "cooling": {
+      "type": "chilled_water",
+      "electrical_kw_to_heat_kw": 1.0,
+      "chilled_water_load_rule": "equals_electrical_kw",
+      "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+    },
+    "data_links": [
+      {
+        "type": "cradle_backbone",
+        "bandwidth_mbps": {
+          "min": null,
+          "nominal": 100,
+          "max": null
+        },
+        "disabled_in_emission_silence": false,
+        "notes": "100 Mbit/s when on cradle."
+      },
+      {
+        "type": "submerged_acoustic",
+        "bandwidth_mbps": {
+          "min": null,
+          "nominal": null,
+          "max": null
+        },
+        "disabled_in_emission_silence": false,
+        "notes": "Uses acoustic link while submerged; guest-specific bandwidth demand not specified. Annex A provides host acoustic link characteristics."
+      }
+    ],
+    "compute": {
+      "cpu_cores": null,
+      "ram_gb": null,
+      "accelerator_units": null,
+      "storage_gb": null
+    },
+    "response_time": {
+      "max_processing_latency_ms": null
+    }
+  },
+  "operational_modes": [
+    {
+      "id": "surveying",
+      "power_mode_id": null,
+      "requirements": [
+        {
+          "field": "navigation.speed_knots",
+          "operator": "eq",
+          "value": 3,
+          "reason": null
+        },
+        {
+          "field": "navigation.course_keeping",
+          "operator": "eq",
+          "value": "steady",
+          "reason": null
+        },
+        {
+          "field": "navigation.noise_level",
+          "operator": "eq",
+          "value": "quiet",
+          "reason": null
+        },
+        {
+          "field": "platform.deck_machinery_active",
+          "operator": "eq",
+          "value": false,
+          "reason": null
+        }
+      ],
+      "conflicts": [
+        {
+          "guest_id": "G2",
+          "guest_mode": "winch_operation",
+          "reason": "No deck machinery while listening."
+        },
+        {
+          "guest_id": "G4",
+          "guest_mode": "launch_recovery",
+          "reason": "Drone recovery requires manoeuvre freedom and deck activity, incompatible with quiet surveying."
+        }
+      ],
+      "notes": "Each survey leg lasts 40 minutes. Ship-side electrical draw while deployed is not explicitly specified; do not assume the standby value applies."
+    },
+    {
+      "id": "launch_recovery",
+      "power_mode_id": null,
+      "requirements": [
+        {
+          "field": "platform.stern_ramp_free",
+          "operator": "eq",
+          "value": true,
+          "reason": null
+        },
+        {
+          "field": "environment.sea_state",
+          "operator": "lte",
+          "value": 4,
+          "reason": null
+        },
+        {
+          "field": "navigation.speed_knots",
+          "operator": "gte",
+          "value": 4,
+          "reason": null
+        },
+        {
+          "field": "navigation.speed_knots",
+          "operator": "lte",
+          "value": 8,
+          "reason": null
+        },
+        {
+          "field": "navigation.course_keeping",
+          "operator": "eq",
+          "value": "steady",
+          "reason": null
+        }
+      ],
+      "conflicts": [
+        {
+          "guest_id": "G4",
+          "guest_mode": "launch_recovery",
+          "reason": "Flight deck and stern ramp cannot operate simultaneously (Annex A.3)."
+        }
+      ],
+      "notes": null
+    },
+    {
+      "id": "standby",
+      "power_mode_id": "standby",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "Cradle standby, 1 kW ship-side demand."
+    },
+    {
+      "id": "charging",
+      "power_mode_id": "charging",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "25 kW noninterruptible charging for 60 minutes after each 40-minute survey leg."
+    }
+  ],
+  "installation": [
+    {
+      "operation": "install_assembly",
+      "component_ids": [
+        "vehicle_and_cradle"
+      ],
+      "port_only": true,
+      "crew_required": 4,
+      "duration_minutes": 360,
+      "at_sea_window": null,
+      "notes": "Cradle and vehicle assembly installed in port."
+    },
+    {
+      "operation": "swap_vehicle_only",
+      "operation_target": "vehicle",
+      "component_ids": [
+        "vehicle_and_cradle"
+      ],
+      "port_only": false,
+      "crew_required": 4,
+      "duration_minutes": 45,
+      "at_sea_window": "Annex A.11",
+      "notes": "Only the vehicle may be swapped at sea. The cradle remains installed."
+    }
+  ],
+  "special_events": [
+    {
+      "type": "cycle",
+      "survey_leg_minutes": 40,
+      "subsequent_charge_minutes": 60,
+      "charging_interruptible": false
+    }
+  ],
+  "policy_hints": [],
+  "documented_unknowns": [
+    "Separate vehicle/cradle masses and footprint not provided.",
+    "Ship-side power draw during deployed surveying not provided.",
+    "Per-guest acoustic bandwidth, compute and response time not specified."
+  ],
+  "notes": []
+}

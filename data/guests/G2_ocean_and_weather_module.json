@@ -1,0 +1,212 @@
+{
+  "schema_version": "1.0",
+  "id": "G2",
+  "name": "Ocean and weather module",
+  "source": {
+    "document": "Fincantieri Software-Defined Vessel SHORT, Technical Annex B (guest cards) and B.0 (ontology); Annex A (host-wide conditions)",
+    "guest_card": "G2",
+    "assumptions_added": []
+  },
+  "capability": {
+    "description": "Measures water-column conditions, sound speed and sea state.",
+    "value_by_mission": {
+      "survey": "high",
+      "default": "medium",
+      "patrol": null,
+      "rescue": null,
+      "disaster_relief": null
+    }
+  },
+  "criticality": {
+    "safety_critical": false,
+    "mission_criticality": "resolved_from_external_mission_priority_file"
+  },
+  "assembly": {
+    "atomic_for_admission_and_shedding": true,
+    "components": [
+      {
+        "id": "ocean_module",
+        "name": "Ocean/weather assembly: winch and probe",
+        "mass_kg": 3500,
+        "footprint_m2": null
+      }
+    ],
+    "requires": [],
+    "excludes": []
+  },
+  "placement": {
+    "configurations": [
+      {
+        "id": "bay2",
+        "preferred": true,
+        "assignments": [
+          {
+            "component_id": "ocean_module",
+            "location": "bay2",
+            "bay_fraction": 1.0,
+            "area_m2": null
+          }
+        ],
+        "requirements": [],
+        "notes": null
+      },
+      {
+        "id": "half_bay1",
+        "preferred": false,
+        "assignments": [
+          {
+            "component_id": "ocean_module",
+            "location": "bay1",
+            "bay_fraction": 0.5,
+            "area_m2": null
+          }
+        ],
+        "requirements": [],
+        "notes": null
+      }
+    ]
+  },
+  "resources": {
+    "power_modes": [
+      {
+        "id": "continuous",
+        "power_kw": {
+          "min": null,
+          "nominal": 6,
+          "peak": null
+        },
+        "max_duration_minutes": null,
+        "interruptible": null,
+        "capability_fraction": null,
+        "notes": "Continuous base draw."
+      },
+      {
+        "id": "winch_operation",
+        "power_kw": {
+          "min": null,
+          "nominal": 20,
+          "peak": null
+        },
+        "max_duration_minutes": 5,
+        "interruptible": null,
+        "capability_fraction": null,
+        "notes": "20 kW total sustained draw for 5 minutes while winch operates (not +20 kW above baseline)."
+      }
+    ],
+    "cooling": {
+      "type": "chilled_water",
+      "electrical_kw_to_heat_kw": 1.0,
+      "chilled_water_load_rule": "equals_electrical_kw",
+      "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
+    },
+    "data_links": [
+      {
+        "type": "backbone",
+        "bandwidth_mbps": {
+          "min": null,
+          "nominal": 5,
+          "max": null
+        },
+        "disabled_in_emission_silence": false,
+        "notes": null
+      },
+      {
+        "type": "shore_link_transport_unspecified",
+        "bandwidth_mbps": {
+          "min": null,
+          "nominal": 0.5,
+          "max": null
+        },
+        "disabled_in_emission_silence": true,
+        "notes": "500 kbit/s buffered transfer to shore; transport unspecified."
+      }
+    ],
+    "compute": {
+      "cpu_cores": null,
+      "ram_gb": null,
+      "accelerator_units": null,
+      "storage_gb": null
+    },
+    "response_time": {
+      "max_processing_latency_ms": null
+    }
+  },
+  "operational_modes": [
+    {
+      "id": "probe_operation",
+      "power_mode_id": "continuous",
+      "requirements": [
+        {
+          "field": "navigation.speed_knots",
+          "operator": "lte",
+          "value": 5,
+          "reason": null
+        },
+        {
+          "field": "environment.sea_state",
+          "operator": "lte",
+          "value": 4,
+          "reason": null
+        },
+        {
+          "field": "navigation.course_keeping",
+          "operator": "eq",
+          "value": "steady",
+          "reason": null
+        },
+        {
+          "field": "platform.deck_area_around_bay_clear",
+          "operator": "eq",
+          "value": true,
+          "reason": null
+        }
+      ],
+      "conflicts": [],
+      "notes": "Probe deployment conditions."
+    },
+    {
+      "id": "winch_operation",
+      "power_mode_id": "winch_operation",
+      "requirements": [
+        {
+          "field": "platform.emission_state",
+          "operator": "neq",
+          "value": "silent",
+          "reason": "Silence forbids deck machinery per Annex A.6."
+        }
+      ],
+      "conflicts": [
+        {
+          "guest_id": "G3",
+          "guest_mode": "surveying",
+          "reason": "Winch cannot operate while underwater vehicle listens."
+        },
+        {
+          "guest_id": "G4",
+          "guest_mode": "launch_recovery",
+          "reason": "Winch cannot operate during rescue-drone recovery."
+        }
+      ],
+      "notes": "Winch is deck machinery; nominal electrical mode is 20 kW for 5 minutes."
+    }
+  ],
+  "installation": [
+    {
+    "operation": "install_assembly",
+    "component_ids": ["ocean_module"],
+    "port_only": true,
+    "crew_required": 4,
+    "duration_minutes": 360,
+    "at_sea_window": null,
+    "notes": "Port-only assembly installation."
+    }
+  ],
+  "special_events": [],
+  "policy_hints": [],
+  "documented_unknowns": [
+    "Footprint and individual winch/probe masses not specified.",
+    "Min/peak power and per-guest compute/response-time not specified.",
+    "How long data can be buffered is not specified."
+  ],
+  "notes": []
+}
