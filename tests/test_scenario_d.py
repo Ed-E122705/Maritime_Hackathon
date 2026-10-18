@@ -224,7 +224,7 @@ def test_original_v3_gauge_endpoints_restore_A_and_B():
     # Original v3 Scenario B expects these keys for the resource and ops dials.
     b = client.post("/api/b", json={
         "priority": "survey", "crew": 14,
-        "aboard": ["G3", "G4"], "overrides": [],
+        "aboard": ["G2", "G3", "G4", "G5", "G7"], "overrides": [],
     })
     assert b.status_code == 200, b.get_data(as_text=True)[:400]
     k = b.get_json()
@@ -233,4 +233,7 @@ def test_original_v3_gauge_endpoints_restore_A_and_B():
                 "d4_timing", "response_limits", "modes"):
         assert key in k
     assert "usage" in k["fleet_check"]
+    assert "G7" in k["aboard"]
+    assert "G7" in k["modes"]
+    assert "G7" in k["rows"][0]
     assert client.get("/preview").status_code == 200
