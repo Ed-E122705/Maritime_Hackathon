@@ -142,6 +142,13 @@ td.num{font-family:var(--mono);text-align:right}
 .d-power-card.g7{border-top:3px solid var(--cyan)}
 .d-power-card.background{border-top:3px solid var(--ghost)}
 .d-power-summary{font-family:var(--mono);font-size:12px;color:var(--mute);margin-top:9px;line-height:1.65}
+.d-live-spotlight{border:1px solid var(--line);border-radius:9px;padding:13px;margin:11px 0 16px}
+.d-live-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.d-live-metric{border:1px solid var(--line);border-radius:8px;background:var(--panel2);padding:13px;min-width:0}
+.d-live-metric-label{font-size:12px;font-weight:700;letter-spacing:.3px}
+.d-live-metric-number{display:block;font:700 27px/1.6 var(--mono);font-variant-numeric:tabular-nums}
+.d-live-metric-note{color:var(--mute);font-size:12px}
+@media(max-width:700px){.d-live-metrics{grid-template-columns:1fr}}
 @media(max-width:700px){.d-power-grid{grid-template-columns:1fr}}
 .busy{opacity:.55;transition:opacity .2s}
 .hide{display:none!important}
@@ -173,6 +180,23 @@ td.num{font-family:var(--mono);text-align:right}
 
 <section class="card" id="scenarioDCard" style="margin:14px 22px">
   <h3>Scenario D · G7 Perimeter Watch → G4 Simulated Response</h3>
+  <div id="dLivePowerSpotlight" class="d-live-spotlight" aria-live="polite">
+    <div class="mono" style="font-weight:700">LIVE POWER · G7 CAMERA → G4 RESPONSE</div>
+    <div id="dLivePowerNotice" class="mute" style="font-size:12px;margin-top:3px">Waiting for G7-to-G4 bridge samples…</div>
+    <div class="d-live-metrics">
+      <div class="d-live-metric">
+        <div class="d-live-metric-label">Total modeled power</div>
+        <strong class="d-live-metric-number" id="dLiveTotalPower">— kW</strong>
+        <div class="d-live-metric-note">Includes 46 kW simulated vessel baseline</div>
+      </div>
+      <div class="d-live-metric">
+        <div class="d-live-metric-label">G4 + G7 power (combined)</div>
+        <strong class="d-live-metric-number" id="dLiveGuestPower">— kW</strong>
+        <div class="d-live-metric-note" id="dLiveGuestDetails">G4 — kW · G7 — kW</div>
+      </div>
+    </div>
+    <div class="mute" style="font-size:11px">Scenario D simulated demand, not measured electrical consumption. Live values update independently of the scripted replay below.</div>
+  </div>
   <div class="mute" style="margin:4px 0 10px">180 s · 1 s steps · prerecorded demonstration; no physical drone commands. Camera alert does not certify flight-deck clearance.</div>
   <div class="row" style="flex-wrap:wrap">
     <button class="btn" type="button" id="dReplay">Load 181-step replay</button>
@@ -203,9 +227,8 @@ td.num{font-family:var(--mono);text-align:right}
         <button class="btn" id="dLiveApprove" type="button">Operator approve (simulated)</button>
       </div>
       <div id="dLiveResult" class="mono">Not connected</div>
-      <h3>Live power by system (BRIO camera)</h3>
-      <div class="mute" style="font-size:11px">Separate G4, G7 and the simulated 46 kW vessel background — no combined total.</div>
-      <div id="dLiveBreakdown" class="d-power-grid" aria-live="polite" aria-label="Live power breakdown"></div>
+      <h3>Live power and resource checks</h3>
+      <div class="mute" style="font-size:11px">Current G4 and G7 power are displayed at the top of this section.</div>
       <div id="dLiveGauges" class="d-power-summary">Waiting for camera bridge…</div>
       <div id="dLiveEventLog" class="log mono" style="max-height:100px"></div>
     </div>
@@ -1186,7 +1209,14 @@ dEl("dLiveRefresh").addEventListener("click",async()=>{
       (j.latest?.g4_state==="Starting"||j.latest?.g4_state==="Awaiting approval" ?
       " · No motion "+(j.latest?.no_motion_seconds??0)+"/"+(j.latest?.no_motion_shutdown_seconds??5)+" s until power-off" : "");
     const p=j.latest?.power;
-    dRenderPowerBreakdown(dEl("dLiveBreakdown"),p);
+    dEl("dLiveTotalPower").textContent=p ? p.total_kw.toFixed(3)+" kW" : "— kW";
+    dEl("dLiveGuestPower").textContent=p ? (p.g4_kw+p.g7_kw).toFixed(3)+" kW" : "— kW";
+    dEl("dLiveGuestDetails").textContent=p
+      ? "G4 "+p.g4_kw.toFixed(3)+" kW · G7 "+p.g7_kw.toFixed(3)+" kW"
+      : "G4 — kW · G7 — kW";
+    dEl("dLivePowerNotice").textContent=j.latest
+      ? "Live tick "+j.second+" · G4 "+j.latest.g4_state+" · G7 "+j.latest.g7_status
+      : "Waiting for G7-to-G4 bridge samples…";
     dEl("dLiveGauges").textContent=p
       ? "Power capacity: "+p.power_capacity_kw+" kW"
         +" · Simulated cooling screen: "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+" kW"
