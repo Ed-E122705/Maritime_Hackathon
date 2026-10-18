@@ -1,9 +1,8 @@
-"""Connect the existing G7 webcam status to Scenario D's simulated controller.
+"""Bridge local G7 webcam observations to G4 simulated readiness on A/A′/B.
 
-Run in the G7 checkout with Flask and vision/g7_deck_watch.py running:
-    py vision/scenario_d_live_bridge.py --port 5051
-No physical drone commands; G7 watches a perimeter area, never launch deck.
-Approval is intentionally NOT submitted by the camera bridge.
+The camera checkbox on the active dashboard tab controls whether samples are
+submitted. No drone hardware commands. Valid no-motion samples power the
+simulated G4 down after five samples while awaiting approval.
 """
 from __future__ import annotations
 
@@ -22,6 +21,11 @@ def submit(url, data):
         return json.load(response)
 
 
+def get_json(url):
+    with urlopen(url, timeout=3) as response:
+        return json.load(response)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=5051)
@@ -30,27 +34,37 @@ def main():
     if args.interval < 0.5:
         parser.error("Interval must be at least 0.5 seconds")
     base = f"http://127.0.0.1:{args.port}/api/scenario/d/live"
-    print("G7 → Scenario D synthetic bridge, localhost only, Ctrl+C to stop.")
-    print("Camera alone cannot approve launch; use dashboard operator control.")
-    submit(base+"/reset", {})
+    gate = f"http://127.0.0.1:{args.port}/api/g7-enabled"
+    print("G7 live bridge for A/A′/B, localhost only. Ctrl+C to stop.")
+    print("Enable the G7 checkbox on the dashboard; camera cannot approve launch.")
+    last_enabled = None
     try:
-        for tick in range(181):
-            status = load_camera_status()
-            # The webcam reports UNCLASSIFIED motion only. Two consecutive
-            # submitted positive samples trigger simulated G4 startup.
-            movement = status["camera_online"] and status.get("positive_motion_sample", False)
-            payload = {
-                "perimeter_motion": bool(movement),
-                "deck_obstructed": False,
-                "operator_approval": False,
-                "observation_valid": bool(status["camera_online"] and status["deck_activity"] not in ("UNKNOWN", "INITIALIZING")),
-            }
-            result = submit(base+"/sample", payload)
-            print(f"{result['second']:03d}s G7={status['deck_activity']} "
-                  f"G4={result['g4_state']} power={result['power']['total_kw']:.3f} kW")
+        while True:
+            enabled = bool(get_json(gate)["enabled"])
+            if enabled != last_enabled:
+                if last_enabled is not None:
+                    submit(base+"/reset", {})
+                print("G7 event bridge: " + ("ENABLED" if enabled else "DISABLED"))
+                last_enabled = enabled
+            if enabled:
+                status = load_camera_status()
+                movement = (status["camera_online"] and
+                            status.get("positive_motion_sample", False))
+                valid = (status["camera_online"] and
+                         status["deck_activity"] not in ("UNKNOWN", "INITIALIZING"))
+                payload = {
+                    "perimeter_motion": bool(movement),
+                    "deck_obstructed": False,
+                    "operator_approval": False,
+                    "observation_valid": bool(valid),
+                }
+                result = submit(base+"/sample", payload)
+                print(f"{result['second']:03d}s G7={status['deck_activity']} "
+                      f"G4={result['g4_state']} G4={result['power']['g4_kw']:.3f}kW "
+                      f"G7={result['power']['g7_kw']:.3f}kW")
             time.sleep(args.interval)
     except KeyboardInterrupt:
-        print("Bridge stopped. Simulation cannot be used to certify a deck is clear.")
+        print("G7 bridge stopped. No flight-deck safety claims or drone commands.")
 
 
 if __name__ == "__main__":
