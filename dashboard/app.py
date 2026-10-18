@@ -497,6 +497,62 @@ def g7_camera():
     return response
 
 
+
+# Scenario D is an isolated SIMULATION. No physical G4 commands are issued.
+from threading import Lock
+from governor.scenario_d import ScenarioD, replay
+
+_scenario_d_lock = Lock()
+_scenario_d_live = ScenarioD(scripted=False)
+
+
+@app.get("/api/scenario/d")
+def scenario_d_replay():
+    response = jsonify(replay())
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@app.get("/api/scenario/d/live")
+def scenario_d_live_status():
+    with _scenario_d_lock:
+        return jsonify({
+            "second": _scenario_d_live.time,
+            "latest": _scenario_d_live.timeline[-1] if _scenario_d_live.timeline else None,
+            "events": _scenario_d_live.events[-30:],
+            "mode": "live_synthetic_observations",
+            "safety_certified": False,
+        })
+
+
+@app.post("/api/scenario/d/live/reset")
+def scenario_d_live_reset():
+    global _scenario_d_live
+    with _scenario_d_lock:
+        _scenario_d_live = ScenarioD(scripted=False)
+    return jsonify({"ok": True, "scenario": "D", "mode": "live", "note": "Simulation reset; no hardware commands"})
+
+
+@app.post("/api/scenario/d/live/sample")
+def scenario_d_live_sample():
+    """Submit ONE discrete sample and optional operator action per call.
+    Untrusted camera data cannot authorize launch: approval is separate and explicit.
+    """
+    data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict):
+        return jsonify({"error": "Expected JSON object"}), 400
+    if not all(isinstance(data.get(k, False), bool) for k in ("perimeter_motion", "deck_obstructed", "operator_approval")):
+        return jsonify({"error": "All booleans must be true/false"}), 400
+    with _scenario_d_lock:
+        if _scenario_d_live.time >= _scenario_d_live.cfg["duration_seconds"]:
+            return jsonify({"error": "Simulation reached 180 seconds; reset to repeat"}), 409
+        row = _scenario_d_live.tick(
+            perimeter_motion=data.get("perimeter_motion", False),
+            deck_obstructed=data.get("deck_obstructed", False),
+            approve=data.get("operator_approval", False),
+        )
+    return jsonify(row)
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
