@@ -613,6 +613,7 @@ def scenario_d_live_sample():
             deck_obstructed=data.get("deck_obstructed", False),
             approve=data.get("operator_approval", False),
             observation_valid=data.get("observation_valid", True),
+            g7_alert=data.get("g7_alert"),
         )
     return jsonify(row)
 
