@@ -7,7 +7,8 @@
     "guest_card": "G6",
     "assumptions_added": [
       "User-defined G6 adopts the optional safety-critical designation proposed in the concept image.",
-      "The module is represented as one atomic guest with monitoring and suppression modes; these are modelling choices using existing G4 fields."
+      "The module is represented as one atomic guest with monitoring and suppression modes; these are modelling choices using existing G4 fields.",
+      "Apply Annex A's global demonstration convention of 1 kW electrical demand to 1 kW heat to G6; its cooling type and cooling-loop allocation remain unknown."
     ]
   },
   "capability": {
@@ -84,7 +85,7 @@
     ],
     "cooling": {
       "type": null,
-      "electrical_kw_to_heat_kw": null,
+      "electrical_kw_to_heat_kw": 1,
       "chilled_water_load_rule": null,
       "notes": "Cooling is a required resource in the concept image. Cooling type, conversion factor and load rule are not specified for G6."
     },
@@ -118,7 +119,9 @@
   "installation": [
     {
       "operation": "install_component",
-      "component_ids": ["fire_detection_and_suppression_module"],
+      "component_ids": [
+        "fire_detection_and_suppression_module"
+      ],
       "port_only": null,
       "crew_required": null,
       "duration_minutes": null,
