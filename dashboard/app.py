@@ -426,6 +426,127 @@ def check():
     out["elapsed_s"] = round(time.perf_counter() - t0, 3)
     return jsonify(_json(out))
 
+
+# ---------------------------------------------------------------- A / A′ · original v3 explainability + eight-dial contract
+@app.post("/api/decision")
+def decision():
+    """Restore the v3 UI's baseline/final admission comparison endpoint.
+
+    The supplied v3 template calls this endpoint for both Scenario A and A′.
+    Keep the output contract aligned with the original v3 dashboard.
+    """
+    import itertools
+    from governor.admission import _demand_plan, degraded_floor, describe_group
+    from governor.model import binding_groups
+    q = request.get_json(force=True)
+    try:
+        raw, ov = _raw_with(q.get("overrides"))
+    except Exception as e:
+        return jsonify({"error": f"override: {e}"}), 400
+    pr = q.get("priority", "survey")
+    w = raw["priority"][pr]["weights"]
+    guests = loader.load_guest_data(raw)
+    budget = loader.load_ship_budget(raw)
+    installed = dict(q.get("installed") or {})
+    adds = {g: (c if c and c != "auto" else None)
+            for g, c in (q.get("adds") or {}).items() if g not in installed}
+    combo = {**installed, **adds}
+    t0 = time.perf_counter()
+    solves = 0
+
+    p = build_problem(raw, guests, {"installed": combo}, pr,
+                      baseline=True, allow_removal=False)
+    plan, core = solve_model(p)
+    solves += 1
+    out = {"priority": pr, "weights": w, "installed": installed,
+           "adds": list(adds), "overrides": ov,
+           "u_start": sum(w.get(g, 1) for g in installed),
+           "start_usage": _usage(raw, installed, pr)}
+    if plan is not None:
+        ev = evaluate(plan, guests, budget)
+        usage = _usage_table(ev, budget)
+        out["baseline"] = {"status": "FEASIBLE", "binding": [],
+                           "binding_text": [], "usage": usage}
+        out["final"] = {
+            "verdict": "YES", "ok": True, "steps": [], "actions": [],
+            "capability_lost": 0, "U": plan["objective"]["U_normal"],
+            "usage": usage, "set": list(plan["config"]),
+            "placement": {g: plan["config"][g] for g in plan["config"]},
+            "order": list(adds),
+        }
+    else:
+        binding = binding_groups(p, core)
+        demand = _demand_plan(raw, guests, {"installed": combo}, pr, minimal=False)
+        dev = evaluate(demand, guests, budget) if demand else None
+        fl = degraded_floor(demand, guests, budget) if demand else None
+        out["baseline"] = {
+            "status": "INFEASIBLE", "binding": binding,
+            "binding_text": [
+                describe_group(g, dev, budget, guests, demand, fl) if dev else g
+                for g in binding
+            ],
+            "usage": _usage_table(dev, budget) if dev else [],
+        }
+        best = None
+        for order in itertools.permutations(list(adds)) if adds else [()]:
+            cur, steps, last, ok = dict(installed), [], None, True
+            for c in order:
+                r = classify_admission(
+                    raw, {"installed": cur, "candidate": c}, pr, n_alternatives=0
+                )
+                solves += 1
+                steps.append({
+                    "candidate": c, "verdict": r["verdict"],
+                    "sentence": r["sentence"], "binding": r.get("binding", []),
+                    "binding_text": r.get("binding_text", []),
+                    "actions": [{**a, "for": c} for a in r.get("actions", [])],
+                })
+                if r["verdict"] not in ("YES", "YES-IF"):
+                    ok = False
+                    break
+                last = r
+                cur = {g: r["plan"]["config"][g]
+                       for g, on in r["plan"]["installed"].items() if on}
+            acts = [a for step in steps for a in step["actions"]]
+            cand = {
+                "order": list(order), "ok": ok, "steps": steps,
+                "actions": acts,
+                "capability_lost": round(
+                    sum(a.get("capability_lost", 0) for a in acts), 3),
+            }
+            if ok and last is not None:
+                cand.update(
+                    verdict=("YES-IF" if any(
+                        step["verdict"] == "YES-IF" for step in steps
+                    ) else "YES"),
+                    U=last["plan"]["objective"]["U_normal"],
+                    usage=last.get("usage", []), set=list(cur),
+                    placement=last.get("placement", {}),
+                    all_aboard=all(g in cur for g in adds),
+                )
+            else:
+                cand.update(
+                    verdict=steps[-1]["verdict"] if steps else "NO",
+                    U=None, usage=[], set=None,
+                    sentence=steps[-1]["sentence"] if steps else "",
+                )
+            if (best is None or
+                    (cand["ok"], cand["U"] or -1) >
+                    (best["ok"], best["U"] or -1)):
+                best = cand
+        out["final"] = best
+
+    final = out["final"]
+    if final.get("U") is not None and final["U"] < out["u_start"] - 1e-9:
+        out["recommendation"] = (
+            f"Feasible, but mission value under '{pr}' falls from "
+            f"{out['u_start']:g} to {final['U']:g}: the captain may prefer "
+            f"to decline {'+'.join(adds)}."
+        )
+    out["solves"] = solves
+    out["elapsed_s"] = round(time.perf_counter() - t0, 3)
+    return jsonify(_json(out))
+
 # ---------------------------------------------------------------- defaults (proposed combinations)
 @lru_cache(maxsize=16)
 def _defaults(priority: str, ov_key: str):
