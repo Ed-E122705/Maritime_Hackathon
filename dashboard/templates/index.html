@@ -150,6 +150,16 @@ td.num{font-family:var(--mono);text-align:right}
   <button class="tab" data-tab="AP">A′ · Under way</button>
   <button class="tab" data-tab="B">B · Right of Way</button>
 </div>
+
+<section class="card" id="g7CameraCard" aria-live="polite" style="margin:14px 22px">
+  <h3>G7 · Live camera deck activity (advisory)</h3>
+  <div class="two">
+    <div><div id="g7CameraStatus" class="mono">Loading camera status…</div>
+      <div id="g7CameraAge" class="mute" style="margin-top:6px">Camera status is not a safety clearance</div></div>
+    <div><b>Recent activity events</b><div id="g7CameraEvents" class="log mono" style="max-height:150px">None yet</div></div>
+  </div>
+  <p class="mute" style="font-size:12px">Motion is detected in a marked region, not a person; NO_MOVEMENT_DETECTED does not mean a clear deck. No automatic G4 flight or G6 suppression commands are issued. Scenario D will be added separately.</p>
+</section>
 <main>
   <aside id="side">
     <!-- A / A′ inputs -->
@@ -1019,6 +1029,33 @@ function switchTab(t){
   $$(".tab").forEach(b=>b.addEventListener("click", ()=>switchTab(b.dataset.tab)));
   switchTab("A");
 })();
+
+async function refreshG7Camera(){
+  try {
+    const response = await fetch("/api/g7-camera", {cache:"no-store"});
+    if (!response.ok) throw new Error("HTTP "+response.status);
+    const j = await response.json();
+    const status = document.getElementById("g7CameraStatus");
+    const age = document.getElementById("g7CameraAge");
+    const events = document.getElementById("g7CameraEvents");
+    const value = j.camera_online ? j.deck_activity : "OFFLINE / UNKNOWN";
+    status.textContent = value + (j.changed_pixels == null ? "" : " · changed pixels "+j.changed_pixels);
+    status.style.color = value === "MOVEMENT_DETECTED" ? "var(--amber)" : "var(--ink)";
+    age.textContent = "Last update: " + (j.timestamp_utc || "never") +
+      " · age: " + (j.age_seconds == null ? "unknown" : j.age_seconds+"s") +
+      " · safety clearance: NEVER VERIFIED";
+    const history = Array.isArray(j.events) ? j.events.slice(-10).reverse() : [];
+    events.textContent = history.length
+      ? history.map(e => e.timestamp_utc + "  " + e.deck_activity).join("\n")
+      : "No activity transitions recorded";
+  } catch (error) {
+    document.getElementById("g7CameraStatus").textContent = "CAMERA STATUS UNAVAILABLE";
+    document.getElementById("g7CameraAge").textContent = String(error);
+  }
+}
+refreshG7Camera();
+setInterval(refreshG7Camera, 1000);
+
 </script>
 </body>
 </html>
