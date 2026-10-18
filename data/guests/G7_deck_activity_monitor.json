@@ -3,19 +3,19 @@
   "id": "G7",
   "name": "Camera-based deck activity monitor",
   "source": {
-    "document": "Team-defined Logitech BRIO 101 USB camera prototype running CPU OpenCV on Dell Snapdragon X Elite; not an official Annex B guest.",
+    "document": "Team-defined Logitech BRIO 101 + Snapdragon/Dragonwing Scenario D prototype: CPU OpenCV on Dell Snapdragon X Elite, with future Dragonwing transfer unverified; not an Annex B guest.",
     "guest_card": "G7",
     "assumptions_added": [
-      "All onboard power, mass, placement, bandwidth, compute and installation figures are demonstration assumptions, not verified ship or camera measurements.",
-      "0.5 kg represents a hypothetical ship-mounted camera and bracket, not the laptop.",
-      "0.1 kW is a synthetic reservation for the entire camera/processing system, not the BRIO 101's measured USB power.",
-      "Mast-slot placement is simulated; live webcam is connected to a separate Dell prototype.",
-      "0.01 Mbit/s models status metadata only. Raw video is not sent over the simulated ship network.",
-      "One crew member and 30 minutes for port installation are hypothetical demonstration values, not an installation authorization."
+      "All power, mass, placement, bandwidth, compute and installation values are Scenario D demonstration assumptions, not verified hardware figures.",
+      "Monitoring 0.040 kW and alerting 0.065 kW are illustrative system load reservations, not the BRIO 101's measured USB draw.",
+      "1.2 kg represents a hypothetical onboard camera and mounting enclosure, not the Dell laptop.",
+      "G7 is a ship-side perimeter camera simulation; live video is processed separately on the Dell workstation.",
+      "0.02 Mbit/s reserves detection metadata only; raw camera video is not transmitted on the simulated ship backbone.",
+      "One crew member and 30 minutes for port installation remain unverified demo assumptions."
     ]
   },
   "capability": {
-    "description": "Observes movement within a marked simulated deck area and provides non-safety-certified crew advisory events.",
+    "description": "Watches a designated perimeter-surveillance region for unclassified motion candidates; publishes advisory signals to Scenario D, separate from flight-deck clearance.",
     "value_by_mission": {
       "rescue": "medium",
       "patrol": "medium",
@@ -34,7 +34,7 @@
       {
         "id": "deck_camera_pod",
         "name": "Camera and hypothetical mast mounting",
-        "mass_kg": 0.5,
+        "mass_kg": 1.2,
         "footprint_m2": 0.05
       }
     ],
@@ -65,13 +65,25 @@
         "id": "active",
         "power_kw": {
           "min": null,
-          "nominal": 0.1,
+          "nominal": 0.04,
           "peak": null
         },
         "max_duration_minutes": null,
         "interruptible": true,
         "capability_fraction": 1,
-        "notes": "Synthetic sustained 0.1 kW reservation, not measured camera draw."
+        "notes": "Scenario D monitoring: synthetic 0.040 kW continuous load."
+      },
+      {
+        "id": "alert",
+        "power_kw": {
+          "min": null,
+          "nominal": 0.065,
+          "peak": null
+        },
+        "max_duration_minutes": null,
+        "interruptible": true,
+        "capability_fraction": 1,
+        "notes": "Scenario D alert: synthetic 0.065 kW continuous load while an observation is active."
       }
     ],
     "cooling": {
@@ -85,11 +97,11 @@
         "type": "backbone",
         "bandwidth_mbps": {
           "min": null,
-          "nominal": 0.01,
+          "nominal": 0.02,
           "max": null
         },
         "disabled_in_emission_silence": false,
-        "notes": "Local activity-event metadata only, not camera frames."
+        "notes": "Scenario D metadata events only, 0.02 Mbps assumed; no raw video transmitted."
       }
     ],
     "compute": {
@@ -108,7 +120,14 @@
       "power_mode_id": "active",
       "requirements": [],
       "conflicts": [],
-      "notes": "OpenCV motion detector reports moving pixels in a marked region; absence of motion never certifies deck clearance."
+      "notes": "Observes a perimeter region independent of G4's launch deck. No motion does not certify safety."
+    },
+    {
+      "id": "alerting",
+      "power_mode_id": "alert",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "Unclassified motion alert; two positive observations are required by Scenario D before automated simulated G4 startup."
     }
   ],
   "installation": [
@@ -126,19 +145,20 @@
   ],
   "special_events": [],
   "policy_hints": [
-    "G7 alerts are advisory only; never infer safe deck clearance from NO_MOVEMENT_DETECTED.",
-    "Camera failure or stale data is UNKNOWN, not safe.",
-    "Do not trigger G6 fire suppression or G4 flight authorization from G7."
+    "G7 is perimeter surveillance only; never infer independent flight-deck clearance.",
+    "Require two consecutive valid positive observations before simulated G4 power-up.",
+    "Camera loss or stale data is UNKNOWN; never substitute it for operator launch authorization.",
+    "Only automatically start a software simulation of G4 power-up; no hardware start/launch commands."
   ],
   "documented_unknowns": [
-    "Real onboard camera placement, power including host computer, weather tolerance and installation details unknown.",
-    "OpenCV motion detection can miss stationary objects, fail under glare or in darkness, and cannot identify persons reliably.",
-    "Actual deck-safety logic and Scenario D trigger conditions are not yet defined.",
-    "Real per-guest hardware requirements and processing-latency limits remain unverified."
+    "Actual electrical draw, environmental reliability, mass, mounting and end-to-end camera latency are unverified.",
+    "The motion detector has no object classifier, person identification or certified intrusion detection; an unclassified candidate is not an identified object.",
+    "Actual hardware interface for Qualcomm Dragonwing and physical drone commands are not implemented.",
+    "Flight-deck safety requires separate verified checks; perimeter detection cannot validate takeoff conditions."
   ],
   "notes": [
-    "User-defined G7; physical values model hypothetical shipboard adoption, live camera runs on a Dell development laptop.",
-    "The live JSON event stream does not automatically affect D1–D4 or safety interlocks.",
-    "Not a Snapdragon NPU workload."
+    "User-defined G7 with new Scenario D synthetic values; camera prototype runs on Dell Snapdragon X Elite.",
+    "Scenario D responds to motion, not a certified AI object classification; NPU deployment is optional future work.",
+    "All simulated launches require an independent deck verification and explicit software operator authorization."
   ]
 }
