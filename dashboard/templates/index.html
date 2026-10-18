@@ -252,7 +252,9 @@ header{position:relative}
 .camPanel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;width:min(960px,94vw);max-height:94vh;overflow:auto}
 .camGrid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:10px}
 .camStage{position:relative;background:#000;border-radius:10px;overflow:hidden;aspect-ratio:4/3}
-.camStage video,.camStage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.camStage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.camStage .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:13px;text-align:center;padding:20px}
+#camLog{white-space:pre-wrap;font-family:var(--mono);font-size:11px;color:var(--red);margin-top:6px;max-height:120px;overflow:auto}
 .obs{display:flex;gap:6px;margin-top:8px} .obs i{flex:1;height:8px;border-radius:4px;background:#1d2a44} .obs i.on{background:var(--green)}
 .mf{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12.5px;margin-top:6px} .mf .k{color:var(--mute)}
 #camStatus{font-size:14px}
@@ -273,13 +275,14 @@ header{position:relative}
       <button class="btn small" id="camClose" style="flex:0 0 auto">✕ Close</button></div>
     <div class="camGrid">
       <div>
-        <div class="camStage"><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas></div>
-        <label>Camera</label><select id="camDevice"></select>
+        <div class="camStage"><div class="ph" id="camPh">starting vision/g7_deck_watch.py…</div><img id="camPreview" alt="G7 camera preview (annotated)" class="hide"></div>
+        <label>Camera index (OpenCV)</label><select id="camDevice"><option value="0">0 · built-in / first camera</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+        <div id="camLog"></div>
       </div>
       <div>
         <div class="dbox"><div class="t">Status</div><div id="camStatus" class="st">starting…</div>
           <div class="mute" style="font-size:12px">Keep the camera still and <b>move a hand or object</b> in front of it. Motion is confirmed
-            as <b>G7</b> after two consecutive positive observations (card G7 policy). Detector: frame-difference motion, in the browser, no video stored.</div>
+            as <b>G7</b> after two consecutive positive observations (card G7 policy). Detector: <span class="mono">vision/g7_deck_watch.py</span> (OpenCV MOG2, centre region), started by the dashboard.</div>
           <div class="obs" id="camObs"><i></i><i></i></div></div>
         <div class="dbox" id="camCard" style="margin-top:10px"><div class="t">G7 guest card</div><div class="mute" style="margin-top:4px">—</div></div>
         <button class="btn" id="camSubmit" disabled style="margin-top:10px;width:100%">Submit to Scenario A</button>
@@ -1474,91 +1477,78 @@ $("#play").addEventListener("click", ()=>{
 });
 
 
-// ---------- camera: motion → G7 → Scenario A (existing optimizer) ----------
-// Browser-side motion detector, same idea as vision/g7_deck_watch.py (MOG2 on a still camera), CPU only:
-// each frame is shrunk to 160×120 grey; a pixel "changed" if it differs from a slow running background by more
-// than PIX_DIFF; a frame shows motion if more than MOTION_FRAC of pixels changed. Observation rule from the
-// G7 card policy_hints: two consecutive positive observations. One observation = a 0.5 s window in which at
-// least OBS_FRAC of the frames showed motion. Vision tuning only — no ship physics here.
-const OBS_MS = 500, OBS_NEED = 2, OBS_FRAC = 0.6, MW = 160, MH = 120, PIX_DIFF = 28, MOTION_FRAC = 0.02, BG_ALPHA = 0.08, WARMUP = 15;
-const CAM = {stream:null, timer:null, win:[], winStart:0, pos:0, ok:false, bg:null, frames:0, sm:null};
+// ---------- camera: vision/g7_deck_watch.py → motion → G7 → Scenario A (existing optimizer) ----------
+// The dashboard starts the repo's Python watcher (OpenCV MOG2 on the centre region, --no-window) and polls its
+// status file through /api/g7-camera. Observation rule from the G7 card policy_hints: two consecutive positive
+// observations. One observation = a 0.5 s window with at least one raw positive motion sample from the watcher.
+const OBS_MS = 500, OBS_NEED = 2, POLL_MS = 250;
+const CAM = {timer:null, win:false, winStart:0, pos:0, ok:false, busy:false, lastPix:null, open:false};
 function camSay(kind, txt){
   $("#camStatus").className = "st " + ({ok:"v-YES", wn:"v-YES-IF", bad:"v-NO"}[kind] || "v-KEEP");
   $("#camStatus").textContent = txt;
 }
 function camReset(){
-  Object.assign(CAM, {win:[], winStart:0, pos:0, ok:false, bg:null, frames:0});
+  Object.assign(CAM, {win:false, winStart:0, pos:0, ok:false, lastPix:null});
   $("#camSubmit").disabled = true; $$("#camObs i").forEach(e=>e.classList.remove("on"));
   $("#camCard").innerHTML = `<div class="t">G7 guest card</div><div class="mute" style="margin-top:4px">—</div>`;
+  $("#camLog").textContent = "";
 }
-function camStopStream(){
+async function camStopStream(){
   clearInterval(CAM.timer); CAM.timer = null;
-  if (CAM.stream) CAM.stream.getTracks().forEach(t=>t.stop());
-  CAM.stream = null;
+  try { await fetch("/api/g7-watch/stop", {method:"POST"}); } catch(e){}
+  $("#camPreview").classList.add("hide"); $("#camPh").classList.remove("hide");
 }
-function camClose(){ camStopStream(); $("#camModal").classList.add("hide"); }
+function camClose(){ CAM.open = false; camStopStream(); $("#camModal").classList.add("hide"); }
 async function camOpen(){
-  $("#camModal").classList.remove("hide"); camReset();
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    camSay("bad", "camera not available here — open the dashboard at http://127.0.0.1:5050 (browsers allow cameras only on localhost or https)"); return;
-  }
-  try { await camStart(); } catch(e){ camSay("bad", "camera: " + (e.message || e.name)); }
+  $("#camModal").classList.remove("hide"); CAM.open = true;
+  try { await camStart($("#camDevice").value); } catch(e){ camSay("bad", "camera: " + (e.message || e)); }
 }
-async function camStart(deviceId){
-  camStopStream(); camReset(); camSay("", "opening camera…");
-  CAM.stream = await navigator.mediaDevices.getUserMedia({audio:false,
-    video: deviceId ? {deviceId:{exact:deviceId}, width:640, height:480} : {width:640, height:480}});
-  const v = $("#camVideo"); v.srcObject = CAM.stream; await v.play();
-  const cur = CAM.stream.getVideoTracks()[0].getSettings().deviceId;
-  const devs = (await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput");
-  $("#camDevice").innerHTML = devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?"selected":""}>${esc(d.label || "camera " + (i+1))}</option>`).join("");
-  if (!CAM.sm){ CAM.sm = document.createElement("canvas"); CAM.sm.width = MW; CAM.sm.height = MH; }
-  camSay("", "warming up — keep the camera still…");
-  CAM.timer = setInterval(camTick, 66);
+async function camStart(index){
+  clearInterval(CAM.timer); CAM.timer = null; camReset();
+  camSay("", "starting vision/g7_deck_watch.py…");
+  $("#camPh").textContent = "starting the camera… (macOS may ask to allow camera access for Terminal / VS Code)";
+  const r = await fetch("/api/g7-watch/start", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({camera: +index})});
+  const j = await r.json();
+  if (!r.ok || j.error){ camSay("bad", j.error || ("HTTP " + r.status)); $("#camLog").textContent = j.log || ""; return; }
+  CAM.timer = setInterval(camTick, POLL_MS);
 }
-function camTick(){
-  const v = $("#camVideo");
-  if (!v.videoWidth) return;
-  const sx = CAM.sm.getContext("2d", {willReadFrequently:true});
-  sx.drawImage(v, 0, 0, MW, MH);
-  const px = sx.getImageData(0, 0, MW, MH).data, n = MW * MH;
-  const g = new Float32Array(n);
-  for (let i = 0; i < n; i++) g[i] = 0.299*px[4*i] + 0.587*px[4*i+1] + 0.114*px[4*i+2];
-  if (!CAM.bg){ CAM.bg = g; return; }
-  let changed = 0, x0 = MW, y0 = MH, x1 = -1, y1 = -1;
-  for (let i = 0; i < n; i++){
-    if (Math.abs(g[i] - CAM.bg[i]) > PIX_DIFF){
-      changed++; const x = i % MW, y = (i / MW) | 0;
-      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+async function camTick(){
+  if (CAM.busy || !CAM.open) return;
+  CAM.busy = true;
+  try {
+    const [c, w] = await Promise.all([fetch("/api/g7-camera", {cache:"no-store"}).then(r=>r.json()),
+                                      fetch("/api/g7-watch", {cache:"no-store"}).then(r=>r.json())]);
+    if (!w.running && !c.camera_online){
+      camSay("bad", w.returncode ? `camera ${w.camera} could not be opened — try another index, or allow camera access for Terminal / VS Code (macOS: System Settings → Privacy & Security → Camera)`
+                                 : `camera not running — ${c.reason || "the watcher exited"}`);
+      $("#camLog").textContent = w.log || "";
+      $("#camPreview").classList.add("hide"); $("#camPh").classList.remove("hide");
+      $("#camPh").textContent = "camera unavailable — check the camera index, or macOS camera permission for Terminal / VS Code";
+      clearInterval(CAM.timer); CAM.timer = null; return;
     }
-    CAM.bg[i] += BG_ALPHA * (g[i] - CAM.bg[i]);
-  }
-  CAM.frames++;
-  if (CAM.frames < WARMUP){ camSay("", `warming up — keep the camera still… ${CAM.frames}/${WARMUP}`); return; }
-  const frac = changed / n, motion = frac > MOTION_FRAC;
-  camResults(motion ? {x:x0, y:y0, w:x1-x0+1, h:y1-y0+1} : null, frac, v);
-}
-function camResults(box, frac, v){
-  const cv = $("#camCanvas");
-  cv.width = v.videoWidth || 640; cv.height = v.videoHeight || 480;
-  const ctx = cv.getContext("2d"); ctx.clearRect(0, 0, cv.width, cv.height);
-  if (box){
-    const kx = cv.width / MW, ky = cv.height / MH;
-    ctx.strokeStyle = CAM.ok ? "#3ddc84" : "#f5a524"; ctx.lineWidth = 4;
-    ctx.strokeRect(box.x*kx, box.y*ky, box.w*kx, box.h*ky);
-  }
-  const now = performance.now();
-  if (!CAM.winStart) CAM.winStart = now;
-  CAM.win.push(!!box);
-  if (now - CAM.winStart >= OBS_MS){
-    const f = CAM.win.filter(Boolean).length / CAM.win.length;
-    CAM.pos = f >= OBS_FRAC ? CAM.pos + 1 : 0;
-    CAM.win = []; CAM.winStart = now;
-    if (CAM.pos >= OBS_NEED && !CAM.ok) camRecognised(frac);
-  }
-  $$("#camObs i").forEach((e,i)=>e.classList.toggle("on", CAM.ok || i < CAM.pos));
-  if (!CAM.ok) camSay(box ? "wn" : "", box ? `MOVEMENT_DETECTED (${(frac*100).toFixed(1)} % of pixels) — observation ${Math.min(CAM.pos+1, OBS_NEED)} / ${OBS_NEED}`
-                                          : `NO_MOVEMENT_DETECTED (${(frac*100).toFixed(1)} % ≤ ${(MOTION_FRAC*100).toFixed(0)} %)`);
+    if (c.camera_online){
+      const im = $("#camPreview");
+      im.src = "/api/g7-preview.jpg?t=" + Date.now();
+      im.onload = ()=>{ im.classList.remove("hide"); $("#camPh").classList.add("hide"); };
+    }
+    if (CAM.ok) return;
+    if (!c.camera_online || c.deck_activity === "UNKNOWN"){ camSay("", "waiting for the camera… " + (c.reason || "")); return; }
+    if (c.deck_activity === "INITIALIZING"){ camSay("", "warming up (40 frames) — keep the camera still…"); return; }
+    const now = performance.now();
+    if (!CAM.winStart) CAM.winStart = now;
+    if (c.positive_motion_sample) CAM.win = true;
+    CAM.lastPix = c.changed_pixels;
+    if (now - CAM.winStart >= OBS_MS){
+      CAM.pos = CAM.win ? CAM.pos + 1 : 0;
+      CAM.win = false; CAM.winStart = now;
+      if (CAM.pos >= OBS_NEED) camRecognised(c.changed_pixels);
+    }
+    $$("#camObs i").forEach((e,i)=>e.classList.toggle("on", CAM.ok || i < CAM.pos));
+    if (!CAM.ok) camSay(c.deck_activity === "MOVEMENT_DETECTED" ? "wn" : "",
+      `${c.deck_activity} · changed pixels ${c.changed_pixels ?? "—"} — observation ${Math.min(CAM.pos + (c.positive_motion_sample ? 1 : 0), OBS_NEED)} / ${OBS_NEED}`);
+  } catch(e){ camSay("bad", "camera status: " + (e.message || e)); }
+  finally { CAM.busy = false; }
 }
 function camRecognised(frac){
   CAM.ok = true;
@@ -1570,7 +1560,7 @@ function camRecognised(frac){
   camSay("ok", `${CAM_GUEST} detected — motion confirmed`);
   $("#camCard").innerHTML = `<div class="t">G7 guest card</div>
     <div style="font-weight:800;margin-top:4px">${CAM_GUEST} · ${esc(G.name)}</div>
-    <div class="mf"><span class="k">evidence</span><span>motion in ${OBS_NEED} consecutive observations (${(frac*100).toFixed(1)} % of pixels changed)</span>
+    <div class="mf"><span class="k">evidence</span><span>motion in ${OBS_NEED} consecutive observations (${frac ?? "—"} changed pixels, vision/g7_deck_watch.py)</span>
       <span class="k">mass</span><span>${esc(G.mass_kg)} kg</span>
       <span class="k">positions</span><span>${G.configs.map(c=>esc(c.id) + (c.preferred ? " ★" : "")).join(", ")}</span>
       <span class="k">power</span><span>${esc(pw || "–")}</span>
@@ -1661,7 +1651,8 @@ function switchTab(t){
   $("#camBtn").addEventListener("click", camOpen);
   $("#camClose").addEventListener("click", camClose);
   $("#camSubmit").addEventListener("click", camSubmit);
-  $("#camDevice").addEventListener("change", e=>{ camStart(e.target.value).catch(err=>camSay("bad", "camera: " + (err.message || err.name))); });
+  $("#camDevice").addEventListener("change", e=>{ camStart(e.target.value).catch(err=>camSay("bad", "camera: " + (err.message || err))); });
+  window.addEventListener("beforeunload", ()=>{ try { navigator.sendBeacon("/api/g7-watch/stop"); } catch(e){} });
   document.addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("#camModal").classList.contains("hide")) camClose(); });
   switchTab("A");
 })();

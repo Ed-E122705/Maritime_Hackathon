@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import sys
 import time
 from functools import lru_cache
@@ -708,6 +709,78 @@ def g7_camera():
     response.headers["Cache-Control"] = "no-store"
     return response
 
+
+
+# ---------------------------------------------------------------- G7 camera process
+# The 📷 button starts the repo's own watcher, vision/g7_deck_watch.py --no-window, as a child process.
+# It writes vision/g7_status.json + g7_preview.jpg, which /api/g7-camera and /api/g7-preview.jpg already serve.
+import atexit                                                        # noqa: E402
+import importlib.util                                                # noqa: E402
+import signal                                                        # noqa: E402
+import subprocess                                                    # noqa: E402
+
+_G7_WATCH = {"proc": None, "camera": None}
+_G7_LOG = ROOT / "vision" / "g7_watch.log"
+
+
+def _g7_watch_info():
+    proc = _G7_WATCH["proc"]
+    running = proc is not None and proc.poll() is None
+    try:
+        log = _G7_LOG.read_text(encoding="utf-8", errors="replace")[-1500:]
+    except OSError:
+        log = ""
+    return {"running": running, "camera": _G7_WATCH["camera"],
+            "returncode": None if proc is None or running else proc.returncode, "log": log}
+
+
+def _g7_watch_stop():
+    proc = _G7_WATCH["proc"]
+    if proc is not None and proc.poll() is None:
+        try:
+            # SIGINT lets the watcher run its finally block (release camera, publish "Camera stopped").
+            if os.name == "nt":
+                proc.terminate()
+            else:
+                proc.send_signal(signal.SIGINT)
+            proc.wait(timeout=3)
+        except Exception:
+            proc.kill()
+            proc.wait(timeout=3)
+    _G7_WATCH["proc"] = None
+
+
+atexit.register(_g7_watch_stop)
+
+
+@app.get("/api/g7-watch")
+def g7_watch_status():
+    response = jsonify(_g7_watch_info())
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@app.post("/api/g7-watch/start")
+def g7_watch_start():
+    body = request.get_json(silent=True) or {}
+    cam = body.get("camera", 0)
+    if type(cam) is not int or not 0 <= cam <= 9:
+        return jsonify({"error": "camera must be an integer index 0-9"}), 400
+    if importlib.util.find_spec("cv2") is None:
+        return jsonify({"error": "OpenCV is not installed in this Python. Run: .venv/bin/pip install opencv-python"}), 400
+    _g7_watch_stop()
+    log = open(_G7_LOG, "w", encoding="utf-8")
+    _G7_WATCH["proc"] = subprocess.Popen(
+        [sys.executable, "-u", str(ROOT / "vision" / "g7_deck_watch.py"), "--camera", str(cam), "--no-window"],
+        cwd=str(ROOT), stdout=log, stderr=subprocess.STDOUT)
+    _G7_WATCH["camera"] = cam
+    return jsonify(_g7_watch_info())
+
+
+@app.post("/api/g7-watch/stop")
+def g7_watch_stop():
+    _g7_watch_stop()
+    return jsonify(_g7_watch_info())
 
 
 # Scenario D is an isolated SIMULATION. No physical G4 commands are issued.
