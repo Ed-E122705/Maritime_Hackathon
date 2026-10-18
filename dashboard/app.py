@@ -561,7 +561,7 @@ def scenario_d_live_sample():
     data = request.get_json(silent=True) or {}
     if not isinstance(data, dict):
         return jsonify({"error": "Expected JSON object"}), 400
-    if not all(isinstance(data.get(k, False), bool) for k in ("perimeter_motion", "deck_obstructed", "operator_approval")):
+    if not all(isinstance(data.get(k, False), bool) for k in ("perimeter_motion", "deck_obstructed", "operator_approval", "observation_valid")):
         return jsonify({"error": "All booleans must be true/false"}), 400
     with _scenario_d_lock:
         if _scenario_d_live.time >= _scenario_d_live.cfg["duration_seconds"]:
@@ -570,6 +570,7 @@ def scenario_d_live_sample():
             perimeter_motion=data.get("perimeter_motion", False),
             deck_obstructed=data.get("deck_obstructed", False),
             approve=data.get("operator_approval", False),
+            observation_valid=data.get("observation_valid", True),
         )
     return jsonify(row)
 
