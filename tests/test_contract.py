@@ -184,12 +184,18 @@ def test_crane_time_limit_gives_not_now_with_hours_needed(raw):
     assert "14 h" in r["sentence"]
 
 
-def test_overlay_role_keys_are_strings_so_guests_can_be_shed_to_off(raw):
-    # YAML reads a bare `off:` as boolean False — every role key must stay a string
+def test_overlay_role_keys_are_strings_and_safety_guests_cannot_be_shed(raw):
+    # YAML may read bare `off:` as boolean False: all role keys must be strings.
     for gid, ov in raw["overlay"].items():
         assert all(isinstance(k, str) for k in ov), gid
     G = loader.load_guest_data(raw)
-    assert all("off" in G[g].modes for g in G)
+    for gid, guest in G.items():
+        if guest.safety_critical:
+            # D4 may never shed or park safety-critical guests in standby.
+            assert "off" not in guest.modes, gid
+            assert "standby" not in guest.modes, gid
+        else:
+            assert "off" in guest.modes, gid
 
 
 def test_lost_line_stress_sheds_instead_of_removing(raw):
