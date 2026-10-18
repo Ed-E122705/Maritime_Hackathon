@@ -488,6 +488,21 @@ def index():
     return render_template("index.html")
 
 
+@app.get("/api/g7-preview.jpg")
+def g7_camera_preview():
+    """Only serve the most recent local annotated preview; no video archive."""
+    from flask import send_file, abort
+    from vision.g7_state import load_camera_status
+    if not load_camera_status(ROOT)["camera_online"]:
+        abort(404)
+    preview = ROOT / "vision" / "g7_preview.jpg"
+    if not preview.is_file():
+        abort(404)
+    response = send_file(preview, mimetype="image/jpeg")
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 @app.get("/api/g7-camera")
 def g7_camera():
     """Live advisory status and recent transition history from the BRIO 101."""
