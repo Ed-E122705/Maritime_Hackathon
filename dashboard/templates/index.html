@@ -1143,7 +1143,10 @@ dEl("dLiveRefresh").addEventListener("click",async()=>{
   try {const j=await (await fetch("/api/scenario/d/live")).json();
     dEl("dLiveResult").textContent="Live tick "+j.second+" · G4 "+
       (j.latest?.g4_state||"standby")+" · latest "+(j.latest?.g7_status||"awaiting samples")+
-      " · "+(j.latest?.power?.total_kw??"—")+" kW";
+      " · "+(j.latest?.power?.total_kw??"—")+" kW"+
+      " · G4 "+(j.latest?.power?.g4_kw??"—")+" kW"+
+      (j.latest?.g4_state==="Starting"||j.latest?.g4_state==="Awaiting approval" ?
+      " · No motion "+(j.latest?.no_motion_seconds??0)+"/"+(j.latest?.no_motion_shutdown_seconds??5)+" s until power-off" : "");
     dEl("dLiveEventLog").textContent=(j.events||[]).slice(-8).map(x=>x.second+"s "+x.event).join("\\n");}
   catch(e){dEl("dLiveResult").textContent=String(e);}
 });
