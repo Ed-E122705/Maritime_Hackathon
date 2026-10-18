@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Physics Engine Dashboard</title>
+<style>
+:root{
+  --bg:#0b1220; --panel:#0f1a2e; --panel2:#132139; --line:#22324f; --ink:#e6edf7; --mute:#8a9bb8;
+  --green:#3ddc84; --amber:#f5a524; --red:#ff5c5c; --cyan:#5cc8ff; --ghost:#55657f;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{padding:18px 22px 10px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:22px;letter-spacing:.5px}
+h1 span{color:var(--mute);font-weight:400}
+.console{font-family:var(--mono);font-size:13px;margin-top:8px;color:var(--amber)}
+.console.status{color:var(--cyan);min-height:1.4em}
+.tabs{display:flex;gap:6px;padding:10px 22px 0}
+.tab{background:transparent;border:1px solid var(--line);border-bottom:none;color:var(--mute);padding:8px 14px;border-radius:8px 8px 0 0;cursor:pointer;font-weight:600}
+.tab.on{background:var(--panel);color:var(--ink)}
+main{display:grid;grid-template-columns:310px 1fr;gap:14px;padding:0 22px 22px}
+aside,.card{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+aside{padding:14px;align-self:start;position:sticky;top:10px;max-height:calc(100vh - 20px);overflow:auto}
+aside h3,.card h3{margin:14px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mute)}
+aside h3:first-child{margin-top:0}
+label{display:block;font-size:12px;color:var(--mute);margin:6px 0 2px}
+select,input[type=number],input[type=text],textarea{width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;font-size:13px}
+textarea{font-family:var(--mono);font-size:12px;min-height:58px}
+input[type=range]{width:100%;accent-color:var(--cyan)}
+.row{display:flex;gap:6px;align-items:center}
+.row>*{flex:1}
+.guestrow{display:grid;grid-template-columns:22px 34px 1fr;gap:4px;align-items:center;margin:3px 0}
+.knob{margin:6px 0}
+.knob .kv{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
+.knob .kv b{color:var(--ink);font-family:var(--mono)}
+.knob.changed .kv b{color:var(--amber)}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--cyan)}
+.btn.small{padding:2px 8px;font-size:12px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{flex:1;background:var(--panel2);border:none;color:var(--mute);padding:5px;cursor:pointer;font-weight:600}
+.seg button.on{background:var(--cyan);color:#04121f}
+.content{display:flex;flex-direction:column;gap:14px;min-width:0}
+.gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px}
+.g{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 8px 8px;text-align:center;position:relative}
+.g .t{font-size:12px;font-weight:700;letter-spacing:.4px}
+.g svg{width:100%;max-width:190px;display:block;margin:2px auto 0}
+.g .v{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:-6px}
+.g .s{font-size:11px;color:var(--mute);min-height:2.6em}
+.g.over{border-color:var(--red)}
+.g.over .v{color:var(--red)}
+.g.tight .v{color:var(--amber)}
+.g .bind{position:absolute;top:6px;right:8px;font-size:10px;color:var(--red);font-weight:700}
+.needle{transition:transform .6s cubic-bezier(.2,.9,.3,1.2)}
+.legend{font-size:11px;color:var(--mute);padding:0 14px 10px;display:flex;gap:14px;flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}
+.card{padding:14px}
+.card h3:first-child{margin-top:0}
+.verdict{display:flex;gap:12px;align-items:flex-start}
+.pill{font-family:var(--mono);font-weight:800;font-size:18px;padding:6px 12px;border-radius:8px;white-space:nowrap}
+.v-YES{background:rgba(61,220,132,.15);color:var(--green);border:1px solid var(--green)}
+.v-YES-IF{background:rgba(245,165,36,.13);color:var(--amber);border:1px solid var(--amber)}
+.v-NO{background:rgba(255,92,92,.13);color:var(--red);border:1px solid var(--red)}
+.v-NOT-NOW{background:rgba(92,200,255,.12);color:var(--cyan);border:1px solid var(--cyan)}
+.sentence{font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ul.clean{margin:4px 0;padding-left:18px}
+ul.clean li{margin:3px 0}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+td.num{font-family:var(--mono);text-align:right}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:10px;border:1px solid var(--line);color:var(--mute);margin:1px}
+.tag.ok{color:var(--green);border-color:rgba(61,220,132,.5)}
+.tag.bad{color:var(--red);border-color:rgba(255,92,92,.5)}
+.tag.warn{color:var(--amber);border-color:rgba(245,165,36,.5)}
+.mute{color:var(--mute)}
+.mono{font-family:var(--mono)}
+.err{color:var(--red);font-family:var(--mono);font-size:12px}
+.timeline svg{width:100%;height:190px;display:block}
+.scrub{display:flex;gap:10px;align-items:center;margin:8px 0}
+.scrub input{flex:1}
+.log{font-family:var(--mono);font-size:12px;max-height:260px;overflow:auto}
+.log div{padding:2px 0;opacity:.35}
+.log div.past{opacity:1}
+.log div.now{background:rgba(92,200,255,.12)}
+.log .k-event{color:var(--amber)} .log .k-D4{color:var(--red)} .log .k-ship{color:var(--cyan)} .log .k-loss{color:#c79bff}
+.bar{height:8px;background:var(--panel2);border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--green)}
+.opt.bad .bar>i{background:var(--red)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:12px;padding:3px 8px;border-radius:6px;background:var(--panel2);border:1px solid var(--line)}
+.explain{font-size:12px;color:var(--mute);margin:0 0 6px}
+.sectionTitle{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mute);margin:16px 0 8px}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.bc{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.bc:hover{border-color:var(--cyan)}
+.bc.sel{border-color:#fff;box-shadow:0 0 0 1px #fff inset}
+.bc.rec{border-color:var(--green)}
+.bc .hd{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.bc .nm{font-weight:800;font-size:16px}
+.bc .pill{font-size:12px;padding:2px 8px}
+.bc .val{font-family:var(--mono);font-size:13px}
+.bc .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--mute);margin-top:2px}
+.bc ul{margin:0;padding-left:16px;font-size:12.5px}
+.v-KEEP{background:rgba(138,155,184,.12);color:var(--ink);border:1px solid var(--ghost)}
+.recb{font-size:11px;color:var(--green);font-weight:700}
+.busy{opacity:.55;transition:opacity .2s}
+.hide{display:none!important}
+@media (max-width:1100px){.gauges{grid-template-columns:repeat(2,1fr)} main{grid-template-columns:1fr} aside{position:static;max-height:none}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>The Physics Engine <span>· A Strictly Finite Budget</span></h1>
+  <div class="console">&gt; EXECUTION_ERROR: You cannot scale out. You must allocate, deny, or steal from another system.</div>
+  <div class="console status" id="status">&gt; loading engine…</div>
+</header>
+<div class="tabs">
+  <button class="tab on" data-tab="A">A · The Landlord (port)</button>
+  <button class="tab" data-tab="AP">A′ · Under way</button>
+  <button class="tab" data-tab="B">B · Right of Way</button>
+</div>
+<main>
+  <aside id="side">
+    <!-- A / A′ inputs -->
+    <div id="inA">
+      <h3>Priority file</h3>
+      <select id="pri"></select>
+      <div id="weights" class="row" style="margin-top:6px"></div>
+      <h3>Starting set (installed, D2 position)</h3>
+      <div class="row" id="presets" style="margin-bottom:4px">
+        <button class="btn small" data-preset="A_landlord_survey_max">G1+G2+G3</button>
+        <button class="btn small" data-preset="A_landlord">G1+G2+G5 (Annex)</button>
+        <button class="btn small" data-preset="A_landlord_rescue_max">G2+G4+G5</button>
+      </div>
+      <div id="installed"></div>
+      <div class="mute" style="font-size:11px;margin-top:2px">★ preferred position · ✕ position impossible for this card</div>
+      <div id="candBox" class="hide"><h3>Candidate</h3>
+      <select id="cand"></select></div>
+      <div id="apState" class="hide">
+        <h3>Ship state (A′)</h3>
+        <label>Crew aboard (D5)</label>
+        <div class="seg" id="crewA"><button data-v="14">14</button><button data-v="6" class="on">6</button><button data-v="0">0</button></div>
+        <div class="row">
+          <div><label>Speed kn</label><input type="number" id="spd" value="12" min="0" max="20"></div>
+          <div><label>Course</label><select id="course"><option>free</option><option>steady</option></select></div>
+        </div>
+        <div class="row">
+          <div><label>Deck</label><select id="deck"><option>occupied</option><option>clear</option></select></div>
+          <div><label>Sea state</label><input type="number" id="sea" value="3" min="0" max="8"></div>
+        </div>
+        <label>Wind kn</label><input type="number" id="wind" value="15" min="0" max="50">
+        <label><input type="checkbox" id="swap"> drone swap through the flight deck (G4.drone)</label>
+      </div>
+      <h3>Jury knobs (in memory only)</h3>
+      <div id="knobsA"></div>
+      <label>Extra overrides, one per line (same as <span class="mono">--set</span>)</label>
+      <textarea id="ovA" placeholder="card.G4.resources.power_modes.charging_initial.power_kw.nominal=70"></textarea>
+      <div class="row" style="margin-top:8px"><button class="btn" id="resetA">Reset</button><button class="btn" id="runA">Run</button></div>
+    </div>
+    <!-- B inputs -->
+    <div id="inB" class="hide">
+      <h3>Priority file (D3)</h3>
+      <select id="priB"></select>
+      <div id="weightsB" class="mute" style="font-size:12px;margin-top:4px"></div>
+      <h3>Crew aboard (D5)</h3>
+      <div class="seg" id="crewB"><button data-v="14" class="on">14</button><button data-v="6">6</button><button data-v="0">0</button></div>
+      <h3>Jury knobs (in memory only)</h3>
+      <div id="knobsB"></div>
+      <label>Extra overrides (<span class="mono">scn.*</span> for the scenario)</label>
+      <textarea id="ovB" placeholder="scn.timeline.1.reserve_kw=60"></textarea>
+      <div class="row" style="margin-top:8px"><button class="btn" id="resetB">Reset</button><button class="btn" id="runB">Run D3 + D4</button></div>
+    </div>
+  </aside>
+
+  <section class="content" id="content">
+      <div class="card" id="boardCard">
+        <h3 id="boardTitle">Decision board</h3>
+        <div class="explain">Each card is one choice for the guests that are not aboard yet. The engine judges every card on the
+          mission envelope (cruise power, 30 °C seawater, one genset down) and scores it with the priority file:
+          <b>mission value</b> = Σ weight × capability of the guests that end up aboard. Click a card: the gauges and the details below switch to it.</div>
+        <div id="recLine" style="margin:10px 0 4px;font-size:15px"></div>
+        <div class="board" id="board"></div>
+      </div>
+    <div class="card" style="padding:0">
+      <div class="gauges" id="gauges"></div>
+      <div class="legend" id="legend">
+        <span><i style="background:var(--green)"></i>within budget</span>
+        <span><i style="background:var(--amber)"></i>last 20 %</span>
+        <span><i style="background:var(--red)"></i>over budget</span>
+        <span><i style="background:var(--ghost)"></i>before (installed only)</span>
+        <span><i style="background:#fff"></i>after the decision</span>
+      </div>
+    </div>
+
+    <!-- A / A′ output -->
+    <div id="outA">
+      <div class="sectionTitle" id="detailTitle">Details</div>
+      <div class="card">
+        <div class="verdict"><div class="pill" id="vpill">…</div><div class="sentence" id="vsent"></div></div>
+        <div id="vextra" style="margin-top:8px"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>G6 · Independent physical monitoring check</h3>
+        <div class="explain">Uses the canonical fire-detection guest and physical-model G6 scenario. This is a conditional resource screen, not fire-control automation or full admission.</div>
+        <div class="row" style="margin-top:10px;justify-content:flex-start">
+          <button class="btn small" id="checkG6">Check G6 monitoring</button>
+          <span id="g6Verification" class="mono" style="font-size:12px;flex:4"></span>
+        </div>
+      </div>
+      <div class="two" style="margin-top:14px">
+        <div class="card"><h3>What has to change</h3><div class="explain">guests removed (D1) or run at lower power (D4) so the new card fits; least mission value lost first</div><div id="actions"></div>
+          <h3>Where everything sits (D2)</h3><div class="explain">position and power line chosen for every guest aboard</div><div id="placement"></div></div>
+        <div class="card"><h3>Other ways to make it fit</h3><div class="explain">next-best plans the optimizer found, with their mission value (U), value with one genset down (U deg) and tightest margin</div><div id="alts"></div>
+          <h3>Positions tried for the new card</h3><div class="explain">every position on its card: chosen, possible but worse, or impossible (why)</div><div id="popts"></div></div>
+      </div>
+      <div class="two" style="margin-top:14px">
+        <div class="card"><h3>Does it survive failures?</h3><div class="explain">the chosen plan re-checked under bad days that are not in the default envelope: cooling loop −40 %, genset down at the same time, emission silence, SATCOM at its 2 Mbit/s low end. “holds” = still feasible (with the change listed)</div><div id="stress"></div></div>
+        <div class="card"><h3>Every resource, before → after</h3><div class="explain">before = starting set; after = this card’s plan. Red = over capacity</div><div id="usage"></div></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>Which starting set should the ship sail with? (default search)</h3>
+        <div class="row" style="justify-content:flex-start;gap:10px;margin-bottom:6px">
+          <button class="btn" id="runDef" style="flex:0 0 auto">Search all G1–G5 trios</button>
+          <span class="mute" id="defNote" style="flex:1">ranks every 3-guest set by weighted capability, degraded capability and margin, then tests the two remaining cards as jury candidates</span>
+        </div>
+        <div id="defaults"></div>
+      </div>
+    </div>
+
+    <!-- B output -->
+    <div id="outB" class="hide">
+      <div class="card">
+        <div class="verdict"><div class="pill v-NOT-NOW" id="bpill">D3</div><div class="sentence" id="bsent"></div></div>
+        <div id="bextra" style="margin-top:8px"></div>
+      </div>
+      <div class="card timeline">
+        <h3>Timeline · scrub or play to watch the variables move</h3>
+        <div class="scrub"><button class="btn small" id="play">▶ Play</button><input type="range" id="tslider" min="0" max="90" value="0"><b class="mono" id="tlabel">min 0</b></div>
+        <div class="chips" id="chips"></div>
+        <svg id="tchart" viewBox="0 0 900 190" preserveAspectRatio="none"></svg>
+        <div class="legend" style="padding:4px 0 0">
+          <span><i style="background:var(--cyan)"></i>guest load kW</span><span><i style="background:var(--red)"></i>power reserve kW</span>
+          <span><i style="background:var(--amber)"></i>cooling capacity kW</span><span><i style="background:var(--green)"></i>G4 battery %</span>
+        </div>
+      </div>
+      <div class="two">
+        <div class="card"><h3>Options simulated and scored (Σ weight × capability-minutes)</h3><div id="bopts"></div>
+          <h3>What each guest got</h3><div id="bcaps"></div></div>
+        <div class="card"><h3>Event log (D3 · D4 · ship)</h3><div class="log" id="blog"></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+let META = null, TAB = "A", BDATA = null, playing = null;
+const GUESTS = ["G1","G2","G3","G4","G5","G6"];
+
+// ---------- knobs: each one is just a jury override path with its default ----------
+const KNOBS_A = [
+  {id:"rc",  label:"Cruise power reserve", path:"ship.power.reserve_kw.cruise", min:100, max:300, step:5,  unit:"kW"},
+  {id:"rd",  label:"Reserve, one genset down", path:"ship.power.degraded_reserve_kw.cruise", min:50, max:160, step:5, unit:"kW"},
+  {id:"cc",  label:"Cooling capacity at 30 °C", path:"ship.cooling.capacity_at_30c_kw", min:60, max:160, step:5, unit:"kW"},
+  {id:"sw",  label:"Hottest seawater on route", path:"ship.envelope.seawater_c", min:12, max:30, step:1, unit:"°C", pick:a=>Math.max(...a), fmt:v=>`[${Math.min(...META.ship.envelope.seawater_c)}, ${v}]`},
+  {id:"mm",  label:"Mass margin", path:"ship.mass.margin_t", min:5, max:14, step:0.5, unit:"t"},
+  {id:"st",  label:"Stability budget", path:"ship.mass.stability_budget_t_eq", min:6, max:16, step:0.5, unit:"t-eq"},
+  {id:"sat", label:"SATCOM capacity", path:"ship.data.satcom_mbps", min:1, max:20, step:1, unit:"Mbit/s"},
+];
+const KNOBS_B = [
+  {id:"bt",  label:"Battery report minute", path:"scn.timeline.0.t", min:2, max:30, step:1, unit:"min"},
+  {id:"dl",  label:"Drone must land within (G4 card)", path:"card.G4.special_events.0.recovery_deadline_minutes", min:4, max:40, step:1, unit:"min"},
+  {id:"tt",  label:"Genset trip minute", path:"scn.timeline.1.t", min:5, max:60, step:1, unit:"min"},
+  {id:"tr",  label:"Reserve after the trip", path:"scn.timeline.1.reserve_kw", min:30, max:200, step:5, unit:"kW"},
+  {id:"r0",  label:"Reserve before the trip", path:"scn.initial.reserve_kw", min:80, max:250, step:5, unit:"kW"},
+  {id:"sw",  label:"Seawater", path:"scn.environment.seawater_c", min:12, max:30, step:1, unit:"°C"},
+  {id:"leg", label:"Survey leg length", path:"scn.guests.G3.leg_min", min:10, max:80, step:5, unit:"min"},
+];
+// the default of every knob is the value at its override path in the loaded config / card / scenario
+function valueAt(path){
+  const [root, ...rest] = path.split(".");
+  let node = {ship: META.ship, card: META.card, scn: META.scenarios.B_right_of_way}[root];
+  for (const p of rest) node = node == null ? undefined : node[p];
+  return node;
+}
+function setDefaults(list){ list.forEach(k=>{ const v = valueAt(k.path); k.def = k.pick ? k.pick(v) : +v; }); }
+function buildKnobs(host, list){
+  host.innerHTML = list.map(k=>`<div class="knob" id="k_${host.id}_${k.id}"><div class="kv"><span>${k.label}</span><b><span>${k.def}</span> ${k.unit}</b></div>
+    <input type="range" min="${k.min}" max="${k.max}" step="${k.step}" value="${k.def}" data-k="${k.id}"></div>`).join("");
+  host.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",()=>{
+    const k = list.find(x=>x.id===inp.dataset.k), box = inp.closest(".knob");
+    box.querySelector("b span").textContent = inp.value;
+    box.classList.toggle("changed", +inp.value !== k.def);
+    schedule();
+  }));
+}
+function knobOverrides(host, list){
+  const out = [];
+  host.querySelectorAll("input").forEach(inp=>{
+    const k = list.find(x=>x.id===inp.dataset.k);
+    if (+inp.value !== k.def) out.push(`${k.path}=${k.fmt ? k.fmt(inp.value) : inp.value}`);
+  });
+  return out;
+}
+const lines = id => $(id).value.split("\n").map(s=>s.trim()).filter(Boolean);
+
+// ---------- gauges ----------
+const R = 70, CX = 90, CY = 86;
+function arcPath(f0, f1){                       // fractions of the half circle (0 = left, 1 = right)
+  const a0 = Math.PI*(1-f0), a1 = Math.PI*(1-f1);
+  const p = a => [CX + R*Math.cos(a), CY - R*Math.sin(a)];
+  const [x0,y0] = p(a0), [x1,y1] = p(a1);
+  return `M${x0.toFixed(1)},${y0.toFixed(1)} A${R},${R} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)}`;
+}
+// dial runs 0 → 1.2 × capacity: green to 80 %, amber to 100 %, red beyond
+const SPAN = 1.2, f = x => Math.max(0, Math.min(1, x / SPAN));
+function gaugeSVG(invert){
+  const zones = invert
+    ? [[0,f(.2),"var(--red)"],[f(.2),f(.35),"var(--amber)"],[f(.35),1,"var(--green)"]]
+    : [[0,f(.8),"var(--green)"],[f(.8),f(1),"var(--amber)"],[f(1),1,"var(--red)"]];
+  return `<svg viewBox="0 0 180 100">
+    <path d="${arcPath(0,1)}" stroke="#1d2a44" stroke-width="16" fill="none"/>
+    ${zones.map(([a,b,c])=>`<path d="${arcPath(a,b)}" stroke="${c}" stroke-width="10" fill="none" opacity=".85"/>`).join("")}
+    <line x1="${CX+R*Math.cos(Math.PI*(1-f(1)))*0.78}" y1="${CY-R*Math.sin(Math.PI*(1-f(1)))*0.78}" x2="${CX+R*Math.cos(Math.PI*(1-f(1)))*1.12}" y2="${CY-R*Math.sin(Math.PI*(1-f(1)))*1.12}" stroke="#fff" stroke-width="1.5" opacity=".6"/>
+    <g class="needle ghost" style="transform-origin:${CX}px ${CY}px;transform:rotate(-90deg)"><line x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY-R+6}" stroke="var(--ghost)" stroke-width="3" stroke-linecap="round"/></g>
+    <g class="needle main" style="transform-origin:${CX}px ${CY}px;transform:rotate(-90deg)"><line x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY-R+4}" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+    <circle cx="${CX}" cy="${CY}" r="5" fill="#fff"/></svg>`;
+}
+function renderGaugeShells(defs){
+  $("#gauges").innerHTML = defs.map((d,i)=>`<div class="g" id="g${i}"><div class="bind"></div><div class="t">${d.title}</div>${gaugeSVG(d.invert)}<div class="v">–</div><div class="s"></div></div>`).join("");
+}
+function setGauge(i, {used, cap, unit, sub, before, bind, invert, show}){
+  const el = $("#g"+i); if (!el) return;
+  const angle = x => -90 + 180 * f(x);
+  const ratio = (cap ? used / cap : 0);
+  el.querySelector(".main").style.transform = `rotate(${angle(ratio)}deg)`;
+  const gh = el.querySelector(".ghost");
+  if (before != null && cap){ gh.style.opacity = 1; gh.style.transform = `rotate(${angle(before/cap)}deg)`; }
+  else gh.style.opacity = 0;
+  const over = invert ? ratio < .2 : ratio > 1 + 1e-9, tight = invert ? ratio < .35 : ratio > .8;
+  el.classList.toggle("over", !!over); el.classList.toggle("tight", !over && tight);
+  el.querySelector(".v").textContent = show || (used == null ? "–" : `${fmt(used)} / ${fmt(cap)} ${unit}`);
+  el.querySelector(".s").innerHTML = sub || "";
+  el.querySelector(".bind").textContent = bind ? "BINDING" : "";
+}
+const fmt = x => x == null ? "–" : (Math.abs(x) >= 100 ? Math.round(x) : Math.round(x*10)/10).toLocaleString();
+
+// ---------- A / A′ ----------
+const GA = [
+  {title:"POWER (kW)"},{title:"COOLING LOOP"},{title:"DECK SPACE"},{title:"MAST POSITIONS"},
+  {title:"MASS"},{title:"DATA LINKS"},{title:"COMPUTE"},{title:"RESPONSE TIME"}];
+const GROUP_OF = {0:["power_normal","power_line","power_degraded"],1:["cooling_normal","cooling_degraded"],
+  2:["deck_space","hangar"],3:["mast"],4:["mass","stability"],5:["satcom","backbone","los_radio"],6:["compute"],7:["installation_time"]};
+const U = (rows, name) => (rows||[]).find(r=>r.resource.startsWith(name));
+
+function gaugesA(j){
+  const res = j.result, after = j.after.length ? j.after : j.demand, before = j.before;
+  const bind = new Set(res.binding || []);
+  const b = name => (U(before,name)||{}).used;
+  const pick = (i, name, extra) => {
+    const a = U(after,name) || U(before,name);
+    if (!a) return setGauge(i,{used:null});
+    setGauge(i, Object.assign({used:a.used, cap:a.capacity, unit:a.unit, before:after.length ? b(name) : null,
+      bind: GROUP_OF[i].some(g=>bind.has(g))}, extra||{}));
+  };
+  const gd = U(after,"power (genset_down)") || U(before,"power (genset_down)");
+  const lp = U(after,"line port") || U(before,"line port"), ls = U(after,"line stbd") || U(before,"line stbd");
+  pick(0,"power (normal", {sub:`one genset down: ${gd?fmt(gd.used)+" / "+fmt(gd.capacity):"–"} kW<br>lines: port ${lp?fmt(lp.used):"–"} · stbd ${ls?fmt(ls.used):"–"} / ${lp?fmt(lp.capacity):"–"}`});
+  pick(1,"cooling (normal", {sub:`judged at the hottest seawater of the envelope`});
+  // deck: two bays as one dial (fractions), hangar/roof in the sub-line
+  const b1 = U(after,"Bay 1")||U(before,"Bay 1"), b2 = U(after,"Bay 2")||U(before,"Bay 2");
+  if (b1 && b2) setGauge(2,{used:b1.used+b2.used, cap:b1.capacity+b2.capacity, unit:"bays",
+      before: after.length && U(before,"Bay 1") ? U(before,"Bay 1").used+U(before,"Bay 2").used : null,
+      sub:`Bay 1 ${fmt(b1.used)} · Bay 2 ${fmt(b2.used)}`, bind: GROUP_OF[2].some(g=>bind.has(g))});
+  else setGauge(2,{used:null});
+  const ms = META.ship.positions.mast_slot;
+  pick(3,"mast slots", {sub:`${ms.total} slots, ${ms.occupied} already taken by the ship`});
+  const stb = U(after,"stability")||U(before,"stability");
+  pick(4,"mass", {sub:`stability ${stb?fmt(stb.used)+" / "+fmt(stb.capacity):"–"} t-eq`});
+  const los = U(after,"LOS radio")||U(before,"LOS radio"), bb = U(after,"backbone")||U(before,"backbone");
+  pick(5,"SATCOM", {sub:`SATCOM shown · LOS ${los?fmt(los.used)+"/"+fmt(los.capacity):"–"} · backbone ${bb?fmt(bb.used):"–"} Mbit/s`});
+  const acc = U(after,"accelerators")||U(before,"accelerators"), ram = U(after,"RAM")||U(before,"RAM");
+  pick(6,"CPU cores", {sub:`accelerators ${acc?fmt(acc.used)+"/"+fmt(acc.capacity):"–"} · RAM ${ram?fmt(ram.used):"–"} GB`});
+  const lim = META.response_time.admission_s;
+  setGauge(7,{used:res.elapsed_s, cap:lim, unit:"s", show:`${res.elapsed_s} s / ${lim} s`, sub:"D1 decision time vs the 30 s ceiling (A.8)"});
+  if (!j.after.length && j.demand.length) $("#status").textContent = "> demand shown with every limit switched off — red needles are the classes that break";
+}
+
+function readA(){
+  const installed = {};
+  GUESTS.forEach(g=>{ if ($("#ic_"+g).checked) installed[g] = $("#is_"+g).value; });
+  const body = {scenario: TAB==="AP" ? ($("#swap").checked ? "A_prime_drone_swap" : "A_prime_underway") : "A_landlord",
+    priority: $("#pri").value, installed, candidate: $("#cand").value,
+    overrides: [...knobOverrides($("#knobsA"), KNOBS_A), ...weightOverrides(), ...lines("#ovA")]};
+  if (TAB==="AP"){
+    body.state = {location:"at_sea", crew:+$("#crewA .on").dataset.v, speed_kn:+$("#spd").value, course:$("#course").value,
+      deck:$("#deck").value, sea_state:+$("#sea").value, wind_kn:+$("#wind").value};
+    body.swap = $("#swap").checked ? "G4.drone" : "";
+  } else body.state = {location:"port", crew:14};
+  return body;
+}
+function weightOverrides(){
+  const p = $("#pri").value, out = [];
+  $$("#weights input").forEach(i=>{ if (+i.value !== META.priorities[p][i.dataset.g]) out.push(`priority.${p}.weights.${i.dataset.g}=${i.value}`); });
+  return out;
+}
+function renderWeights(){
+  const p = $("#pri").value;
+  $("#weights").innerHTML = GUESTS.map(g=>`<div><label>${g}</label><input type="number" min="0" max="20" step="1" data-g="${g}" value="${META.priorities[p][g]}"></div>`).join("");
+  $$("#weights input").forEach(i=>i.addEventListener("input", schedule));
+}
+function renderInstalled(inst){
+  $("#installed").innerHTML = GUESTS.map(g=>{
+    const G = META.guests[g];
+    const opts = G.configs.map(c=>`<option value="${c.id}" ${inst&&inst[g]===c.id?"selected":""}>${c.id}${c.preferred?" ★":""}${c.issues.length?" ✕":""}</option>`).join("");
+    return `<div class="guestrow"><input type="checkbox" id="ic_${g}" ${inst&&inst[g]?"checked":""}><b>${g}</b>
+      <select id="is_${g}" title="${G.name}">${opts}</select></div>`;
+  }).join("");
+  GUESTS.forEach(g=>{ $("#ic_"+g).addEventListener("change",()=>{refreshCand(); schedule();}); $("#is_"+g).addEventListener("change",schedule); });
+  refreshCand();
+}
+function refreshCand(){
+  const cur = $("#cand").value, swap = TAB==="AP" && $("#swap").checked;
+  const free = GUESTS.filter(g=> swap ? g==="G4" : !$("#ic_"+g).checked);
+  $("#cand").innerHTML = free.map(g=>`<option value="${g}">${g} · ${META.guests[g].name}</option>`).join("");
+  if (free.includes(cur)) $("#cand").value = cur;
+}
+
+async function runA(sel){
+  const body = readA();
+  if (sel){ body.installed = sel.installed; body.candidate = sel.candidate; }
+  if (!body.candidate){ $("#vpill").textContent="—"; $("#vsent").textContent="Every guest is installed — untick one to make a candidate."; return; }
+  $("#content").classList.add("busy");
+  $("#status").textContent = `> classify_admission(candidate=${body.candidate}, priority=${body.priority}${body.overrides.length? ", overrides="+body.overrides.length:""}) …`;
+  let j;
+  try { const r = await fetch("/api/admit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); j = await r.json(); }
+  catch(e){ j = {error:String(e)}; }
+  $("#content").classList.remove("busy");
+  if (j.error){ $("#status").innerHTML = `<span class="err">&gt; ${esc(j.error)}</span>`; return; }
+  if (sel && sel.before) j.before = sel.before;
+  if (sel && sel.u0 != null && j.result.value) j.result.value.before = sel.u0;
+  if (sel) $("#status").textContent = `> showing ${sel.label}: ${j.result.verdict} in ${j.result.elapsed_s} s`;
+  const res = j.result;
+  if (!sel) $("#status").textContent = `> ${res.verdict} in ${res.elapsed_s} s${j.overrides.length ? " · overrides: "+j.overrides.join(", ") : ""}`;
+  gaugesA(j);
+  $("#vpill").className = "pill v-"+res.verdict; $("#vpill").textContent = res.verdict;
+  $("#vsent").textContent = res.sentence;
+  let ex = "";
+  if (res.value) ex += `<span class="tag ${res.value.after<res.value.before?"bad":"ok"}">mission value ${res.value.before} → ${res.value.after}</span> `;
+  (res.binding||[]).forEach(b=>ex += `<span class="tag bad">binding: ${esc(b)}</span> `);
+  if (res.degraded) ex += `<div class="mute" style="margin-top:6px">${esc(res.degraded.sentence||"")}</div>`;
+  if (res.next_port_verdict) ex += `<div style="margin-top:6px"><span class="tag warn">next port: ${res.next_port_verdict}</span> <span class="mute">${esc(res.next_port_sentence||"")}</span></div>`;
+  if (res.window_unmet) ex += `<div style="margin-top:6px">${res.window_unmet.map(w=>`<span class="tag warn">${esc(w)}</span>`).join(" ")}</div>`;
+  (res.operability||[]).filter(o=>o.includes("NEVER")).forEach(o=> ex += `<div class="mute">⚠ ${esc(o)}</div>`);
+  if (res.warning) ex += `<div class="err">${esc(res.warning)}</div>`;
+  if (res.physical_crosscheck){
+    const p=res.physical_crosscheck;
+    ex += `<div style="margin-top:9px"><span class="tag ${p.status==="FAIL"?"bad":"warn"}">Independent physical snapshot: ${esc(p.status)}</span> <span class="mute">${esc(p.basis||p.reason||"selected-state screen")}</span></div>`;
+    (p.failed_constraints||[]).forEach(c=>ex += `<div class="err">Physical: ${esc(c)}</div>`);
+  }
+  if (res.integration_warning) ex += `<div class="err">${esc(res.integration_warning)}</div>`;
+  (res.binding_text||[]).forEach(t=> ex += `<div class="mute">· ${esc(t)}</div>`);
+  $("#vextra").innerHTML = ex;
+  $("#actions").innerHTML = (res.actions||[]).length ? `<ol class="clean">${res.actions.map(a=>`<li>${esc(a.text)}</li>`).join("")}</ol>` : `<span class="mute">${res.mode==="at_sea"?"nothing physical — see the sentence above":"no change to installed guests"}</span>`;
+  $("#placement").innerHTML = res.placement ? `<ul class="clean">${Object.entries(res.placement).map(([g,t])=>`<li><b>${g}</b> ${esc(t)}</li>`).join("")}</ul>` : `<span class="mute">–</span>`;
+  $("#alts").innerHTML = (res.alternatives||[]).length ? `<table><tr><th>#</th><th>plan</th><th>U</th><th>U deg</th><th>margin</th></tr>${res.alternatives.map((a,i)=>`<tr><td>${i+1}</td><td>${esc(a.actions.join("; ")||"no change")}</td><td class="num">${a.U_normal}</td><td class="num">${a.U_degraded}</td><td class="num">${a.MI_pct}%</td></tr>`).join("")}</table>` : `<span class="mute">no other distinct feasible plan</span>`;
+  $("#popts").innerHTML = (res.placement_options||[]).length ? `<ul class="clean">${res.placement_options.map(o=>`<li><span class="tag ${o.status==="chosen"?"ok":o.status==="impossible"?"bad":"warn"}">${o.status}</span> <b>${o.config}</b>${o.preferred?" ★":""} ${o.reason?`<span class="mute">— ${esc(o.reason)}</span>`:""}</li>`).join("")}</ul>` : `<span class="mute">–</span>`;
+  $("#stress").innerHTML = (res.stress||[]).length ? `<ul class="clean">${res.stress.map(s=>`<li><span class="tag ${s.holds?"ok":"bad"}">${s.holds?"holds":"fails"}</span> ${esc(s.sentence)}</li>`).join("")}</ul>` : `<span class="mute">–</span>`;
+  const after = j.after.length ? j.after : j.demand;
+  const rows = (after.length ? after : j.before).map(a=>{ const b = U(j.before, a.resource);
+    const over = a.used > a.capacity + 1e-9;
+    return `<tr><td>${esc(a.resource)}</td><td class="num">${b?fmt(b.used):"–"}</td><td class="num" style="color:${over?"var(--red)":"inherit"}">${fmt(a.used)}</td><td class="num">${fmt(a.capacity)}</td><td>${a.unit}</td></tr>`;}).join("");
+  $("#usage").innerHTML = `<table><tr><th>resource</th><th>before</th><th>${j.after.length?"after":j.demand.length?"demand":"now"}</th><th>cap</th><th></th></tr>${rows}</table>`;
+}
+
+// ---------- A · decision board ----------
+let BOARD = null;
+async function runBoard(){
+  const body = readA();
+  if (!Object.keys(body.installed).length){ $("#board").innerHTML = `<span class="mute">tick at least one installed guest</span>`; return; }
+  $("#content").classList.add("busy");
+  $("#status").textContent = `> judging every way to add ${GUESTS.filter(g=>!body.installed[g]).join(", ")} to ${Object.keys(body.installed).join("+")} under '${body.priority}' …`;
+  let j; try { const r = await fetch("/api/board",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); j = await r.json(); } catch(e){ j={error:String(e)}; }
+  $("#content").classList.remove("busy");
+  if (j.error){ $("#status").innerHTML = `<span class="err">&gt; ${esc(j.error)}</span>`; return; }
+  BOARD = j;
+  const start = Object.keys(j.installed).join("+"), keep = j.options[0], rec = j.options.find(o=>o.recommended);
+  $("#status").textContent = `> board: ${j.options.length} choices judged${j.overrides.length?" · overrides: "+j.overrides.join(", "):""}`;
+  $("#boardTitle").textContent = `Decision board — starting from ${start}, priority file '${j.priority}'`;
+  const wtxt = Object.entries(j.weights).map(([g,w])=>`${g}=${w}`).join(" ");
+  if (rec.id === "keep")
+    $("#recLine").innerHTML = `<span class="tag ok">recommendation</span> <b>Keep ${start}.</b> Every way of adding ${GUESTS.filter(g=>!j.installed[g]).join(" / ")} ends with less mission value than ${keep.U} under '${j.priority}' (weights ${wtxt}) — the captain should decline the card.`;
+  else {
+    const acts = rec.steps.flatMap(s=>s.actions);
+    $("#recLine").innerHTML = `<span class="tag ok">recommendation</span> <b>${esc(rec.label.replace("+ ","Add "))}</b>: mission value ${keep.U} → ${rec.U} under '${j.priority}' (weights ${wtxt})${acts.length?`, at the cost of: ${esc(acts.join("; "))}`:""}.`;
+  }
+  $("#board").innerHTML = j.options.map((o,i)=>boardCard(o, keep.U, i)).join("");
+  $$("#board .bc").forEach(el=>el.addEventListener("click",()=>selectOpt(+el.dataset.i)));
+  selectOpt(j.options.indexOf(rec));
+}
+function boardCard(o, u0, i){
+  const d = o.U == null ? null : Math.round((o.U - u0)*100)/100;
+  const val = o.U == null ? `<span class="err">not admitted</span>`
+    : `${o.U} <span style="color:${d>0?"var(--green)":d<0?"var(--red)":"var(--mute)"}">(${d>0?"+":""}${d})</span>`;
+  let why = "", chg = "";
+  if (o.id === "keep"){
+    why = `<li>nothing added; every guest at full power</li>`;
+    chg = `<li>no crane work</li>`;
+  } else {
+    const multi = o.steps.length > 1;
+    why = o.steps.map(s=>s.why.map(w=>`<li>${multi?`<b>${s.candidate}</b> ${s.verdict}: `:""}${esc(w)}</li>`).join("")).join("");
+    const acts = o.steps.flatMap(s=>s.actions.map(a=>`<li>${multi?`<b>${s.candidate}</b>: `:""}${esc(a)}</li>`));
+    chg = acts.join("") || `<li>no change to the guests aboard</li>`;
+  }
+  const ends = o.set ? Object.keys(o.set).join("+") : "—";
+  return `<div class="bc ${o.recommended?"rec":""}" data-i="${i}">
+    <div class="hd"><span class="nm">${esc(o.label)}</span><span class="pill v-${o.verdict}">${o.verdict}</span></div>
+    ${o.recommended?'<span class="recb">★ RECOMMENDED</span>':""}
+    <div class="lbl">mission value</div><div class="val">${val}</div>
+    <div class="lbl">${o.id==="keep"?"status":o.verdict==="YES"?"why it fits (tightest resources)":"why (binding constraint)"}</div><ul>${why}</ul>
+    <div class="lbl">what has to change</div><ul>${chg}</ul>
+    <div class="lbl">ends with aboard</div><div class="mono" style="font-size:12px">${ends}</div>
+  </div>`;
+}
+function selectOpt(i){
+  const o = BOARD.options[i];
+  $$("#board .bc").forEach(el=>el.classList.toggle("sel", +el.dataset.i===i));
+  $("#detailTitle").textContent = `Details · ${o.label}${o.steps.length>1?" (shown: the last step, "+o.adds[o.adds.length-1]+")":""}`;
+  if (o.id === "keep"){
+    gaugesA({result:{elapsed_s:0, binding:[]}, before:BOARD.before, after:[], demand:[]});
+    $("#status").textContent = `> showing ${o.label}: nothing added`;
+    $("#vpill").className = "pill v-KEEP"; $("#vpill").textContent = "KEEP";
+    $("#vsent").textContent = `No card added: ${o.label.replace("Keep ","")} stays as installed, mission value ${o.U}.`;
+    ["#vextra","#actions","#placement","#alts","#popts","#stress"].forEach(id=>$(id).innerHTML = `<span class="mute">–</span>`);
+    $("#usage").innerHTML = `<table><tr><th>resource</th><th>now</th><th>cap</th><th></th></tr>${BOARD.before.map(a=>`<tr><td>${esc(a.resource)}</td><td class="num">${fmt(a.used)}</td><td class="num">${fmt(a.capacity)}</td><td>${a.unit}</td></tr>`).join("")}</table>`;
+    return;
+  }
+  const n = o.steps.length;
+  runA({installed: n > 1 ? o.steps[n-2].installed_after : BOARD.installed, candidate: o.adds[n-1], before: BOARD.before,
+        u0: BOARD.options[0].U, label: o.label});
+}
+
+async function runDefaults(){
+  $("#defaults").innerHTML = `<span class="mute">searching 10 trios × CP-SAT, then 2 jury cards each…</span>`;
+  const body = {priority:$("#pri").value, overrides:[...knobOverrides($("#knobsA"), KNOBS_A), ...weightOverrides(), ...lines("#ovA")]};
+  const j = await (await fetch("/api/defaults",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})).json();
+  if (j.error){ $("#defaults").innerHTML = `<span class="err">${esc(j.error)}</span>`; return; }
+  const ok = j.rows.filter(r=>r.feasible);
+  $("#defaults").innerHTML = `<table><tr><th>rank</th><th>set</th><th>U / max</th><th>U deg</th><th>margin</th><th>mass</th><th>jury cards</th><th></th></tr>
+    ${ok.map((r,i)=>`<tr><td>${i+1}</td><td><b>${r.set.join("+")}</b><div class="mute" style="font-size:11px">${Object.entries(r.placement).map(([g,c])=>g+":"+c).join(" · ")}</div></td>
+      <td class="num">${r.U_normal}/${r.U_max}</td><td class="num">${r.U_degraded}</td><td class="num">${r.MI_pct}%</td><td class="num">${r.mass_t} t</td>
+      <td>${Object.entries(r.jury||{}).map(([c,v])=>`<span class="tag ${v.verdict==="YES"?"ok":v.verdict==="NO"?"bad":"warn"}" title="${esc(v.actions.join("; "))}">${c} ${v.verdict}</span>`).join(" ")}</td>
+      <td><button class="btn small" data-apply='${JSON.stringify(r.placement)}'>use</button></td></tr>`).join("")}</table>
+    ${j.infeasible.length?`<div class="mute" style="margin-top:6px">cannot be a starting set: ${j.infeasible.map(r=>`<b>${r.set.join("+")}</b> (${(r.binding||[]).join(", ")})`).join(" · ")}</div>`:""}
+    <div class="mute" style="margin-top:4px;font-size:11px">${j.elapsed_s} s · cached per priority file and overrides</div>`;
+  $$("#defaults [data-apply]").forEach(b=>b.addEventListener("click",()=>{ renderInstalled(JSON.parse(b.dataset.apply)); schedule(); }));
+}
+
+// ---------- B ----------
+const GB = [{title:"POWER (kW)"},{title:"COOLING LOOP"},{title:"DRONE BATTERY", invert:true},{title:"SHIP SPEED"},
+            {title:"MASS"},{title:"DATA LINKS"},{title:"COMPUTE"},{title:"RESPONSE TIME"}];
+function readB(){
+  return {priority:$("#priB").value, crew:+$("#crewB .on").dataset.v,
+          overrides:[...knobOverrides($("#knobsB"), KNOBS_B), ...lines("#ovB")]};
+}
+async function runB(){
+  const body = readB();
+  $("#content").classList.add("busy");
+  $("#status").textContent = `> right_of_way(priority=${body.priority}, crew=${body.crew}) …`;
+  let j; try { j = await (await fetch("/api/b",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})).json(); } catch(e){ j={error:String(e)}; }
+  $("#content").classList.remove("busy");
+  if (j.error){ $("#status").innerHTML = `<span class="err">&gt; ${esc(j.error)}</span>`; return; }
+  BDATA = j; const d = j.decision;
+  $("#status").textContent = `> D3 at min ${d.t}: ${d.decision} (executed min ${d.t_exec}) in ${d.elapsed_s} s${j.overrides.length?" · overrides: "+j.overrides.join(", "):""}`;
+  $("#bpill").textContent = d.decision.replace(/_/g," ").toUpperCase();
+  $("#bsent").innerHTML = `<b>${esc(d.decision_desc)}</b><div style="margin-top:6px">${esc(d.rationale)}</div>`;
+  $("#bextra").innerHTML = `<span class="tag warn">deadline: land by min ${d.deadline ?? "–"}</span> <span class="tag">${esc(d.confirmation||"")}</span>
+    ${(d.conflicts||[]).map(c=>`<span class="tag bad" title="${esc(c)}">conflict: ${esc(c.split(":")[0])}</span>`).join(" ")}
+    <div style="margin-top:6px"><b>Cost to the loser:</b> ${esc(d.cost_to_loser)}</div>`;
+  const best = Math.max(...d.options.map(o=>o.U));
+  $("#bopts").innerHTML = d.options.map(o=>`<div class="opt ${o.feasible?"":"bad"}" style="margin:8px 0">
+     <div class="row" style="justify-content:space-between"><span><b>${o.option}</b> ${o.option===d.decision?'<span class="tag ok">chosen</span>':""} ${o.feasible?"":'<span class="tag bad">infeasible</span>'}</span><span class="mono" style="flex:0">${o.U}</span></div>
+     <div class="bar"><i style="width:${Math.max(2,100*o.U/best)}%"></i></div>
+     <div class="mute" style="font-size:12px">${esc(o.desc)}${o.violations.length?" — <span class='err'>"+esc(o.violations.join("; "))+"</span>":""}</div></div>`).join("");
+  const H = 90;
+  $("#bcaps").innerHTML = `<table><tr><th>guest</th><th>weight</th><th>capability-min / ${H}</th></tr>${Object.entries(j.caps).map(([g,v])=>`<tr><td>${g} <span class="mute">${esc(META.guests[g].name)}</span></td><td class="num">${j.weights[g]}</td><td class="num">${fmt(v)}</td></tr>`).join("")}</table>
+    <div class="mute" style="font-size:12px;margin-top:4px">${j.lost.G4_ditched?"<span class='err'>drone ditched</span>":`drone landed min ${j.lost.G4_landed ?? "–"}`} · survey progress lost ${j.lost.G3_progress_lost_min} min · legs done ${j.lost.G3_legs_done}</div>`;
+  $("#tslider").max = j.rows.length - 1;
+  drawChart();
+  setT(Math.min(+$("#tslider").value, j.rows.length-1));
+}
+function drawChart(){
+  const rows = BDATA.rows, W = 900, H = 190, pad = 22, n = rows.length;
+  const ymax = Math.max(220, ...rows.map(r=>Math.max(r.reserve_kw, r.cooling_cap_kw, r.power_kw)));
+  const x = i => pad + (W-2*pad) * i/(n-1), y = v => H - pad - (H-2*pad) * v/ymax, yb = v => H - pad - (H-2*pad) * v/100;
+  const poly = (fn, col, w) => `<polyline fill="none" stroke="${col}" stroke-width="${w||2}" points="${rows.map((r,i)=>x(i).toFixed(1)+","+fn(r).toFixed(1)).join(" ")}"/>`;
+  const ev = BDATA.log.filter(l=>l.kind==="event"||l.kind==="D4");
+  let s = `<rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>`;
+  for (let v=0; v<=ymax; v+=50) s += `<line x1="${pad}" x2="${W-pad}" y1="${y(v)}" y2="${y(v)}" stroke="#1d2a44"/><text x="2" y="${y(v)+4}" fill="#8a9bb8" font-size="10">${v}</text>`;
+  ev.forEach(e=> s += `<line x1="${x(e.t)}" x2="${x(e.t)}" y1="${pad-8}" y2="${H-pad}" stroke="${e.kind==="D4"?"var(--red)":"var(--amber)"}" stroke-dasharray="3 3" opacity=".7"/>`);
+  if (BDATA.decision.deadline!=null) s += `<line x1="${x(BDATA.decision.deadline)}" x2="${x(BDATA.decision.deadline)}" y1="${pad-8}" y2="${H-pad}" stroke="var(--green)" stroke-dasharray="6 3"/><text x="${x(BDATA.decision.deadline)+3}" y="${pad}" fill="var(--green)" font-size="10">deadline</text>`;
+  s += poly(r=>y(r.reserve_kw),"var(--red)",2) + poly(r=>y(r.cooling_cap_kw),"var(--amber)",1.5) + poly(r=>y(r.power_kw),"var(--cyan)",2.5) + poly(r=>yb(r.g4_battery??0),"var(--green)",1.5);
+  for (let t=0; t<n; t+=10) s += `<text x="${x(t)-6}" y="${H-6}" fill="#8a9bb8" font-size="10">${t}</text>`;
+  s += `<line id="cursor" x1="0" x2="0" y1="${pad-8}" y2="${H-pad}" stroke="#fff" stroke-width="1.5"/>`;
+  $("#tchart").innerHTML = s;
+  $("#tchart").dataset.n = n; $("#tchart").dataset.pad = pad;
+}
+function setT(t){
+  if (!BDATA) return;
+  const r = BDATA.rows[t], st = BDATA.static, d = BDATA.decision;
+  $("#tslider").value = t; $("#tlabel").textContent = `min ${t}`;
+  const prev = BDATA.rows[0];
+  setGauge(0,{used:r.power_kw, cap:r.reserve_kw, unit:"kW", before:prev.power_kw, sub:`guest load vs continuous reserve · posture <b>${r.posture}</b>`});
+  setGauge(1,{used:r.cooling_kw, cap:r.cooling_cap_kw, unit:"kW", before:prev.cooling_kw, sub:`capacity follows seawater temperature (A.2, linear 12→30 °C)`});
+  const bat = r.g4_battery;
+  setGauge(2,{used:bat, cap:100, unit:"%", invert:true, show: bat==null?"–":`${fmt(bat)} %`, sub:`G4 <b>${r.G4}</b>${d.deadline!=null?` · land by min ${d.deadline}`:""}`});
+  setGauge(3,{used:r.speed_kn, cap:Math.max(...BDATA.rows.map(x=>x.speed_kn), 1), unit:"kn", show:`${r.speed_kn} kn`, sub:`posture <b>${r.posture}</b> · dial = fastest speed in this run`});
+  setGauge(4,{used:st.mass_t, cap:st.mass_cap_t, unit:"t", sub:"B fleet as the PDF narrates it — A.4 would refuse it; B skips admission"});
+  setGauge(5,{used:r.satcom_mbps, cap:st.satcom_cap, unit:"Mbit/s", sub:`acoustic ${r.acoustic?"<b style='color:var(--green)'>on</b>":"off"} · drone video ${r.los_video?"<b style='color:var(--green)'>on</b>":"off"}`});
+  setGauge(6,{used:st.cpu, cap:st.cpu_cap, unit:"cores", sub:"pooled cluster, 80 % allocatable (A.7)"});
+  const lim = META.response_time.arbitration_s;
+  setGauge(7,{used:d.elapsed_s, cap:lim, unit:"s", show:`${d.elapsed_s} s / ${lim} s`, sub:`D3 decision · D4 first shed ≤ ${META.response_time.first_shed_s} s`});
+  $("#chips").innerHTML = ["G2","G3","G4","G5"].map(g=>`<span class="chip">${g} ${r[g]}</span>`).join("") + `<span class="chip">reserve ${r.reserve_kw} kW</span>`;
+  const n = +$("#tchart").dataset.n, pad = +$("#tchart").dataset.pad, cx = pad + (900-2*pad)*t/(n-1);
+  const c = $("#cursor"); if (c){ c.setAttribute("x1",cx); c.setAttribute("x2",cx); }
+  $("#blog").innerHTML = BDATA.log.map(l=>`<div class="${l.t<=t?"past":""} ${l.t===t?"now":""}"><span class="k-${l.kind}">[${String(l.t).padStart(2," ")} ${l.kind}]</span> ${esc(l.text)}</div>`).join("");
+}
+$("#tslider").addEventListener("input", e=>setT(+e.target.value));
+$("#play").addEventListener("click", ()=>{
+  if (playing){ clearInterval(playing); playing=null; $("#play").textContent="▶ Play"; return; }
+  if (+$("#tslider").value >= +$("#tslider").max) setT(0);
+  $("#play").textContent = "❚❚ Pause";
+  playing = setInterval(()=>{ const t = +$("#tslider").value + 1; if (t > +$("#tslider").max){ clearInterval(playing); playing=null; $("#play").textContent="▶ Play"; return; } setT(t); }, 180);
+});
+
+// ---------- wiring ----------
+let timer = null;
+function schedule(){ clearTimeout(timer); timer = setTimeout(()=> TAB==="B" ? runB() : TAB==="A" ? runBoard() : runA(), 350); }
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function segs(id){ $$(id+" button").forEach(b=>b.addEventListener("click",()=>{ $$(id+" button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); schedule(); })); }
+
+function loadScenario(name, keepPri){
+  const s = META.scenarios[name];
+  if (!keepPri){ $("#pri").value = s.priority || "survey"; renderWeights(); }
+  renderInstalled(s.installed);
+  if (s.candidate) { refreshCand(); $("#cand").value = s.candidate; }
+  if (s.state && TAB==="AP"){
+    $("#spd").value = s.state.speed_kn ?? 12; $("#course").value = s.state.course || "free";
+    $("#deck").value = s.state.deck || "occupied"; $("#sea").value = s.state.sea_state ?? 3; $("#wind").value = s.state.wind_kn ?? 15;
+  }
+}
+function switchTab(t){
+  TAB = t; $$(".tab").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
+  const isB = t==="B";
+  $("#inA").classList.toggle("hide", isB); $("#outA").classList.toggle("hide", isB);
+  $("#inB").classList.toggle("hide", !isB); $("#outB").classList.toggle("hide", !isB);
+  $("#apState").classList.toggle("hide", t!=="AP");
+  $("#candBox").classList.toggle("hide", t!=="AP"); $("#presets").classList.toggle("hide", t==="AP");
+  $("#boardCard").classList.toggle("hide", t!=="A"); $("#detailTitle").classList.toggle("hide", t!=="A");
+  $("#legend").querySelectorAll("span")[3].classList.toggle("hide", false);
+  if (isB){ renderGaugeShells(GB); runB(); }
+  else if (t==="AP"){ renderGaugeShells(GA); loadScenario($("#swap").checked?"A_prime_drone_swap":"A_prime_underway"); runA(); }
+  else { renderGaugeShells(GA); loadScenario("A_landlord_survey_max"); runBoard(); }
+}
+
+(async function init(){
+  META = await (await fetch("/api/meta")).json();
+  const pris = Object.keys(META.priorities);
+  $("#pri").innerHTML = $("#priB").innerHTML = pris.map(p=>`<option>${p}</option>`).join("");
+  $("#priB").value = META.scenarios.B_right_of_way.priority || "survey";
+  setDefaults(KNOBS_A); setDefaults(KNOBS_B);
+  buildKnobs($("#knobsA"), KNOBS_A); buildKnobs($("#knobsB"), KNOBS_B);
+  segs("#crewA"); segs("#crewB");
+  $("#pri").addEventListener("change", ()=>{ renderWeights(); $("#defaults").innerHTML=""; schedule(); });
+  $("#priB").addEventListener("change", ()=>{ $("#weightsB").textContent = "weights " + GUESTS.map(g=>`${g}:${META.priorities[$("#priB").value][g]}`).join(" "); schedule(); });
+  $("#priB").dispatchEvent(new Event("change"));
+  ["#cand","#spd","#course","#deck","#sea","#wind"].forEach(id=>$(id).addEventListener("change", schedule));
+  $("#swap").addEventListener("change", ()=>{ loadScenario($("#swap").checked?"A_prime_drone_swap":"A_prime_underway"); schedule(); });
+  $("#ovA").addEventListener("change", schedule); $("#ovB").addEventListener("change", schedule);
+  $("#runA").addEventListener("click", ()=> TAB==="A" ? runBoard() : runA());
+  $$("#presets [data-preset]").forEach(b=>b.addEventListener("click", ()=>{ loadScenario(b.dataset.preset, true); schedule(); })); $("#runB").addEventListener("click", runB);
+  $("#runDef").addEventListener("click", runDefaults);
+  $("#checkG6").addEventListener("click", async ()=>{
+    const el = $("#g6Verification"); el.textContent = "Evaluating conditional G6 snapshot…";
+    try {
+      const response = await fetch("/api/physical-g6");
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      el.textContent = `Physical ${data.status} · Assessment ${data.assessment_status} · Full admission ${data.full_admission_status} · ${data.note || ""}`;
+    } catch(err) {el.textContent = `G6 verification unavailable: ${err}`;}
+  });
+  $("#resetA").addEventListener("click", ()=>{ buildKnobs($("#knobsA"), KNOBS_A); $("#ovA").value=""; switchTab(TAB); });
+  $("#resetB").addEventListener("click", ()=>{ buildKnobs($("#knobsB"), KNOBS_B); $("#ovB").value=""; runB(); });
+  $$(".tab").forEach(b=>b.addEventListener("click", ()=>switchTab(b.dataset.tab)));
+  switchTab("A");
+})();
+</script>
+</body>
+</html>

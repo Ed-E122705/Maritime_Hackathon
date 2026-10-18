@@ -1,0 +1,27 @@
+# Scenario B — Right of Way (contention + degradation), as in the PDF.
+# Min 0  survey vehicle G3 on a cable route — 3 kn, steady course, quiet, 40-min leg
+# Min 8  rescue drone G4 at 18 % battery, wind 22 kn; recovery needs manoeuvre freedom, deck clear, 35 kW × 20 min
+# Min 12 one genset trips (reserve ~100 kW, cooling nominal)
+# Run with --priority survey and --priority rescue; the jury may swap the priority file or any payload.
+name: B_right_of_way
+aboard: [G2, G3, G4, G5]          # PDF B narrative: ocean module, survey vehicle, drone, comms node
+crew: 14
+environment: { seawater_c: 24, sea_state: 3, wind_kn: 12 }      # 24 °C from the PDF demo; sea state assumed 3
+initial:
+  speed_kn: 3
+  course: steady
+  noise: quiet
+  deck: clear
+  emission: normal
+  deck_machinery: false
+  ramp_in_use: false
+  reserve_kw: 200                 # A.1 cruise reserve; PDF demo: the trip "halves" it to ~100 kW
+  cooling: nominal
+guests:
+  G2: { mode: full }              # probe module powered (6 kW)
+  G3: { activity: surveying, leg_min: 40, leg_start: 0 }
+  G4: { activity: in_flight, battery_pct: 30 }
+  G5: { mode: full }
+timeline:
+  - { t: 8,  event: battery_report, guest: G4, battery_pct: 18, wind_kn: 22 }
+  - { t: 12, event: genset_trip, reserve_kw: 100 }

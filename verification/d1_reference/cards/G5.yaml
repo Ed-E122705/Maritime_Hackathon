@@ -1,0 +1,12 @@
+# Annex B card G5 — Emergency comms & edge compute node
+id: G5
+name: Emergency comms & edge node
+power_kw: 45               # continuous (card)
+low_power_kw: 8            # low-power mode 8 kW with 70 % capability loss (card)
+parts:
+  - { name: node,    mass_t: 3.0,   at: deck }     # Bay 2 preferred (card)
+  - { name: antenna, mass_t: 0.025, at: hangar }   # 25 kg; ASSUMED on hangar roof (x1.2) because G1 holds the only free mast slot
+capability:                # card: "high for rescue / disaster relief, low otherwise"
+  sar: high
+  survey: low
+  patrol: low

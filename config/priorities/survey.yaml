@@ -1,0 +1,4 @@
+# Mission priority file — an INPUT, swappable at run time (PDF: "an input, not a constant").
+# Survey weights copied verbatim from Whole_model.docx §5.
+mission: survey
+weights: { G1: 1, G2: 5, G3: 10, G4: 1, G5: 1 }   # [docx] §5 survey weights

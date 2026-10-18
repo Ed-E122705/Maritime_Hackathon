@@ -1,0 +1,11 @@
+# Annex B card G1 — Passive radio sensor
+id: G1
+name: Passive radio sensor
+power_kw: 1.5              # continuous, air-cooled (card)
+low_power_kw: null         # card declares no low-power mode
+parts:
+  - { name: sensor, mass_t: 0.045, at: mast }    # 45 kg at the free mast slot (card)
+capability:                # card: "high for patrol, low for survey"
+  patrol: high
+  survey: low
+  sar: low                 # ASSUMED — card is silent on SAR

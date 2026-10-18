@@ -1,0 +1,95 @@
+# Optimizer view of each guest card. The card JSON (guests/Gx.json) stays the source of truth for
+# every number it declares; this file only (a) names which card power mode plays which role and
+# (b) fills values the card leaves null. Anything filled here is tagged [ASSUMED] or [docx] and is
+# rendered into docs/PHYSICAL_ACCOUNT.md.
+#
+# Roles:
+#   full     — mode that delivers 100 % capability, drawn continuously
+#   windows  — sustained draws with a duration (not peaks: A.1 "sustained draws are not peaks").
+#              total_kw replaces the full-mode draw while the window runs.
+#   low      — throttled mode (capability < 1)
+#   standby  — installed, powered, no capability
+#   off      — installed, unpowered (mass and space still used — docx §4)
+#
+# Schema exception (judged necessary): guest_schema.json has no field that links a power mode to
+# capability retained, duty cycle or deferral cost, so those live here instead of in the card.
+
+G1:
+  full:    { power_mode: active, capability: 1.0 }                 # [B G1][docx]
+  standby: null
+  low:     null
+  "off":     { kw: 0, capability: 0.0 }
+  windows: []
+  cooling: air                                                     # [B G1]
+  needs_bay_clear: false
+  compute: { cpu_cores: 4, ram_gb: 16, accelerator_units: 0, storage_gb: 500 }   # [ASSUMED] signal processing
+  data:    { backbone: 50, satcom: 0.2, los_radio: 0 }             # [B G1]
+
+G2:
+  full:    { power_mode: continuous, capability: 1.0 }             # [B G2][docx]
+  standby: { kw: 0.5, capability: 0.0 }                            # [ASSUMED] card gives no standby draw; docx capability 0
+  low:     null
+  "off":     { kw: 0, capability: 0.0 }
+  windows:
+    - { id: winch, power_mode: winch_operation, interruptible: true, defer_capability: 0.8 }
+      # [ASSUMED] winch can wait; a deferred cast keeps 80 % of the module's value
+  cooling: chilled_water
+  needs_bay_clear: true      # [ASSUMED] probe needs "deck area around bay clear" (B G2) → may not share Bay 1 (A.3)
+  compute: { cpu_cores: 2, ram_gb: 8, accelerator_units: 0, storage_gb: 1000 }    # [ASSUMED]
+  data:    { backbone: 5, satcom: 0.5, los_radio: 0 }              # [B G2]
+
+G3:
+  full:    { kw: 2, capability: 1.0 }
+           # [ASSUMED] ship-side draw while the vehicle surveys. Card: "do not assume the standby value
+           # applies" → we use 2 kW (cradle standby 1 kW + acoustic modem/topside 1 kW).
+  standby: { power_mode: standby, capability: 0.0 }                # [B G3][docx]
+  low:     null
+  "off":     { kw: 0, capability: 0.0 }
+  windows:
+    - { id: charge, power_mode: charging, interruptible: false, defer_capability: 0.0 }   # [B G3] not interruptible
+  cooling: chilled_water
+  needs_bay_clear: false
+  compute: { cpu_cores: 8, ram_gb: 32, accelerator_units: 0, storage_gb: 4000 }   # [ASSUMED] sonar/video post-processing
+  data:    { backbone: 100, satcom: 0, los_radio: 0 }              # [B G3] 100 Mbit/s on cradle
+
+G4:
+  full:    { power_mode: charging_followup, capability: 1.0 }
+           # [docx] "Normal: 10" — conservative: the 10 kW follow-up charge is treated as continuous
+  standby: { power_mode: standby, capability: 0.0 }                # [B G4][docx]
+  low:     null
+  "off":     { kw: 0, capability: 0.0 }
+  windows:
+    - { id: charge, power_mode: charging_initial, interruptible: true, defer_capability: 0.5 }
+      # [ASSUMED] card leaves interruptible null; a deferred charge halves readiness
+  cooling: chilled_water
+  needs_bay_clear: false
+  compute: { cpu_cores: 8, ram_gb: 32, accelerator_units: 1, storage_gb: 2000 }   # [ASSUMED] video analytics
+  data:    { backbone: 0, satcom: 0, los_radio: 5 }                # [B G4] 5–20 Mbit/s; 5 is the floor
+  data_nominal: { los_radio: 20 }
+
+G5:
+  full:    { power_mode: full, capability: 1.0 }                   # [B G5]
+  standby: null
+  low:     { power_mode: low_power }                               # capability 0.3 read from the card
+  "off":     { kw: 0, capability: 0.0 }
+  windows: []
+  cooling: chilled_water
+  needs_bay_clear: false
+  compute: { cpu_cores: 16, ram_gb: 64, accelerator_units: 1, storage_gb: 4000 }  # [ASSUMED] analytics on ship compute
+  data:    { backbone: 1000, satcom: 6, los_radio: 0 }             # [B G5] up to 6 of 8 Mbit/s
+
+
+# Custom G6 is optional, loaded only if the authoritative data/guests manifest exists.
+# Reserve full 8 kW suppression (not its 2 kW monitoring baseline) when admitted.
+# Installation crew/duration are currently UNKNOWN in its manifest; this solver
+# does not certify installation of G6 without a separate physical-account review.
+G6:
+  full:    { power_mode: suppression, capability: 1.0 }            # [ASSUMED] reserve safety response
+  low:     null
+  standby: null
+  "off":    null
+  windows: []
+  cooling: chilled_water
+  needs_bay_clear: false
+  compute: { cpu_cores: 2, ram_gb: 4, accelerator_units: 0, storage_gb: 100 }
+  data: { backbone: 1, satcom: 0, los_radio: 0 }

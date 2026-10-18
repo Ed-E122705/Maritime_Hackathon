@@ -1,0 +1,11 @@
+# Scenario A with the default set that maximises survey value (default search, results/defaults.json):
+# G1 + G2 + G3 delivers 16/16 survey utility at full power. Every jury card then needs a displacement.
+name: A_landlord_survey_max
+priority: survey
+installed:
+  G1: mast
+  G2: bay2
+  G3: bay1
+candidate: G4
+state: { location: port, crew: 14 }
+overrides: []

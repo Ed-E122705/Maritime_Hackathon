@@ -1,0 +1,5 @@
+ortools>=9.10
+PyYAML>=6.0
+jsonschema>=4.20
+pytest>=8.0
+flask>=3.0

@@ -1,0 +1,36 @@
+# Runtime (Scenario B) parameters: D3 right of way, D4 degradation, crew policy.
+# Tags as in ship.yaml: [A.x]/[B Gx] from the PDF (hard), [ASSUMED] invented and listed in the Physical Account.
+
+d3:
+  horizon_min: 90                 # [ASSUMED] utility of each option is scored over the next 90 min
+  landing_min: 2                  # [ASSUMED] final approach + touchdown once recovery conditions hold
+  min_recovery_window_min: 15     # [PDF B demo] survey pauses for the minimum 15-minute recovery window
+  uuv_ramp_recovery_min: 10       # [ASSUMED] stern-ramp recovery of the survey vehicle (card gives none)
+  recovery_speed_kn: 6            # [ASSUMED] inside both G4 (5–12 kn) and ramp (4–8 kn) windows
+  relaunch_after_initial_charge: true   # [ASSUMED] drone is relaunch-ready after its 20-min 35 kW charge
+  battery_drain_pct_per_min: 1.11 # [B G4] 90-min endurance → 100 % / 90 min
+  allow_asset_loss: false         # [ASSUMED] no default priority file accepts ditching a vehicle
+  # a requirement that implies others (card G4: "freedom to turn into wind")
+  implications:
+    navigation.manoeuvre_freedom:
+      - { field: navigation.noise_level, value: manoeuvring }
+      - { field: navigation.course_keeping, value: free }
+
+d4:
+  first_action_s: 0.1             # [ASSUMED] first shed command issued 100 ms after the overload is detected
+  step_interval_s: 2.0            # [ASSUMED] spacing between successive shed commands (lets loads settle)
+  restore_hysteresis_kw: 5        # [ASSUMED] restore a shed guest only if ≥5 kW headroom remains afterwards
+
+crew_policy:                      # [A.6] confirmation of a contested decision; D5 rule written down
+  rule: >-
+    A contested right-of-way decision is confirmed by a human when a crew exists,
+    unless waiting for confirmation would break a hard deadline (battery, non-interruptible charge),
+    in which case the governor acts automatically and notifies.
+  confirm_delay_min: { 14: 1, 6: 3, 0: null }   # [A.6] worst end of 15–60 s and 1–3 min; null = no human aboard
+  deck_clear_min: { 14: 5, 6: 12, 0: null }      # [A.6] null = only if already clear
+
+lines_b:                          # [ASSUMED] Scenario B carries four guests whose bays cannot all be satisfied
+  G2: stbd                        # under A.3 (see DESIGN_DECISIONS); lines are assigned directly for the run
+  G3: port
+  G4: stbd
+  G5: port

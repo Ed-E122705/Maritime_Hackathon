@@ -1,0 +1,6 @@
+# Mission-priority file: survey primary (cable / pipeline inspection mission). Swappable input.
+name: survey_primary
+weights:                   # ASSUMED weights — not in the Annex; see PHYSICAL_ACCOUNT.md
+  survey: 1.0
+  sar: 0.2
+  patrol: 0.3

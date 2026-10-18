@@ -1,0 +1,4 @@
+# Search-and-rescue primary. [ASSUMED] Derived from each card's value_by_mission with
+# high=10, medium=5, low=1; a null falls back to the card's "default" level, else 1.
+mission: rescue
+weights: { G1: 1, G2: 5, G3: 1, G4: 10, G5: 10 }   # [ASSUMED] card value_by_mission mapped high=10, medium=5, low=1; null → card default, else 1

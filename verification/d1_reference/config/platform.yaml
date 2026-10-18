@@ -1,0 +1,14 @@
+# Reference platform — Annex A. Every number the solver uses for the platform lives here.
+# Scenario A is judged against the MISSION ENVELOPE (A.10): one genset down is assumed possible,
+# so the admission reserve is the degraded figure, not the pier-side or cruise figure.
+name: Reference multi-role vessel (Annex A)
+
+power_reserve_kw: 100            # A.9 degraded state: ~100 kW continuous with one genset down (range 90-120)
+power_reserve_nominal_kw: 200    # A.1 cruise, both gensets — informational, NOT used for the verdict
+
+mass_margin_t: 10.0              # A.4 mass margin
+stability_budget_t_eq: 12.0      # A.4 stability budget, tonne-equivalent
+stability_multiplier:            # A.4: weight high up costs more stability
+  deck: 1.0
+  hangar: 1.2                    # hangar / flight deck
+  mast: 3.0

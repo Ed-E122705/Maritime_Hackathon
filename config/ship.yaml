@@ -1,0 +1,132 @@
+# Reference platform (Annex A) + mission envelope (A.10).
+# Every value carries a tag in the trailing comment:
+#   [A.x]      taken from the PDF Annex — HARD, never changed by the solver
+#   [docx]     taken from Whole_model.docx
+#   [ASSUMED]  invented by us; listed in docs/PHYSICAL_ACCOUNT.md with the reason
+# Jury overrides use dotted paths, e.g. --set ship.power.reserve_kw.cruise=180
+
+power:
+  reserve_kw:                       # continuous reserve available to guests, by speed band
+    slow: 250                       # [ASSUMED] slow band frees propulsion power; top of the 150–250 range in A.1
+    cruise: 200                     # [A.1] 200 kW nominal at cruise
+    fast: 150                       # [ASSUMED] bottom of the 150–250 range in A.1
+  degraded_reserve_kw:              # one genset down
+    slow: 120                       # [ASSUMED] top of the 90–120 range in A.1
+    cruise: 100                     # [A.1/A.9] ~100 kW
+    fast: 90                        # [ASSUMED] bottom of the 90–120 range
+  peak_extra_kw: 250                # [A.1] +250 kW for ≤60 s if continuous not saturated
+  peak_extra_degraded_kw: 100       # [A.1/A.9]
+  peak_max_seconds: 60              # [A.1]
+  line_capacity_kw: 150             # [A.1] per mission line (port / stbd)
+  lines: [port, stbd]               # [A.1]
+  degraded_lost_line: none          # [ASSUMED] A.9 lets the team choose. We assume the bus-tie closes on a
+                                    # genset trip, so both lines stay live and only the total shrinks.
+                                    # Set to port|stbd to stress-test line loss.
+  connection_points: [bay1, bay2, flight_deck, mast]   # [A.1] one connection per bay, flight deck and mast
+  wiring:                           # [ASSUMED] which mission line feeds each connection point (ship cabling)
+    bay1: port                      # aft bay and mast on port, midships bay and flight deck on starboard,
+    mast: port                      # so the two heavy bay loads land on different lines
+    bay2: stbd
+    flight_deck: stbd
+
+cooling:
+  capacity_at_12c_kw: 160           # [A.2]
+  capacity_at_30c_kw: 120           # [A.2] linear between 12 and 30 °C
+  degraded_factor: 0.6              # [A.2] pump/exchanger down = −40 %
+  heat_per_electrical_kw: 1.0       # [A.2] 1 kW electric = 1 kW heat
+  inertia_extra_kw: 30              # [A.2] +30 kW for 60 s, once every 10 min (peaks only)
+  inertia_seconds: 60               # [A.2]
+  mast_air_cooled_max_kw: 2.0       # [A.2] no manifold at the mast
+
+positions:
+  bay1:   { kind: bay, fraction_capacity: 1.0, max_mass_t: 8.0, length_m: 6.1, width_m: 2.4, height_m: 2.6, connection: bay1 }   # [A.3]
+  bay2:   { kind: bay, fraction_capacity: 1.0, max_mass_t: 4.0, length_m: 3.0, width_m: 2.4, height_m: 2.6, connection: bay2 }   # [A.3]
+  flight_deck_hangar: { kind: hangar, capacity: 1, max_vtol_kg: 150, connection: flight_deck }  # [A.3]
+  hangar_roof: { kind: roof, capacity: 1, connection: flight_deck,
+                 requires_hangar_guest: false,      # [ASSUMED] A.3 lists the hangar as a ship position, so its roof
+                                                    # exists even before G4's hangar equipment is fitted. Set true to
+                                                    # require G4 aboard (then G1 + G5 cannot coexist without G4).
+                 drone_clearance_verified: true }   # [ASSUMED] card says "check drone clearance"
+  mast_slot: { kind: mast, total: 3, occupied: 2, max_mass_kg: 60, max_area_m2: 0.6, connection: mast }  # [A.3]
+
+mass:
+  margin_t: 10.0                    # [A.4]
+  stability_budget_t_eq: 12.0       # [A.4]
+  stability_multiplier:             # [A.4]
+    bay1: 1.0
+    bay2: 1.0
+    flight_deck_hangar: 1.2
+    hangar_roof: 1.2
+    mast_slot: 3.0
+
+data:
+  backbone_mbps: 10000              # [A.5][docx] one of the dual 10 Gbit/s links (the other kept as redundancy)
+  satcom_mbps: 8                    # [docx] upper end of A.5's 2–8 Mbit/s; best case, the 2 Mbit/s low end is reported as a stress state
+  satcom_low_mbps: 2                # [A.5] lower end, used for the stress report
+  los_radio_mbps: 20                # [ASSUMED] upper end of A.5's 1–20 Mbit/s; G4 needs only its 5 Mbit/s floor
+  acoustic_kbps: 5                  # [A.5] 1–5 kbit/s
+
+compute:                            # [A.7] 4 nodes × 32 cores / 128 GB / 1 accelerator; 20 TB; 80 % allocatable
+  nodes: 4
+  cores_per_node: 32
+  ram_gb_per_node: 128
+  accelerators_per_node: 1
+  storage_tb: 20
+  allocatable_fraction: 0.8
+
+response_time:                      # [A.8]
+  admission_s: 30
+  arbitration_s: 2
+  first_shed_s: 5
+  full_shed_s: 60
+  safety_command_ms: 200
+
+installation:                       # [A.11]
+  crane_max_lift_t: 8
+  port_window_hours: 24             # [ASSUMED] length of the port call available for crane work
+  removal_time_factor: 1.0          # [ASSUMED] removing a guest takes as long as installing it
+  at_sea_max_item_kg: 250
+  at_sea_window:
+    sea_state_max: 3
+    wind_kn_max: 20
+    speed_kn: [4, 8]
+    course: steady
+    deck: clear
+    no_survey_vehicle_listening: true
+    crew_flight_deck: 3
+    crew_ramp: 4
+
+state_transitions:                  # [A.6] minutes, worst end of each range used for "when" estimates
+  course_settle_min: 3
+  speed_band_change_min: 5
+  go_quiet_min: 4
+  deck_clear_min: { 14: 5, 6: 12, 0: null }   # null = only if already clear
+  genset_restart_min: 15
+
+speed_bands:                        # [A.6]
+  stopped: [0, 0]
+  slow: [3, 5]
+  cruise: [10, 14]
+  fast: [18, 30]
+
+envelope:                           # [A.10] default mission envelope; jury may narrow or widen
+  speed_bands: [slow, cruise]       # use the lower reserve → cruise
+  seawater_c: [12, 30]              # judge cooling at 30 °C
+  sea_state_max: 5
+  wind_kn_max: 30
+  genset_down_possible: true
+  cooling_loop_failure_possible: false   # not in the A.10 default; reported as a stress test
+  emission_silence_possible: true        # [ASSUMED] reported as a stress state (links lost, modes stopped), not a verdict input
+  days_without_port: 14
+
+current_state:                      # Scenario A pier-side state — shown, NOT used for the verdict (A.10)
+  location: port                    # port | at_sea
+  crew: 14
+  speed_kn: 0
+  seawater_c: 16
+  shore_power: true
+  sea_state: 1
+  wind_kn: 8
+  course: free
+  deck: clear
+  survey_vehicle_listening: false
