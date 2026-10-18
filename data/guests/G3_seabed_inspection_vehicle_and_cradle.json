@@ -1,4 +1,3 @@
-
 {
   "schema_version": "1.0",
   "id": "G3",
@@ -44,7 +43,7 @@
           {
             "component_id": "vehicle_and_cradle",
             "location": "bay1",
-            "bay_fraction": 1.0,
+            "bay_fraction": 1,
             "area_m2": null
           }
         ],
@@ -82,7 +81,7 @@
     ],
     "cooling": {
       "type": "chilled_water",
-      "electrical_kw_to_heat_kw": 1.0,
+      "electrical_kw_to_heat_kw": 1,
       "chilled_water_load_rule": "equals_electrical_kw",
       "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
     },
@@ -204,7 +203,7 @@
           "reason": "Flight deck and stern ramp cannot operate simultaneously (Annex A.3)."
         }
       ],
-      "notes": null
+      "notes": "Stern ramp launch/recovery requires sea state <=4, speed 4-8 kn, a steady course and an available ramp."
     },
     {
       "id": "standby",
