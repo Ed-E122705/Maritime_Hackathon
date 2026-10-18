@@ -75,7 +75,7 @@ class ScenarioD:
         self.timeline = []
 
     def tick(self, perimeter_motion=False, deck_obstructed=False, approve=False,
-             observation_valid=True):
+             observation_valid=True, g7_alert=None):
         self.time += 1
         t = self.time
         self.deck_obstructed = bool(deck_obstructed)
@@ -106,9 +106,17 @@ class ScenarioD:
             else:
                 # Invalid camera readings interrupt the streak; do not call them no-motion.
                 self.no_motion_seconds = 0
-        if valid_motion and observation_valid and not self.alert:
+        # G7's alert-mode power follows the camera's latched activity status;
+        # G4 startup still requires consecutive *raw* positive motion samples.
+        # A missing g7_alert preserves behavior for the scripted replay and
+        # callers of the original tick interface.
+        active_alert = valid_motion if g7_alert is None else bool(g7_alert)
+        if not self.scripted and observation_valid and not active_alert and self.alert:
+            self.alert = False
+            notes.append("G7 motion alert ended: return to monitoring power")
+        if observation_valid and active_alert and not self.alert:
             self.alert = True
-            notes.append("G7 first unclassified perimeter-motion candidate")
+            notes.append("G7 unclassified perimeter-motion candidate")
         if (self.confirm >= self.cfg["required_consecutive_positive_samples"]
                 and self.start_time is None and self.state in ("Standby", "Off")):
             startup_demand = demand(self.cfg, t, True, True)
