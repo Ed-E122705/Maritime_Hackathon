@@ -406,12 +406,19 @@ function readA(){
 }
 function weightOverrides(){
   const p = $("#pri").value, out = [];
-  $$("#weights input").forEach(i=>{ if (+i.value !== META.priorities[p][i.dataset.g]) out.push(`priority.${p}.weights.${i.dataset.g}=${i.value}`); });
+  $("#weights input").forEach(i=>{
+    const baseline = META.priorities[p][i.dataset.g];
+    // G6 is an independently monitored custom guest without a declared
+    // mission-priority weight. Never manufacture a priority override for it.
+    if (baseline !== undefined && +i.value !== baseline)
+      out.push(`priority.${p}.weights.${i.dataset.g}=${i.value}`);
+  });
   return out;
 }
 function renderWeights(){
   const p = $("#pri").value;
-  $("#weights").innerHTML = GUESTS.map(g=>`<div><label>${g}</label><input type="number" min="0" max="20" step="1" data-g="${g}" value="${META.priorities[p][g]}"></div>`).join("");
+  $("#weights").innerHTML = GUESTS.filter(g => META.priorities[p][g] !== undefined)
+    .map(g=>`<div><label>${g}</label><input type="number" min="0" max="20" step="1" data-g="${g}" value="${META.priorities[p][g]}"></div>`).join("");
   $$("#weights input").forEach(i=>i.addEventListener("input", schedule));
 }
 function renderInstalled(inst){
@@ -677,7 +684,12 @@ function switchTab(t){
   buildKnobs($("#knobsA"), KNOBS_A); buildKnobs($("#knobsB"), KNOBS_B);
   segs("#crewA"); segs("#crewB");
   $("#pri").addEventListener("change", ()=>{ renderWeights(); $("#defaults").innerHTML=""; schedule(); });
-  $("#priB").addEventListener("change", ()=>{ $("#weightsB").textContent = "weights " + GUESTS.map(g=>`${g}:${META.priorities[$("#priB").value][g]}`).join(" "); schedule(); });
+  $("#priB").addEventListener("change", ()=>{
+    const weights = META.priorities[$("#priB").value];
+    $("#weightsB").textContent = "weights " + GUESTS.filter(g => weights[g] !== undefined)
+      .map(g=>`${g}:${weights[g]}`).join(" ");
+    schedule();
+  });
   $("#priB").dispatchEvent(new Event("change"));
   ["#cand","#spd","#course","#deck","#sea","#wind"].forEach(id=>$(id).addEventListener("change", schedule));
   $("#swap").addEventListener("change", ()=>{ loadScenario($("#swap").checked?"A_prime_drone_swap":"A_prime_underway"); schedule(); });
