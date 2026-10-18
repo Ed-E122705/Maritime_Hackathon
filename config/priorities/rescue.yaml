@@ -1,6 +1,7 @@
 # Search-and-rescue primary. [ASSUMED] Derived from each card's value_by_mission with
 # high=10, medium=5, low=1; a null falls back to the card's "default" level, else 1.
 mission: rescue
-weights: { G1: 1, G2: 5, G3: 1, G4: 10, G5: 10, G6: 10 }   # [ASSUMED] card value_by_mission mapped high=10, medium=5, low=1; null → card default, else 1
+weights: { G1: 1, G2: 5, G3: 1, G4: 10, G5: 10, G6: 10 , G7: 5}   # [ASSUMED] card value_by_mission mapped high=10, medium=5, low=1; null → card default, else 1
 # [ASSUMED] Custom G6 mission utility weight 10 (demonstration policy, not Annex B).
+# G7: synthetic demonstration priority 5; camera data remains advisory.
 # Safety-critical no-shed protection applies regardless of priority weight.
