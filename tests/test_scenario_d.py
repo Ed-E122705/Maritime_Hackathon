@@ -187,3 +187,19 @@ def test_g7_camera_alert_changes_only_g7_guest_resource_mode(monkeypatch):
     card_mode = next(m for m in raw["card"]["G7"]["resources"]["power_modes"] if m["id"] == "active")
     assert card_mode["power_kw"]["nominal"] == 0.065
     assert dashboard_module.RAW["card"]["G7"]["resources"]["power_modes"][0]["power_kw"]["nominal"] == before
+
+
+def test_g7_alert_power_tracks_valid_latched_activity():
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True, g7_alert=True)
+    row = engine.tick(perimeter_motion=True, g7_alert=True)
+    assert row["g4_state"] == "Starting"
+    assert row["power"]["g7_kw"] == 0.065
+    row = engine.tick(perimeter_motion=False, g7_alert=False, observation_valid=True)
+    assert row["g4_state"] == "Starting"
+    assert row["power"]["g7_kw"] == 0.04
+    assert row["power"]["g4_kw"] == 3
+    # Camera disconnection doesn't generate another valid no-motion second.
+    row = engine.tick(perimeter_motion=False, g7_alert=False, observation_valid=False)
+    assert row["power"]["g7_kw"] == 0.04
+    assert row["g4_state"] == "Starting"
