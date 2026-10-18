@@ -197,6 +197,7 @@ def simulate(raw, ops, scn, weights, policy, t_decision=None, crew=None, t_exec=
         if e and e["event"] == "genset_trip":
             reserve = e["reserve_kw"]
             say(t, "event", f"genset trip → continuous reserve {reserve} kW (A.9)")
+            ship["genset_tripped"] = True
             trip_check = True
         # ---- D3 policy execution
         if t == s.t_exec and policy in ("recover_then_resume", "suspend_survey"):
@@ -349,7 +350,13 @@ def simulate(raw, ops, scn, weights, policy, t_decision=None, crew=None, t_exec=
                        "power_kw": round(load, 1), "cooling_kw": round(load, 1), "cooling_cap_kw": round(cool_cap, 1),
                        "G2": granted["G2"], "G3": g3["act"], "G4": g4["act"], "G5": granted["G5"],
                        "g4_battery": round(g4["battery"], 1), "satcom_mbps": G["G5"].data["satcom"] if granted["G5"] != "off" else 0,
-                       "acoustic": g3["act"] == "surveying", "los_video": g4["act"] == "in_flight"})
+                       "acoustic": g3["act"] == "surveying", "los_video": g4["act"] == "in_flight",
+                       "course": ship["course"], "noise": ship["noise"], "deck": ship["deck"],
+                       "emission": ship["emission"], "ramp_in_use": ship["ramp_in_use"],
+                       "cooling": ship.get("cooling", "nominal"),
+                       "genset_tripped": ship.get("genset_tripped", False),
+                       "wind_kn": env["wind_kn"], "sea_state": env["sea_state"],
+                       "seawater_c": env["seawater_c"]})
     g3["useful"] += g3["progress"] if g3["act"] == "surveying" else 0
     s.lost = {"G3_progress_lost_min": g3["lost"], "G3_legs_done": g3["legs_done"], "G4_ditched": g4["ditched"],
               "G4_landed": next((x["t"] for x in s.log if x["text"].startswith("G4 landed")), None),

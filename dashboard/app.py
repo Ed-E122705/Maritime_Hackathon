@@ -67,6 +67,23 @@ def _demand_usage(raw, scn, priority):
     return _usage_table(evaluate(plan, guests, budget), budget)
 
 
+def _find_key(obj, key):
+    """First value stored under `key` anywhere in a nested card (cards differ in layout)."""
+    if isinstance(obj, dict):
+        if key in obj:
+            return obj[key]
+        for v in obj.values():
+            r = _find_key(v, key)
+            if r is not None:
+                return r
+    elif isinstance(obj, list):
+        for v in obj:
+            r = _find_key(v, key)
+            if r is not None:
+                return r
+    return None
+
+
 # ---------------------------------------------------------------- meta
 @app.get("/api/meta")
 def meta():
@@ -77,6 +94,21 @@ def meta():
                             "configs": [{"id": c.id, "preferred": c.preferred, "issues": c.issues} for c in G.configs]}
     for p, d in sorted(RAW["priority"].items()):
         out["priorities"][p] = d["weights"]
+    # where every weight comes from (for the tooltips): the card's value for this mission and the
+    # comment/tag on the priority file line. Nothing is computed here; it is read from the files.
+    out["weight_basis"] = {}
+    for p, d in sorted(RAW["priority"].items()):
+        mission = d.get("mission", p)
+        path = ROOT / "config" / "priorities" / f"{p}.yaml"
+        txt = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+        header = " ".join(l.lstrip("# ").strip() for l in txt if l.startswith("#"))
+        note = next((l.split("#", 1)[1].strip() for l in txt if l.lstrip().startswith("weights") and "#" in l), "")
+        basis = {}
+        for g, G in guests.items():
+            vbm = _find_key(RAW["card"].get(g, {}), "value_by_mission") or {}
+            basis[g] = {"level": vbm.get(mission), "default": vbm.get("default"), "safety_critical": G.safety_critical}
+        out["weight_basis"][p] = {"mission": mission, "file": f"config/priorities/{p}.yaml",
+                                  "header": header, "note": note, "guests": basis}
     for name, path in SCN.items():
         out["scenarios"][name] = loader.load_scenario(path)
     b = loader.load_ship_budget(RAW)
@@ -215,6 +247,124 @@ def board():
     return jsonify(_json({"priority": pr, "weights": w, "installed": installed, "before": before,
                           "options": options, "details": details, "overrides": ov}))
 
+
+# ---------------------------------------------------------------- A · capacity check of one combination
+def _value(w, plan):
+    return plan["objective"]["U_normal"] if plan else None
+
+
+@app.post("/api/check")
+def check():
+    """Scenario A: judge ONE combination (installed + ticked candidates, everyone at full power, positions as
+    chosen) against every ship capacity. If it does not fit, name the binding classes and propose alternatives:
+    keep everyone but throttle / interlock / move, admit the candidates one by one with the engine's
+    displacement (D1), or leave a candidate ashore. Every number comes from the engine."""
+    import itertools
+    from governor.admission import _actions, _demand_plan, degraded_floor, describe_group
+    from governor.model import binding_groups
+    q = request.get_json(force=True)
+    try:
+        raw, ov = _raw_with(q.get("overrides"))
+    except Exception as e:
+        return jsonify({"error": f"override: {e}"}), 400
+    pr = q.get("priority", "survey")
+    w = raw["priority"][pr]["weights"]
+    guests = loader.load_guest_data(raw)
+    budget = loader.load_ship_budget(raw)
+    installed = dict(q.get("installed") or {})
+    adds = {g: (c if c and c != "auto" else None) for g, c in (q.get("adds") or {}).items() if g not in installed}
+    combo = {**installed, **adds}
+    pending = []
+    for gid in adds:
+        for item in raw["card"][gid].get("installation", []):
+            if item.get("component_ids") and any(item.get(k) is None
+                   for k in ("port_only", "crew_required", "duration_minutes")):
+                pending.append(gid)
+                break
+    t0 = time.perf_counter()
+
+    def as_is(sets):
+        p = build_problem(raw, guests, {"installed": sets}, pr, baseline=True, allow_removal=False)
+        plan, core = solve_model(p)
+        return p, plan, core
+
+    p, plan, core = as_is(combo)
+    out = {"priority": pr, "weights": w, "installed": installed, "adds": list(adds), "combo": list(combo),
+           "u_start": sum(w.get(g, 1) for g in installed), "u_combo_max": sum(w.get(g, 1) for g in combo),
+           "overrides": ov, "before": _usage(raw, installed, pr),
+           "admission_status": "NOT-NOW" if pending else "NOT_EVALUATED",
+           "installation_warning": ("Installation not authorized for " + ", ".join(pending)
+                                    + ": crew, duration, or port permission undefined. "
+                                    + "Capacity evaluation is hypothetical only; D1 remains NOT-NOW."
+                                    if pending else ""),
+           "assessment_note": "Capacity-only screen, not full mission admission or independent physical approval."}
+    if plan is not None:
+        ev = evaluate(plan, guests, budget)
+        out.update(fits=True, binding=[], binding_text=[], usage=_usage_table(ev, budget),
+                   placement={g: plan["config"][g] for g in plan["config"]}, U=_value(w, plan), alternatives=[])
+        out["elapsed_s"] = round(time.perf_counter() - t0, 3)
+        return jsonify(_json(out))
+
+    # does not fit as is → what breaks, with the numbers the ship would need
+    binding = binding_groups(p, core)
+    demand = _demand_plan(raw, guests, {"installed": combo}, pr, minimal=False)
+    dev = evaluate(demand, guests, budget) if demand else None
+    fl = degraded_floor(demand, guests, budget) if demand else None
+    out.update(fits=False, binding=binding,
+               binding_text=[describe_group(g, dev, budget, guests, demand, fl) if dev else g for g in binding],
+               usage=_usage_table(dev, budget) if dev else [],
+               placement=(demand or {}).get("config", {}), U=None)
+
+    alts = []
+    # 1) keep everyone aboard; the optimizer may throttle, interlock or move guests
+    pk = build_problem(raw, guests, {"installed": combo}, pr, allow_removal=False)
+    pl, _ = solve_model(pk)
+    if pl is not None:
+        alts.append({"kind": "keep all, change modes/positions", "set": list(pl["config"]),
+                     "changes": [a["text"] for a in _actions(pl, pk, guests)], "U": _value(w, pl),
+                     "usage": _usage_table(evaluate(pl, guests, budget), budget)})
+    # 2) admit the candidates one by one (D1: the engine may remove a lower-value guest)
+    for order in itertools.permutations(list(adds)):
+        cur, changes, ok, last = dict(installed), [], True, None
+        for c in order:
+            r = classify_admission(raw, {"installed": cur, "candidate": c}, pr, n_alternatives=0)
+            if r["verdict"] not in ("YES", "YES-IF"):
+                ok = False
+                break
+            changes += [f"{c}: {a['text']}" for a in r.get("actions", [])]
+            last = r
+            cur = {g: r["plan"]["config"][g] for g, on in r["plan"]["installed"].items() if on}
+        if ok and last:
+            alts.append({"kind": "admit " + " then ".join(order) + " (D1 displacement)", "set": list(cur),
+                         "changes": changes or ["no change"], "U": last["plan"]["objective"]["U_normal"],
+                         "usage": last.get("usage", [])})
+    # 3) leave one or more candidates ashore
+    for k in range(len(adds) - 1, 0, -1):
+        for keep in itertools.combinations(list(adds), k):
+            _, pl2, _ = as_is({**installed, **{g: adds[g] for g in keep}})
+            if pl2 is not None:
+                left = [g for g in adds if g not in keep]
+                alts.append({"kind": "leave " + "+".join(left) + " ashore", "set": list(pl2["config"]),
+                             "changes": [f"do not embark {g}" for g in left], "U": _value(w, pl2),
+                             "usage": _usage_table(evaluate(pl2, guests, budget), budget)})
+    # 4) decline every candidate: the starting set as it is
+    _, pl0, _ = as_is(installed)
+    if pl0 is not None and adds:
+        alts.append({"kind": "decline " + "+".join(adds) + " (keep the starting set)", "set": list(pl0["config"]),
+                     "changes": [f"do not embark {g}" for g in adds], "U": _value(w, pl0),
+                     "usage": _usage_table(evaluate(pl0, guests, budget), budget)})
+    # rank: mission value first, then fewer changes; one card per resulting set
+    seen, ranked = set(), []
+    for a in sorted(alts, key=lambda a: (-(a["U"] or 0), len(a["changes"]))):
+        key = tuple(sorted(a["set"]))
+        if key not in seen:
+            seen.add(key)
+            ranked.append(a)
+    if ranked:
+        ranked[0]["recommended"] = True
+    out["alternatives"] = ranked
+    out["elapsed_s"] = round(time.perf_counter() - t0, 3)
+    return jsonify(_json(out))
 
 # ---------------------------------------------------------------- defaults (proposed combinations)
 @lru_cache(maxsize=16)
