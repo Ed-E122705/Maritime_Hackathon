@@ -160,6 +160,40 @@ td.num{font-family:var(--mono);text-align:right}
   </div>
   <p class="mute" style="font-size:12px">Motion is detected in a marked region, not a person; NO_MOVEMENT_DETECTED does not mean a clear deck. No automatic G4 flight or G6 suppression commands are issued. Scenario D will be added separately.</p>
 </section>
+
+<section class="card" id="scenarioDCard" style="margin:14px 22px">
+  <h3>Scenario D · G7 Perimeter Watch → G4 Simulated Response</h3>
+  <div class="mute" style="margin:4px 0 10px">180 s · 1 s steps · prerecorded demonstration; no physical drone commands. Camera alert does not certify flight-deck clearance.</div>
+  <div class="row" style="flex-wrap:wrap">
+    <button class="btn" type="button" id="dReplay">Load 181-step replay</button>
+    <button class="btn" type="button" id="dPlay">Play</button>
+    <button class="btn" type="button" id="dPause">Pause</button>
+    <a class="btn" style="text-decoration:none" href="/scenario/D">Scenario D link</a>
+  </div>
+  <label for="dTime">Replay time: <span id="dTimeText">0 s</span></label>
+  <input id="dTime" type="range" min="0" max="180" value="0" step="1" style="width:100%">
+  <div class="two">
+    <div>
+      <h3>Response telemetry</h3>
+      <div id="dStatus" class="mono">Load replay to view data</div>
+      <h3>Resource gauges</h3>
+      <div id="dGauges" class="mono">Power — · Cooling —</div>
+      <h3>Constraint / launch check</h3>
+      <div id="dChecks" class="mono">Awaiting scenario</div>
+    </div>
+    <div>
+      <h3>Event timeline</h3>
+      <div id="dEventLog" class="log" style="max-height:220px">No events yet</div>
+      <h3>Live camera → G4 simulation</h3>
+      <div class="mute">Start the camera, then run <span class="mono">py vision/scenario_d_live_bridge.py --port 5051</span>. Live samples are distinct from this scripted replay.</div>
+      <div class="row" style="margin:8px 0">
+        <button class="btn" id="dLiveRefresh" type="button">Refresh live status</button>
+        <button class="btn" id="dLiveApprove" type="button">Operator approve (simulated)</button>
+      </div>
+      <div id="dLiveResult" class="mono">Not connected</div>
+    </div>
+  </div>
+</section>
 <main>
   <aside id="side">
     <!-- A / A′ inputs -->
@@ -1056,6 +1090,66 @@ async function refreshG7Camera(){
 refreshG7Camera();
 setInterval(refreshG7Camera, 1000);
 
+
+let DROWS=[], DEVENTS=[], DPLAY=null;
+const dEl=id=>document.getElementById(id);
+function dDraw(t){
+  if (!DROWS.length) return;
+  t=Math.min(180,Math.max(0,Number(t)||0));
+  const r=DROWS[t], p=r.power;
+  dEl("dTime").value=t; dEl("dTimeText").textContent=t+" s";
+  dEl("dStatus").textContent="G7 "+r.g7_status+" · G4 "+r.g4_state+
+    " · battery "+r.g4_battery_percent+"% · operator authorization "+
+    (r.operator_authorized?"YES (simulation)":"NO");
+  dEl("dGauges").textContent="Total power "+p.total_kw.toFixed(3)+"/"+p.power_capacity_kw+
+    " kW (margin "+p.power_margin_kw.toFixed(3)+")"+
+    " · Cooling estimate "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+
+    " kW · G7 "+p.g7_kw.toFixed(3)+" kW · G4 "+p.g4_kw.toFixed(3)+" kW";
+  const all={...r.launch_checks,...p.checks};
+  dEl("dChecks").textContent=Object.entries(all).map(([k,v])=>(v?"PASS ":"HOLD ")+k).join(" · ");
+  dEl("dEventLog").textContent=DEVENTS.filter(e=>e.second<=t).map(e=>
+    e.second+"s: "+e.event).join("\n")||"No event yet";
+}
+async function dLoad(){
+  try {
+    const response=await fetch("/api/scenario/d",{cache:"no-store"});
+    if(!response.ok)throw new Error("HTTP "+response.status);
+    const data=await response.json();
+    DROWS=data.timeline;DEVENTS=data.events;dDraw(0);
+  }catch(e){dEl("dStatus").textContent="Replay unavailable: "+e;}
+}
+dEl("dReplay").addEventListener("click",dLoad);
+dEl("dTime").addEventListener("input",e=>dDraw(e.target.value));
+dEl("dPlay").addEventListener("click",()=>{
+  if(DPLAY)return;
+  DPLAY=setInterval(()=>{
+    const t=Number(dEl("dTime").value);
+    if(t>=180){clearInterval(DPLAY);DPLAY=null;return;}
+    dDraw(t+1);
+  },300);
+});
+dEl("dPause").addEventListener("click",()=>{if(DPLAY)clearInterval(DPLAY);DPLAY=null;});
+dEl("dLiveRefresh").addEventListener("click",async()=>{
+  try {const j=await (await fetch("/api/scenario/d/live")).json();
+    dEl("dLiveResult").textContent="Live tick "+j.second+" · G4 "+
+      (j.latest?.g4_state||"standby")+" · latest "+(j.latest?.g7_status||"awaiting samples");}
+  catch(e){dEl("dLiveResult").textContent=String(e);}
+});
+dEl("dLiveApprove").addEventListener("click",async()=>{
+  if(!confirm("Authorize SIMULATED G4 launch, subject to independent deck/resource checks?"))return;
+  try{
+    const r=await fetch("/api/scenario/d/live/sample",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({perimeter_motion:false,deck_obstructed:false,operator_approval:true})});
+    const j=await r.json();
+    dEl("dLiveResult").textContent=(j.g4_state||j.error||"Unknown")+
+      " · "+(j.events||[]).join(" · ");
+  }catch(e){dEl("dLiveResult").textContent=String(e);}
+});
+if(location.pathname==="/scenario/D"){
+  dLoad();
+  setTimeout(()=>dEl("scenarioDCard").scrollIntoView(),150);
+}
 </script>
 </body>
 </html>
