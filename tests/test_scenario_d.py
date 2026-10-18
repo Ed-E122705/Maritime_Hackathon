@@ -124,3 +124,26 @@ def test_live_no_motion_does_not_abort_authorized_takeoff():
         row = engine.tick(perimeter_motion=False)
     assert row["g4_state"] == "In flight"
     assert row["power"]["g4_kw"] == 2
+
+
+def test_scenario_d_per_system_power_breakdown():
+    """Keep the synthetic 46 kW baseline distinct from G4 and G7."""
+    rows = replay()["timeline"]
+    for second, expected in [
+        (0, (46.0, 2.0, 0.04, 48.04)),
+        (21, (46.0, 3.0, 0.065, 49.065)),
+    ]:
+        p = rows[second]["power"]
+        assert (p["background_kw"], p["g4_kw"], p["g7_kw"], p["total_kw"]) == expected
+        assert round(p["background_kw"] + p["g4_kw"] + p["g7_kw"], 3) == p["total_kw"]
+
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True)
+    for _ in range(5):
+        off_row = engine.tick(perimeter_motion=False, observation_valid=True)
+    assert off_row["g4_state"] == "Powering off"
+    p = off_row["power"]
+    assert (p["background_kw"], p["g4_kw"], p["g7_kw"], p["total_kw"]) == (
+        46.0, 0.0, 0.04, 46.04
+    )
