@@ -176,7 +176,7 @@ td.num{font-family:var(--mono);text-align:right}
     <div>
       <h3>Response telemetry</h3>
       <div id="dStatus" class="mono">Load replay to view data</div>
-      <h3>Resource gauges</h3>
+      <h3>Replay resource gauges (scripted timeline)</h3>
       <div id="dGauges" class="mono">Power — · Cooling —</div>
       <h3>Constraint / launch check</h3>
       <div id="dChecks" class="mono">Awaiting scenario</div>
@@ -191,6 +191,8 @@ td.num{font-family:var(--mono);text-align:right}
         <button class="btn" id="dLiveApprove" type="button">Operator approve (simulated)</button>
       </div>
       <div id="dLiveResult" class="mono">Not connected</div>
+      <h3>Live resource demand (BRIO camera)</h3>
+      <div id="dLiveGauges" class="mono" aria-live="polite">Waiting for camera bridge…</div>
       <div id="dLiveEventLog" class="log mono" style="max-height:100px"></div>
     </div>
   </div>
@@ -1147,7 +1149,15 @@ dEl("dLiveRefresh").addEventListener("click",async()=>{
       " · G4 "+(j.latest?.power?.g4_kw??"—")+" kW"+
       (j.latest?.g4_state==="Starting"||j.latest?.g4_state==="Awaiting approval" ?
       " · No motion "+(j.latest?.no_motion_seconds??0)+"/"+(j.latest?.no_motion_shutdown_seconds??5)+" s until power-off" : "");
-    dEl("dLiveEventLog").textContent=(j.events||[]).slice(-8).map(x=>x.second+"s "+x.event).join("\\n");}
+    const p=j.latest?.power;
+    dEl("dLiveGauges").textContent=p
+      ? "LIVE ship demand: "+p.total_kw.toFixed(3)+" kW"
+        +" | G4: "+p.g4_kw.toFixed(3)+" kW"
+        +" | G7: "+p.g7_kw.toFixed(3)+" kW"
+        +" | Other baseline: "+p.background_kw.toFixed(3)+" kW"
+        +" | Cooling screen: "+p.thermal_demand_kw.toFixed(3)+" kW"
+      : "Waiting for live camera bridge samples.";
+    dEl("dLiveEventLog").textContent=(j.events||[]).slice(-8).map(x=>x.second+"s "+x.event).join("\n");}
   catch(e){dEl("dLiveResult").textContent=String(e);}
 });
 dEl("dLiveApprove").addEventListener("click",async()=>{
@@ -1159,6 +1169,7 @@ dEl("dLiveApprove").addEventListener("click",async()=>{
     const j=await r.json();
     dEl("dLiveResult").textContent=(j.g4_state||j.error||"Unknown")+
       " · "+(j.events||[]).join(" · ");
+    dEl("dLiveRefresh").click();
   }catch(e){dEl("dLiveResult").textContent=String(e);}
 });
 setInterval(()=>dEl("dLiveRefresh").click(),2000);
