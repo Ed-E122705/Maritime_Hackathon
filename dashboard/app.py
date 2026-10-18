@@ -488,6 +488,15 @@ def index():
     return render_template("index.html")
 
 
+@app.get("/api/g7-camera")
+def g7_camera():
+    """Live advisory status and recent transition history from the BRIO 101."""
+    from vision.g7_state import load_camera_status
+    response = jsonify(load_camera_status(ROOT))
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
