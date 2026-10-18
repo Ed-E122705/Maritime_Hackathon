@@ -1,0 +1,116 @@
+{
+  "id": "G6",
+  "name": "Automated fire detection and water-mist suppression module (simulation)",
+  "installed": true,
+  "mass_kg": 450,
+  "power_line": "stbd",
+  "placements": [
+    {
+      "location": "hangar",
+      "mass_kg": 450,
+      "dimensions_m": [
+        1.5,
+        1.0,
+        1.8
+      ],
+      "units": 1
+    }
+  ],
+  "mode": "monitoring",
+  "modes": {
+    "monitoring": {
+      "power_kw": 0.2,
+      "peak_extra_kw": 0,
+      "peak_duration_s": 0,
+      "heat_paths": [
+        {
+          "location": "hangar",
+          "kw": 0.2
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 1,
+          "max_latency_ms": 100,
+          "required": false
+        },
+        "satcom": {
+          "mbps": 0,
+          "max_latency_ms": 800,
+          "required": false
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 2,
+        "ram_gb": 4,
+        "accelerators": 0,
+        "storage_tb": 0.05,
+        "allocations": [
+          {
+            "node": "node3",
+            "cores": 2,
+            "ram_gb": 4,
+            "accelerators": 0
+          }
+        ]
+      }
+    },
+    "suppression": {
+      "power_kw": 12.5,
+      "peak_extra_kw": 6,
+      "peak_duration_s": 3,
+      "heat_paths": [
+        {
+          "location": "hangar",
+          "kw": 12.5
+        }
+      ],
+      "datalinks": {
+        "backbone": {
+          "mbps": 2,
+          "max_latency_ms": 100,
+          "required": false
+        },
+        "satcom": {
+          "mbps": 0,
+          "max_latency_ms": 800,
+          "required": false
+        },
+        "los": {
+          "mbps": 0,
+          "max_latency_ms": 20,
+          "required": false
+        },
+        "acoustic": {
+          "mbps": 0,
+          "max_latency_ms": 60000,
+          "required": false
+        }
+      },
+      "compute": {
+        "cores": 4,
+        "ram_gb": 8,
+        "accelerators": 0,
+        "storage_tb": 0.05,
+        "allocations": [
+          {
+            "node": "node3",
+            "cores": 4,
+            "ram_gb": 8,
+            "accelerators": 0
+          }
+        ]
+      }
+    }
+  }
+}
