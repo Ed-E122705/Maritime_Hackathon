@@ -1,4 +1,4 @@
-"""Translate canonical Annex B G1–G5 JSON into the normalized resource-model input.
+"""Translate canonical Annex B G1–G5 and custom G6 JSON into resource-model input.
 
 This is NOT a second manifest database: the canonical `data/guests/G*.json` files
 are read without modification. `resource_profiles.json` contains ONLY synthetic
@@ -178,7 +178,9 @@ def normalize_guests(canonical, runtime, assumptions):
             raise InputError(f'{gid}.{operation}: power_mode must be one of {allowed}')
         if operation is not None and fixed_power is None and allowed is None:
             used_assumptions.add('MODE-08')
-        profile = profiles[gid]
+        profile = profiles.get(gid)
+        if profile is None:
+            raise InputError(f'{gid}: no resource profile configured; unresolved guest demands and geometry prevent admission assessment')
         placements = _placing(g, cfg, profile)
         power_kw = number(declared_modes[pmode]['power_kw']['nominal'], f'{gid}.{pmode}.power')
         if gid == 'G3' and operation == 'surveying' and fixed_power is None:
