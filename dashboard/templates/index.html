@@ -133,6 +133,16 @@ td.num{font-family:var(--mono);text-align:right}
   padding:10px 12px;font-size:12.5px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.45);pointer-events:none;display:none}
 #tip b{color:var(--ink)} #tip .k{color:var(--mute)} #tip .hl{color:var(--amber)} #tip .ok{color:var(--green)}
 #tip hr{border:none;border-top:1px solid var(--line);margin:6px 0}
+.d-power-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
+.d-power-card{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px;min-width:0}
+.d-power-name{font-size:11px;font-weight:700;color:var(--mute);letter-spacing:.5px;text-transform:uppercase}
+.d-power-amount{font:700 22px/1.35 var(--mono);margin:8px 0 5px;white-space:nowrap}
+.d-power-description{font-size:11px;color:var(--mute);line-height:1.4}
+.d-power-card.g4{border-top:3px solid var(--amber)}
+.d-power-card.g7{border-top:3px solid var(--cyan)}
+.d-power-card.background{border-top:3px solid var(--ghost)}
+.d-power-summary{font-family:var(--mono);font-size:12px;color:var(--mute);margin-top:9px;line-height:1.65}
+@media(max-width:700px){.d-power-grid{grid-template-columns:1fr}}
 .busy{opacity:.55;transition:opacity .2s}
 .hide{display:none!important}
 @media (max-width:1100px){.gauges{grid-template-columns:repeat(2,1fr)} main{grid-template-columns:1fr} aside{position:static;max-height:none}.two{grid-template-columns:1fr}}
@@ -176,8 +186,9 @@ td.num{font-family:var(--mono);text-align:right}
     <div>
       <h3>Response telemetry</h3>
       <div id="dStatus" class="mono">Load replay to view data</div>
-      <h3>Replay resource gauges (scripted timeline)</h3>
-      <div id="dGauges" class="mono">Power — · Cooling —</div>
+      <h3>Replay power by system (scripted timeline)</h3>
+      <div id="dReplayBreakdown" class="d-power-grid" aria-label="Replay power breakdown"></div>
+      <div id="dGauges" class="d-power-summary">Load replay to see modeled power</div>
       <h3>Constraint / launch check</h3>
       <div id="dChecks" class="mono">Awaiting scenario</div>
     </div>
@@ -191,8 +202,9 @@ td.num{font-family:var(--mono);text-align:right}
         <button class="btn" id="dLiveApprove" type="button">Operator approve (simulated)</button>
       </div>
       <div id="dLiveResult" class="mono">Not connected</div>
-      <h3>Live resource demand (BRIO camera)</h3>
-      <div id="dLiveGauges" class="mono" aria-live="polite">Waiting for camera bridge…</div>
+      <h3>Live power by system (BRIO camera)</h3>
+      <div id="dLiveBreakdown" class="d-power-grid" aria-live="polite" aria-label="Live power breakdown"></div>
+      <div id="dLiveGauges" class="d-power-summary">Waiting for camera bridge…</div>
       <div id="dLiveEventLog" class="log mono" style="max-height:100px"></div>
     </div>
   </div>
@@ -1105,6 +1117,30 @@ setInterval(refreshG7Camera, 1000);
 
 let DROWS=[], DEVENTS=[], DPLAY=null;
 const dEl=id=>document.getElementById(id);
+function dRenderPowerBreakdown(target, power) {
+  if (!power) {
+    target.textContent = "Waiting for simulation data…";
+    return;
+  }
+  // The scenario provides three distinct power contributions. The background
+  // is a synthetic 46 kW aggregate, not measured load or per-guest attribution.
+  const entries = [
+    {label:"Vessel background", kw:power.background_kw, unit:"background",
+     note:"Illustrative baseline; no individual guest allocation"},
+    {label:"G4 · Drone system", kw:power.g4_kw, unit:"g4",
+     note:"0 kW Off · 2 kW Standby · 3 kW Preflight"},
+    {label:"G7 · Camera system", kw:power.g7_kw, unit:"g7",
+     note:"0.040 kW Monitoring · 0.065 kW Alert"}
+  ];
+  target.innerHTML = entries.map(e => {
+    const kw = Number(e.kw);
+    const shown = Number.isFinite(kw) ? kw.toFixed(3) : "—";
+    return '<div class="d-power-card '+e.unit+'">'
+      +'<div class="d-power-name">'+e.label+'</div>'
+      +'<div class="d-power-amount">'+shown+' <span style="font-size:12px">kW</span></div>'
+      +'<div class="d-power-description">'+e.note+'</div></div>';
+  }).join("");
+}
 function dDraw(t){
   if (!DROWS.length) return;
   t=Math.min(180,Math.max(0,Number(t)||0));
@@ -1113,10 +1149,10 @@ function dDraw(t){
   dEl("dStatus").textContent="G7 "+r.g7_status+" · G4 "+r.g4_state+
     " · battery "+r.g4_battery_percent+"% · operator authorization "+
     (r.operator_authorized?"YES (simulation)":"NO");
-  dEl("dGauges").textContent="Total power "+p.total_kw.toFixed(3)+"/"+p.power_capacity_kw+
-    " kW (margin "+p.power_margin_kw.toFixed(3)+")"+
-    " · Cooling estimate "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+
-    " kW · G7 "+p.g7_kw.toFixed(3)+" kW · G4 "+p.g4_kw.toFixed(3)+" kW";
+  dRenderPowerBreakdown(dEl("dReplayBreakdown"),p);
+  dEl("dGauges").textContent="TOTAL: "+p.total_kw.toFixed(3)+" kW"
+    +" · Power capacity: "+p.power_capacity_kw+" kW"
+    +" · Cooling screen: "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+" kW";
   const all={...r.launch_checks,...p.checks};
   dEl("dChecks").textContent=Object.entries(all).map(([k,v])=>(v?"PASS ":"HOLD ")+k).join(" · ");
   dEl("dEventLog").textContent=DEVENTS.filter(e=>e.second<=t).map(e=>
@@ -1150,12 +1186,11 @@ dEl("dLiveRefresh").addEventListener("click",async()=>{
       (j.latest?.g4_state==="Starting"||j.latest?.g4_state==="Awaiting approval" ?
       " · No motion "+(j.latest?.no_motion_seconds??0)+"/"+(j.latest?.no_motion_shutdown_seconds??5)+" s until power-off" : "");
     const p=j.latest?.power;
+    dRenderPowerBreakdown(dEl("dLiveBreakdown"),p);
     dEl("dLiveGauges").textContent=p
-      ? "LIVE ship demand: "+p.total_kw.toFixed(3)+" kW"
-        +" | G4: "+p.g4_kw.toFixed(3)+" kW"
-        +" | G7: "+p.g7_kw.toFixed(3)+" kW"
-        +" | Other baseline: "+p.background_kw.toFixed(3)+" kW"
-        +" | Cooling screen: "+p.thermal_demand_kw.toFixed(3)+" kW"
+      ? "TOTAL: "+p.total_kw.toFixed(3)+" kW"
+        +" · Power capacity: "+p.power_capacity_kw+" kW"
+        +" · Cooling screen: "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+" kW"
       : "Waiting for live camera bridge samples.";
     dEl("dLiveEventLog").textContent=(j.events||[]).slice(-8).map(x=>x.second+"s "+x.event).join("\n");}
   catch(e){dEl("dLiveResult").textContent=String(e);}
