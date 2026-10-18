@@ -607,8 +607,7 @@ def scenario_d_live_sample():
     if not all(isinstance(data.get(k, False), bool) for k in ("perimeter_motion", "deck_obstructed", "operator_approval", "observation_valid")):
         return jsonify({"error": "All booleans must be true/false"}), 400
     with _scenario_d_lock:
-        if _scenario_d_live.time >= _scenario_d_live.cfg["duration_seconds"]:
-            return jsonify({"error": "Simulation reached 180 seconds; reset to repeat"}), 409
+        # Live webcam monitoring is continuous; only the scripted replay is 180 s.
         row = _scenario_d_live.tick(
             perimeter_motion=data.get("perimeter_motion", False),
             deck_obstructed=data.get("deck_obstructed", False),
