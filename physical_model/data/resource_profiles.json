@@ -178,6 +178,12 @@
           "ram_gb": 4,
           "accelerators": 0,
           "storage_tb": 0.01
+        },
+        "alert": {
+          "cores": 2,
+          "ram_gb": 4,
+          "accelerators": 0,
+          "storage_tb": 0.01
         }
       },
       "dimensions_by_location": {},
@@ -202,7 +208,7 @@
     "link_latency_ms": "Synthetic guest tolerance assumptions; these are not established by host latency specifications.",
     "g4_los_nominal_mbps": "10 Mbps is a selected point in 5–20, not the midpoint or a declared nominal.",
     "silence": "G1 transmission is suppressed; no buffering guarantee. G2 buffering duration/capacity remains unknown.",
-    "g7_camera": "Team demonstration values: 2 cores / 4 GB on ship node4 are synthetic; Dell Snapdragon USB motion inference is an off-ship prototype. 0.1 kW/0.5 kg/mast mounting are not equipment measurements."
+    "g7_camera": "Scenario D synthetic values: G7 monitoring 0.040 kW, alert 0.065 kW, 1.2 kg, 0.02 Mbps metadata; CPU allocated to node4 as a hypothetical shipboard profile. Dell CV prototype is physically separate."
   },
   "operational_policy": {
     "status": "Inherited demonstration screening constants; not supplied as structured host specifications. See OP-01.",
