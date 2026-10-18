@@ -187,6 +187,7 @@ td.num{font-family:var(--mono);text-align:right}
       <h3>Response telemetry</h3>
       <div id="dStatus" class="mono">Load replay to view data</div>
       <h3>Replay power by system (scripted timeline)</h3>
+      <div class="mute" style="font-size:11px">Values displayed individually; simulated 46 kW vessel background remains included.</div>
       <div id="dReplayBreakdown" class="d-power-grid" aria-label="Replay power breakdown"></div>
       <div id="dGauges" class="d-power-summary">Load replay to see modeled power</div>
       <h3>Constraint / launch check</h3>
@@ -203,6 +204,7 @@ td.num{font-family:var(--mono);text-align:right}
       </div>
       <div id="dLiveResult" class="mono">Not connected</div>
       <h3>Live power by system (BRIO camera)</h3>
+      <div class="mute" style="font-size:11px">Separate G4, G7 and the simulated 46 kW vessel background — no combined total.</div>
       <div id="dLiveBreakdown" class="d-power-grid" aria-live="polite" aria-label="Live power breakdown"></div>
       <div id="dLiveGauges" class="d-power-summary">Waiting for camera bridge…</div>
       <div id="dLiveEventLog" class="log mono" style="max-height:100px"></div>
@@ -1150,9 +1152,8 @@ function dDraw(t){
     " · battery "+r.g4_battery_percent+"% · operator authorization "+
     (r.operator_authorized?"YES (simulation)":"NO");
   dRenderPowerBreakdown(dEl("dReplayBreakdown"),p);
-  dEl("dGauges").textContent="TOTAL: "+p.total_kw.toFixed(3)+" kW"
-    +" · Power capacity: "+p.power_capacity_kw+" kW"
-    +" · Cooling screen: "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+" kW";
+  dEl("dGauges").textContent="Capacity: "+p.power_capacity_kw+" kW"
+    +" · Simulated cooling screen: "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+" kW";
   const all={...r.launch_checks,...p.checks};
   dEl("dChecks").textContent=Object.entries(all).map(([k,v])=>(v?"PASS ":"HOLD ")+k).join(" · ");
   dEl("dEventLog").textContent=DEVENTS.filter(e=>e.second<=t).map(e=>
@@ -1181,16 +1182,14 @@ dEl("dLiveRefresh").addEventListener("click",async()=>{
   try {const j=await (await fetch("/api/scenario/d/live")).json();
     dEl("dLiveResult").textContent="Live tick "+j.second+" · G4 "+
       (j.latest?.g4_state||"standby")+" · latest "+(j.latest?.g7_status||"awaiting samples")+
-      " · "+(j.latest?.power?.total_kw??"—")+" kW"+
-      " · G4 "+(j.latest?.power?.g4_kw??"—")+" kW"+
+      " · G4 "+(j.latest?.power?.g4_kw??"—")+" kW (shown in breakdown below)"+
       (j.latest?.g4_state==="Starting"||j.latest?.g4_state==="Awaiting approval" ?
       " · No motion "+(j.latest?.no_motion_seconds??0)+"/"+(j.latest?.no_motion_shutdown_seconds??5)+" s until power-off" : "");
     const p=j.latest?.power;
     dRenderPowerBreakdown(dEl("dLiveBreakdown"),p);
     dEl("dLiveGauges").textContent=p
-      ? "TOTAL: "+p.total_kw.toFixed(3)+" kW"
-        +" · Power capacity: "+p.power_capacity_kw+" kW"
-        +" · Cooling screen: "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+" kW"
+      ? "Power capacity: "+p.power_capacity_kw+" kW"
+        +" · Simulated cooling screen: "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+" kW"
       : "Waiting for live camera bridge samples.";
     dEl("dLiveEventLog").textContent=(j.events||[]).slice(-8).map(x=>x.second+"s "+x.event).join("\n");}
   catch(e){dEl("dLiveResult").textContent=String(e);}
