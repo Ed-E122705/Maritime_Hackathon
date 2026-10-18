@@ -16,7 +16,7 @@ def load_camera_status(root=ROOT, now=None, ttl_seconds=5):
     base = Path(root) / "vision"
     result = {
         "guest_id": "G7", "camera_online": False, "deck_activity": "UNKNOWN",
-        "movement_detected": False, "safety_certified": False,
+        "movement_detected": False, "positive_motion_sample": False, "safety_certified": False,
         "reason": "Camera not started", "timestamp_utc": None,
         "age_seconds": None, "events": [],
         "integration_scope": "advisory_only_no_automatic_ship_commands",
@@ -53,6 +53,7 @@ def load_camera_status(root=ROOT, now=None, ttl_seconds=5):
             camera_online=raw["camera_online"],
             deck_activity=activity if raw["camera_online"] else "UNKNOWN",
             movement_detected=activity == "MOVEMENT_DETECTED" and raw["camera_online"],
+            positive_motion_sample=bool(raw.get("positive_motion_sample", False)) and raw["camera_online"],
             changed_pixels=raw.get("changed_pixels"),
             reason=raw.get("reason", "") if raw["camera_online"] else "Camera stopped",
         )
