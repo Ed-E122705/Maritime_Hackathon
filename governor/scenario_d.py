@@ -1,0 +1,151 @@
+"""Scenario D simulation only: motion confirmation -> resource check -> simulated G4 preflight.
+
+No hardware commands are issued. Launch requires distinct deck checks and explicit
+software operator approval. Perimeter alerts cannot establish launch-deck clearance.
+"""
+from __future__ import annotations
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_CONFIG = ROOT / "scenarios" / "D_g7_g4.json"
+
+
+def config():
+    return json.loads(DEFAULT_CONFIG.read_text(encoding="utf-8"))
+
+
+def safety_checks(cfg, deck_obstructed=False):
+    s = cfg["ship"]
+    checks = {
+        "perimeter_separate_from_deck": True,
+        "flight_deck_verified_clear": s["flight_deck_verified_clear"] and not deck_obstructed,
+        "g4_ready": s["g4_ready"],
+        "sea_state_lte_4": s["sea_state"] <= 4,
+        "wind_lte_25_kn": s["wind_knots"] <= 25,
+        "speed_5_to_12_kn": 5 <= s["speed_knots"] <= 12,
+        "course_steady": s["course_keeping"] == "steady",
+        "stern_ramp_idle": not s["stern_ramp_in_use"],
+        "crew_available": s["crew_available"] > 0,
+    }
+    return checks
+
+
+def demand(cfg, seconds, alert, preflight):
+    background = cfg["background_ship_load_kw"]
+    g7 = cfg["g7_alert_kw"] if alert else cfg["g7_monitoring_kw"]
+    g4 = cfg["g4_preflight_kw"] if preflight else cfg["g4_standby_kw"]
+    total = background + g7 + g4
+    # Conservative screening: synthetic all-electrical-to-heat total; the
+    # real vessel physical checker allocates cooling to paths and positions.
+    limit = cfg["ship"]["continuous_guest_capacity_kw"]
+    cooling = cfg["ship"]["cooling_capacity_kw"]
+    checks = {
+        "continuous_power": total <= limit,
+        "thermal_screen": total <= cooling,
+        "port_branch": background + g7 <= cfg["ship"]["power_branch_capacity_kw"],
+        "starboard_branch": g4 <= cfg["ship"]["power_branch_capacity_kw"],
+    }
+    return {
+        "background_kw": round(background, 3), "g7_kw": round(g7, 3),
+        "g4_kw": round(g4, 3), "total_kw": round(total, 3),
+        "thermal_demand_kw": round(total, 3),
+        "power_capacity_kw": limit, "cooling_capacity_kw": cooling,
+        "power_margin_kw": round(limit-total, 3),
+        "cooling_margin_kw": round(cooling-total, 3),
+        "checks": checks,
+    }
+
+
+class ScenarioD:
+    def __init__(self, settings=None, scripted=True):
+        self.cfg = settings or config()
+        self.scripted = scripted
+        self.time = -1
+        self.confirm = 0
+        self.alert = False
+        self.start_time = None
+        self.state = "Standby"
+        self.authorized = False
+        self.launch_time = None
+        self.deck_obstructed = False
+        self.events = []
+        self.timeline = []
+
+    def tick(self, perimeter_motion=False, deck_obstructed=False, approve=False):
+        self.time += 1
+        t = self.time
+        self.deck_obstructed = bool(deck_obstructed)
+        notes = []
+        valid_motion = bool(perimeter_motion)
+        if self.scripted:
+            valid_motion = t in (20, 21)
+            approve = t == self.cfg["operator_approval_at_s"]
+        self.confirm = self.confirm + 1 if valid_motion else 0
+        if valid_motion and not self.alert:
+            self.alert = True
+            notes.append("G7 first unclassified perimeter-motion candidate")
+        if self.confirm >= self.cfg["required_consecutive_positive_samples"] and self.start_time is None:
+            startup_demand = demand(self.cfg, t, True, True)
+            checks = safety_checks(self.cfg, self.deck_obstructed)
+            # Readiness + resources can permit PREPARATION; deck clearance is
+            # independently mandatory for launch, but not for safe preparation.
+            if all(startup_demand["checks"].values()) and checks["g4_ready"]:
+                self.start_time = t
+                self.state = "Starting"
+                notes.append("Two positive observations: simulated G4 startup begins")
+            else:
+                notes.append("Simulated startup held: G4 not ready or resources unavailable")
+        if self.state == "Starting" and t >= self.start_time + self.cfg["g4_startup_seconds"]:
+            self.state = "Awaiting approval"
+            notes.append("Simulated G4 startup complete; await operator clearance")
+        if approve and self.state == "Awaiting approval":
+            checks = safety_checks(self.cfg, self.deck_obstructed)
+            d = demand(self.cfg, t, self.alert, True)
+            if all(checks.values()) and all(d["checks"].values()):
+                self.authorized = True
+                self.state = "Simulated launch"
+                self.launch_time = t
+                notes.append("Operator approved: simulated launch only (no drone command)")
+            else:
+                notes.append("Launch held: " + ", ".join(k for k,v in {**checks,**d["checks"]}.items() if not v))
+        if self.state == "Simulated launch" and t >= (self.launch_time or 0) + 5:
+            self.state = "In flight"
+            notes.append("Simulated takeoff complete; G4 ship-side returns to standby load")
+        if self.state == "In flight" and self.scripted and t >= self.cfg["recon_complete_at_s"]:
+            self.state = "Mission complete"
+            self.alert = False
+            notes.append("Reconnaissance simulation complete")
+        preflight = self.state in ("Starting", "Awaiting approval", "Simulated launch")
+        d = demand(self.cfg, t, self.alert, preflight)
+        check = safety_checks(self.cfg, self.deck_obstructed)
+        if not check["flight_deck_verified_clear"] and self.state in ("Awaiting approval", "Simulated launch"):
+            notes.append("Flight deck obstruction: HOLD launch; perimeter is a different zone")
+        for note in notes:
+            self.events.append({"second":t,"event":note})
+        row = {
+            "second":t,
+            "g7_status": "ALERT" if self.alert else "MONITORING",
+            "consecutive_positive_samples":self.confirm,
+            "g4_state":self.state,
+            "g4_battery_percent":self.cfg["g4_initial_battery_percent"],
+            "operator_authorized":self.authorized,
+            "flight_deck_obstructed":self.deck_obstructed,
+            "power":d,
+            "launch_checks":check,
+            "events":notes,
+            "safety_certified":False,
+        }
+        self.timeline.append(row)
+        return row
+
+
+def replay(settings=None):
+    engine = ScenarioD(settings=settings, scripted=True)
+    return {
+        "scenario":"D",
+        "parameters":engine.cfg,
+        "timeline":[engine.tick() for _ in range(engine.cfg["duration_seconds"]+1)],
+        "events":engine.events,
+        "scope":"simulation_only_no_physical_drone_commands",
+    }
