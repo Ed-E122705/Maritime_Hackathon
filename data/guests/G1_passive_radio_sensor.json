@@ -5,7 +5,9 @@
   "source": {
     "document": "Fincantieri Software-Defined Vessel SHORT, Technical Annex B (guest cards) and B.0 (ontology); Annex A (host-wide conditions)",
     "guest_card": "G1",
-    "assumptions_added": []
+    "assumptions_added": [
+      "The active capability fraction is normalized to 1.0 as a relative reference for G1's declared 30% radar-interference loss; this is not a measured absolute performance score."
+    ]
   },
   "capability": {
     "description": "Detects non-identifying transmitting vessels.",
@@ -70,13 +72,13 @@
         },
         "max_duration_minutes": null,
         "interruptible": null,
-        "capability_fraction": null,
+        "capability_fraction": 1,
         "notes": "Continuous; air-cooled."
       }
     ],
     "cooling": {
       "type": "air",
-      "electrical_kw_to_heat_kw": 1.0,
+      "electrical_kw_to_heat_kw": 1,
       "chilled_water_load_rule": "not_on_chilled_water_loop",
       "notes": "Electrical load converts to heat at 1:1 per Annex A.2. Air-cooled mast guests cannot use a chilled-water manifold."
     },
@@ -89,7 +91,7 @@
           "max": null
         },
         "disabled_in_emission_silence": false,
-        "notes": null
+        "notes": "Source-specified 50 Mbit/s local backbone demand; passive reception is compatible with emission silence."
       },
       {
         "type": "shore_link_transport_unspecified",
