@@ -139,15 +139,14 @@
         "roof": [
           0.6,
           0.6,
-          1.0
+          1
         ]
       },
       "default_power_line": "stbd",
       "satcom_demand_policy": "manifest_maximum_for_each_mode"
-    },    
+    },
     "G6": {
       "compute_node": "node4",
-
       "compute_by_mode": {
         "monitoring": {
           "cores": 1,
@@ -162,12 +161,27 @@
           "storage_tb": 0.1
         }
       },
-
       "dimensions_by_location": {
-        "bay2": [2.0, 1.0, 1.5]
+        "bay2": [
+          2,
+          1,
+          1.5
+        ]
       },
-
       "default_power_line": "stbd"
+    },
+    "G7": {
+      "compute_node": "node4",
+      "compute_by_mode": {
+        "active": {
+          "cores": 2,
+          "ram_gb": 4,
+          "accelerators": 0,
+          "storage_tb": 0.01
+        }
+      },
+      "dimensions_by_location": {},
+      "default_power_line": "port"
     }
   },
   "link_latency_ms": {
@@ -186,8 +200,9 @@
     "g5_data": "Use declared 6 Mbps maximum as a conservative demo reservation for both modes; actual low-mode throughput remains unknown.",
     "g3_survey": "1 kW is an explicit demonstration estimate for deployed survey, not the standby source requirement.",
     "link_latency_ms": "Synthetic guest tolerance assumptions; these are not established by host latency specifications.",
-    "g4_los_nominal_mbps": "10 Mbps is a selected point in 5\u201320, not the midpoint or a declared nominal.",
-    "silence": "G1 transmission is suppressed; no buffering guarantee. G2 buffering duration/capacity remains unknown."
+    "g4_los_nominal_mbps": "10 Mbps is a selected point in 5–20, not the midpoint or a declared nominal.",
+    "silence": "G1 transmission is suppressed; no buffering guarantee. G2 buffering duration/capacity remains unknown.",
+    "g7_camera": "Team demonstration values: 2 cores / 4 GB on ship node4 are synthetic; Dell Snapdragon USB motion inference is an off-ship prototype. 0.1 kW/0.5 kg/mast mounting are not equipment measurements."
   },
   "operational_policy": {
     "status": "Inherited demonstration screening constants; not supplied as structured host specifications. See OP-01.",
@@ -205,26 +220,26 @@
       14
     ],
     "deck_clearance_minutes": {
-      "14": [
-        3,
-        5
-      ],
+      "0": null,
       "6": [
         8,
         12
       ],
-      "0": null
+      "14": [
+        3,
+        5
+      ]
     },
     "human_confirmation_seconds": {
-      "14": [
-        15,
-        60
-      ],
+      "0": null,
       "6": [
         60,
         180
       ],
-      "0": null
+      "14": [
+        15,
+        60
+      ]
     }
   }
 }
