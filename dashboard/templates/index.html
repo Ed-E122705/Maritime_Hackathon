@@ -155,7 +155,7 @@ td.num{font-family:var(--mono);text-align:right}
   <h3>G7 · Live camera deck activity (advisory)</h3>
   <div class="two">
     <div><img id="g7Preview" alt="Live perimeter camera preview, annotated with detection region" style="display:none;width:100%;max-width:540px;border-radius:8px;margin:6px 0;border:1px solid var(--line)"><div id="g7PreviewFallback" class="mute">Waiting for BRIO 101 live preview…</div><div><div id="g7CameraStatus" class="mono">Loading camera status…</div>
-      <div id="g7CameraAge" class="mute" style="margin-top:6px">Camera status is not a safety clearance</div></div>
+      <div id="g7CameraDetails" class="mono" style="margin-top:5px">—</div><div id="g7CameraAge" class="mute" style="margin-top:6px">Camera status is not a safety clearance</div></div>
     <div><b>Recent activity events</b><div id="g7CameraEvents" class="log mono" style="max-height:150px">None yet</div></div>
   </div>
   <p class="mute" style="font-size:12px">Motion is detected in a marked region, not a person; NO_MOVEMENT_DETECTED does not mean a clear deck. No automatic G4 flight or G6 suppression commands are issued. Scenario D will be added separately.</p>
@@ -191,6 +191,7 @@ td.num{font-family:var(--mono);text-align:right}
         <button class="btn" id="dLiveApprove" type="button">Operator approve (simulated)</button>
       </div>
       <div id="dLiveResult" class="mono">Not connected</div>
+      <div id="dLiveEventLog" class="log mono" style="max-height:100px"></div>
     </div>
   </div>
 </section>
@@ -1081,7 +1082,8 @@ async function refreshG7Camera(){
     fallback.style.display = j.camera_online ? "none" : "block";
     if (j.camera_online) img.src = "/api/g7-preview.jpg?t=" + Date.now();
     fallback.textContent = j.reason || "Camera offline / stale";
-        age.textContent = "Last update: " + (j.timestamp_utc || "never") +
+        document.getElementById("g7CameraDetails").textContent = "Current threshold sample: "+(j.positive_motion_sample?"POSITIVE":"negative/unknown")+" · Changed pixels: "+(j.changed_pixels??"—")+" · Zone: perimeter surveillance";
+    age.textContent = "Last update: " + (j.timestamp_utc || "never") +
       " · age: " + (j.age_seconds == null ? "unknown" : j.age_seconds+"s") +
       " · safety clearance: NEVER VERIFIED";
     const history = Array.isArray(j.events) ? j.events.slice(-10).reverse() : [];
@@ -1140,7 +1142,9 @@ dEl("dPause").addEventListener("click",()=>{if(DPLAY)clearInterval(DPLAY);DPLAY=
 dEl("dLiveRefresh").addEventListener("click",async()=>{
   try {const j=await (await fetch("/api/scenario/d/live")).json();
     dEl("dLiveResult").textContent="Live tick "+j.second+" · G4 "+
-      (j.latest?.g4_state||"standby")+" · latest "+(j.latest?.g7_status||"awaiting samples");}
+      (j.latest?.g4_state||"standby")+" · latest "+(j.latest?.g7_status||"awaiting samples")+
+      " · "+(j.latest?.power?.total_kw??"—")+" kW";
+    dEl("dLiveEventLog").textContent=(j.events||[]).slice(-8).map(x=>x.second+"s "+x.event).join("\\n");}
   catch(e){dEl("dLiveResult").textContent=String(e);}
 });
 dEl("dLiveApprove").addEventListener("click",async()=>{
@@ -1154,6 +1158,7 @@ dEl("dLiveApprove").addEventListener("click",async()=>{
       " · "+(j.events||[]).join(" · ");
   }catch(e){dEl("dLiveResult").textContent=String(e);}
 });
+setInterval(()=>dEl("dLiveRefresh").click(),2000);
 if(location.pathname==="/scenario/D"){
   dLoad();
   setTimeout(()=>dEl("scenarioDCard").scrollIntoView(),150);
