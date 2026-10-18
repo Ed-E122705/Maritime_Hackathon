@@ -7,13 +7,13 @@
   "required_consecutive_positive_samples": 2,
   "g4_startup_seconds": 8,
   "g4_initial_battery_percent": 80,
-  "g7_monitoring_kw": 0.040,
+  "g7_monitoring_kw": 0.04,
   "g7_alert_kw": 0.065,
-  "g4_standby_kw": 2.0,
-  "g4_preflight_kw": 3.0,
+  "g4_standby_kw": 2,
+  "g4_preflight_kw": 3,
   "g7_mass_kg": 1.2,
   "g7_metadata_mbps": 0.02,
-  "background_ship_load_kw": 46.0,
+  "background_ship_load_kw": 46,
   "operator_approval_at_s": 32,
   "takeoff_complete_at_s": 37,
   "recon_complete_at_s": 77,
@@ -40,6 +40,8 @@
     "46 kW background ship load is explicitly introduced to reproduce the supplied 48.040 kW initial ship demand.",
     "Flight launch is represented only as a simulated state transition. Operator approval is an example script event, not automatic authorization.",
     "Perimeter region and independent flight-deck-clearance region are distinct.",
-    "Power and heat here are synthetic aggregate screens; not certified physical transient or performance analyses."
-  ]
+    "Power and heat here are synthetic aggregate screens; not certified physical transient or performance analyses.",
+    "Live simulation only: after five valid no-motion samples during startup or approval wait, G4 powers off (0 kW). Replay remains unchanged; no-motion does not certify the perimeter clear."
+  ],
+  "no_motion_shutdown_seconds": 5
 }

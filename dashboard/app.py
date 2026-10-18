@@ -37,9 +37,28 @@ def _json(obj):
     return json.loads(json.dumps(obj, default=str))
 
 
+def _g7_camera_resource_raw(raw):
+    """Account for G7's synthetic alert mode without altering stored manifests.
+
+    The standard guest model already accounts for G7's position, mass, CPU,
+    links and 0.040 kW monitoring. When a current valid alert is active, its
+    modeled electrical reservation changes to 0.065 kW. No camera-dependent
+    decision can authorize physical G4 launch.
+    """
+    if "G7" not in raw["card"]:
+        return raw
+    from vision.g7_state import load_camera_status
+    status = load_camera_status(ROOT)
+    if status["camera_online"] and status["deck_activity"] == "MOVEMENT_DETECTED":
+        return loader.apply_overrides(
+            raw, ["card.G7.resources.power_modes.active.power_kw.nominal=0.065"])
+    return raw
+
+
 def _raw_with(overrides):
     ov = [o.strip() for o in overrides or [] if o and o.strip()]
-    return (loader.apply_overrides(RAW, ov) if ov else RAW), ov
+    raw = loader.apply_overrides(RAW, ov) if ov else RAW
+    return _g7_camera_resource_raw(raw), ov
 
 
 def _usage(raw, installed, priority):
@@ -407,6 +426,127 @@ def check():
     out["elapsed_s"] = round(time.perf_counter() - t0, 3)
     return jsonify(_json(out))
 
+
+# ---------------------------------------------------------------- A / A′ · original v3 explainability + eight-dial contract
+@app.post("/api/decision")
+def decision():
+    """Restore the v3 UI's baseline/final admission comparison endpoint.
+
+    The supplied v3 template calls this endpoint for both Scenario A and A′.
+    Keep the output contract aligned with the original v3 dashboard.
+    """
+    import itertools
+    from governor.admission import _demand_plan, degraded_floor, describe_group
+    from governor.model import binding_groups
+    q = request.get_json(force=True)
+    try:
+        raw, ov = _raw_with(q.get("overrides"))
+    except Exception as e:
+        return jsonify({"error": f"override: {e}"}), 400
+    pr = q.get("priority", "survey")
+    w = raw["priority"][pr]["weights"]
+    guests = loader.load_guest_data(raw)
+    budget = loader.load_ship_budget(raw)
+    installed = dict(q.get("installed") or {})
+    adds = {g: (c if c and c != "auto" else None)
+            for g, c in (q.get("adds") or {}).items() if g not in installed}
+    combo = {**installed, **adds}
+    t0 = time.perf_counter()
+    solves = 0
+
+    p = build_problem(raw, guests, {"installed": combo}, pr,
+                      baseline=True, allow_removal=False)
+    plan, core = solve_model(p)
+    solves += 1
+    out = {"priority": pr, "weights": w, "installed": installed,
+           "adds": list(adds), "overrides": ov,
+           "u_start": sum(w.get(g, 1) for g in installed),
+           "start_usage": _usage(raw, installed, pr)}
+    if plan is not None:
+        ev = evaluate(plan, guests, budget)
+        usage = _usage_table(ev, budget)
+        out["baseline"] = {"status": "FEASIBLE", "binding": [],
+                           "binding_text": [], "usage": usage}
+        out["final"] = {
+            "verdict": "YES", "ok": True, "steps": [], "actions": [],
+            "capability_lost": 0, "U": plan["objective"]["U_normal"],
+            "usage": usage, "set": list(plan["config"]),
+            "placement": {g: plan["config"][g] for g in plan["config"]},
+            "order": list(adds),
+        }
+    else:
+        binding = binding_groups(p, core)
+        demand = _demand_plan(raw, guests, {"installed": combo}, pr, minimal=False)
+        dev = evaluate(demand, guests, budget) if demand else None
+        fl = degraded_floor(demand, guests, budget) if demand else None
+        out["baseline"] = {
+            "status": "INFEASIBLE", "binding": binding,
+            "binding_text": [
+                describe_group(g, dev, budget, guests, demand, fl) if dev else g
+                for g in binding
+            ],
+            "usage": _usage_table(dev, budget) if dev else [],
+        }
+        best = None
+        for order in itertools.permutations(list(adds)) if adds else [()]:
+            cur, steps, last, ok = dict(installed), [], None, True
+            for c in order:
+                r = classify_admission(
+                    raw, {"installed": cur, "candidate": c}, pr, n_alternatives=0
+                )
+                solves += 1
+                steps.append({
+                    "candidate": c, "verdict": r["verdict"],
+                    "sentence": r["sentence"], "binding": r.get("binding", []),
+                    "binding_text": r.get("binding_text", []),
+                    "actions": [{**a, "for": c} for a in r.get("actions", [])],
+                })
+                if r["verdict"] not in ("YES", "YES-IF"):
+                    ok = False
+                    break
+                last = r
+                cur = {g: r["plan"]["config"][g]
+                       for g, on in r["plan"]["installed"].items() if on}
+            acts = [a for step in steps for a in step["actions"]]
+            cand = {
+                "order": list(order), "ok": ok, "steps": steps,
+                "actions": acts,
+                "capability_lost": round(
+                    sum(a.get("capability_lost", 0) for a in acts), 3),
+            }
+            if ok and last is not None:
+                cand.update(
+                    verdict=("YES-IF" if any(
+                        step["verdict"] == "YES-IF" for step in steps
+                    ) else "YES"),
+                    U=last["plan"]["objective"]["U_normal"],
+                    usage=last.get("usage", []), set=list(cur),
+                    placement=last.get("placement", {}),
+                    all_aboard=all(g in cur for g in adds),
+                )
+            else:
+                cand.update(
+                    verdict=steps[-1]["verdict"] if steps else "NO",
+                    U=None, usage=[], set=None,
+                    sentence=steps[-1]["sentence"] if steps else "",
+                )
+            if (best is None or
+                    (cand["ok"], cand["U"] or -1) >
+                    (best["ok"], best["U"] or -1)):
+                best = cand
+        out["final"] = best
+
+    final = out["final"]
+    if final.get("U") is not None and final["U"] < out["u_start"] - 1e-9:
+        out["recommendation"] = (
+            f"Feasible, but mission value under '{pr}' falls from "
+            f"{out['u_start']:g} to {final['U']:g}: the captain may prefer "
+            f"to decline {'+'.join(adds)}."
+        )
+    out["solves"] = solves
+    out["elapsed_s"] = round(time.perf_counter() - t0, 3)
+    return jsonify(_json(out))
+
 # ---------------------------------------------------------------- defaults (proposed combinations)
 @lru_cache(maxsize=16)
 def _defaults(priority: str, ov_key: str):
@@ -436,10 +576,17 @@ def scenario_b():
     scn_ov = [o[4:] for o in sets if o.startswith("scn.")]
     try:
         raw = loader.apply_overrides(RAW, raw_ov) if raw_ov else RAW
+        raw = _g7_camera_resource_raw(raw)
         scn = loader.load_scenario(SCN["B_right_of_way"])
         scn = loader.apply_overrides(scn, scn_ov) if scn_ov else scn
     except Exception as e:
         return jsonify({"error": f"override: {e}"}), 400
+    if q.get("aboard"):
+        # Preserve v3 selectable fleet, with G3/G4 compulsory in B.
+        fleet_ids = set(q["aboard"]) | {"G3", "G4"}
+        scn["aboard"] = sorted(
+            (g for g in fleet_ids if g in raw["card"]),
+            key=lambda g: (len(g), g))
     crew = q.get("crew")
     d = right_of_way(raw, scn, q.get("priority", "survey"), crew=int(crew) if crew not in (None, "") else None)
     sim = d.pop("sim")
@@ -453,8 +600,53 @@ def scenario_b():
               "cpu": sum((guests[g].compute or {}).get("cpu_cores", 0) or 0 for g in aboard),
               "cpu_cap": budget["cpu_cores"], "satcom_cap": budget["satcom_mbps"]}
     weights = raw["priority"][q.get("priority", "survey")]["weights"]
-    return jsonify(_json({"decision": d, "rows": sim.rows, "log": sim.log, "caps": sim.caps, "lost": sim.lost,
-                          "static": static, "aboard": aboard, "weights": weights, "overrides": sets}))
+    fleet_check = _fleet_check(raw, guests, budget, aboard, q.get("priority", "survey"))
+    return jsonify(_json({
+        "decision": d, "rows": sim.rows, "log": sim.log,
+        "caps": sim.caps, "lost": sim.lost,
+        "static": static, "aboard": aboard, "weights": weights,
+        "overrides": sets, "fleet_check": fleet_check,
+        "horizon_min": _ops()["d3"]["horizon_min"],
+        "d4_timing": {k: _ops()["d4"][k] for k in
+                      ("first_action_s", "step_interval_s")},
+        "response_limits": raw["ship"]["response_time"],
+        "modes": {g: {m: {"kw": v["kw"], "capability": v["capability"]}
+                      for m, v in guests[g].modes.items()} for g in aboard},
+    }))
+
+
+def _ops():
+    from governor.rightofway import load_ops
+    return load_ops()
+
+
+def _fleet_check(raw, guests, budget, aboard, priority):
+    """Restore original v3 Scenario B static fleet resource dial data."""
+    from governor.admission import _demand_plan, degraded_floor, describe_group
+    from governor.model import binding_groups
+    installed = {g: None for g in aboard}
+    p = build_problem(raw, guests, {"installed": installed}, priority,
+                      baseline=True, allow_removal=False)
+    plan, core = solve_model(p)
+    if plan is not None:
+        return {"fits": True, "binding": [], "binding_text": [],
+                "usage": _usage_table(evaluate(plan, guests, budget), budget),
+                "placement": {g: plan["config"][g] for g in plan["config"]}}
+    binding = binding_groups(p, core)
+    demand = _demand_plan(
+        raw, guests, {"installed": installed}, priority, minimal=False)
+    dev = evaluate(demand, guests, budget) if demand else None
+    floor = degraded_floor(demand, guests, budget) if demand else None
+    return {
+        "fits": False, "binding": binding,
+        "binding_text": [
+            describe_group(g, dev, budget, guests, demand, floor) if dev else g
+            for g in binding
+        ],
+        "usage": _usage_table(dev, budget) if dev else [],
+        "placement": {g: demand["config"][g] for g in demand["config"]}
+                     if demand else {},
+    }
 
 
 @app.get("/api/physical-g6")
@@ -481,6 +673,11 @@ def physical_g6():
         return jsonify({"status": "UNKNOWN", "assessment_status": "UNKNOWN",
                         "full_admission_status": "NOT_EVALUATED",
                         "note": f"G6 physical snapshot unavailable: {type(exc).__name__}: {exc}"})
+
+
+@app.get("/preview")
+def preview():
+    return render_template("preview.html")
 
 
 @app.get("/")
@@ -519,6 +716,29 @@ from governor.scenario_d import ScenarioD, replay
 
 _scenario_d_lock = Lock()
 _scenario_d_live = ScenarioD(scripted=False)
+_g7_enabled = False
+
+
+@app.get("/api/g7-enabled")
+def g7_enabled_get():
+    with _scenario_d_lock:
+        return jsonify({"enabled": _g7_enabled})
+
+
+@app.post("/api/g7-enabled")
+def g7_enabled_set():
+    """Opt in to G7 monitoring from the active A/A′/B checkbox."""
+    global _g7_enabled, _scenario_d_live
+    body = request.get_json(silent=True) or {}
+    if not isinstance(body, dict) or type(body.get("enabled")) is not bool:
+        return jsonify({"error": "enabled must be a boolean"}), 400
+    with _scenario_d_lock:
+        changed = _g7_enabled != body["enabled"]
+        _g7_enabled = body["enabled"]
+        if changed:
+            _scenario_d_live = ScenarioD(scripted=False)
+        return jsonify({"enabled": _g7_enabled, "reset": changed,
+                        "scope": "simulation_only"})
 
 
 @app.get("/scenario/D")
@@ -561,15 +781,16 @@ def scenario_d_live_sample():
     data = request.get_json(silent=True) or {}
     if not isinstance(data, dict):
         return jsonify({"error": "Expected JSON object"}), 400
-    if not all(isinstance(data.get(k, False), bool) for k in ("perimeter_motion", "deck_obstructed", "operator_approval")):
+    if not all(isinstance(data.get(k, False), bool) for k in ("perimeter_motion", "deck_obstructed", "operator_approval", "observation_valid", "g7_alert")):
         return jsonify({"error": "All booleans must be true/false"}), 400
     with _scenario_d_lock:
-        if _scenario_d_live.time >= _scenario_d_live.cfg["duration_seconds"]:
-            return jsonify({"error": "Simulation reached 180 seconds; reset to repeat"}), 409
+        # Live webcam monitoring is continuous; only the scripted replay is 180 s.
         row = _scenario_d_live.tick(
             perimeter_motion=data.get("perimeter_motion", False),
             deck_obstructed=data.get("deck_obstructed", False),
             approve=data.get("operator_approval", False),
+            observation_valid=data.get("observation_valid", True),
+            g7_alert=data.get("g7_alert"),
         )
     return jsonify(row)
 

@@ -29,10 +29,10 @@ def test_scenario_d_needs_two_samples_and_operator():
     assert engine.tick(perimeter_motion=True)["g4_state"] == "Standby"
     assert engine.tick(perimeter_motion=True)["g4_state"] == "Starting"
     for _ in range(8):
-        last = engine.tick()
+        last = engine.tick(perimeter_motion=True)
     assert last["g4_state"] == "Awaiting approval"
     for _ in range(4):
-        last = engine.tick()
+        last = engine.tick(perimeter_motion=True)
     assert last["g4_state"] == "Awaiting approval"
     assert last["operator_authorized"] is False
     assert engine.tick(approve=True)["g4_state"] == "Simulated launch"
@@ -43,7 +43,7 @@ def test_scenario_d_obstructed_flight_deck_blocks_launch():
     engine.tick(perimeter_motion=True)
     engine.tick(perimeter_motion=True)
     for _ in range(8):
-        engine.tick()
+        engine.tick(perimeter_motion=True)
     row = engine.tick(deck_obstructed=True,approve=True)
     assert row["g4_state"] == "Awaiting approval"
     assert not row["operator_authorized"]
@@ -71,3 +71,169 @@ def test_scenario_d_dashboard_api():
     r=client.post("/api/scenario/d/live/sample",json={"perimeter_motion":True})
     assert r.status_code == 200
     assert r.get_json()["g4_state"] == "Standby"
+
+
+def test_live_five_valid_no_motion_samples_power_g4_off():
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True)
+    for _ in range(8):
+        engine.tick(perimeter_motion=True)
+    assert engine.state == "Awaiting approval"
+    for n in range(1, 5):
+        row = engine.tick(perimeter_motion=False, observation_valid=True)
+        assert row["g4_state"] == "Awaiting approval"
+        assert row["no_motion_seconds"] == n
+    row = engine.tick(perimeter_motion=False, observation_valid=True)
+    assert row["g4_state"] == "Powering off"
+    assert row["power"]["g4_kw"] == 0
+    assert row["g7_status"] == "MONITORING"
+    row = engine.tick(perimeter_motion=False, observation_valid=True)
+    assert row["g4_state"] == "Off"
+    assert row["power"]["g4_kw"] == 0
+    engine.tick(perimeter_motion=True)
+    row = engine.tick(perimeter_motion=True)
+    assert row["g4_state"] == "Starting"
+    assert row["power"]["g4_kw"] == 3
+
+
+def test_live_no_motion_streak_resets_on_motion_or_camera_failure():
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True)
+    row = engine.tick(perimeter_motion=False)
+    assert row["no_motion_seconds"] == 1
+    row = engine.tick(perimeter_motion=False, observation_valid=False)
+    assert row["no_motion_seconds"] == 0
+    assert row["g4_state"] == "Starting"
+    row = engine.tick(perimeter_motion=False)
+    assert row["no_motion_seconds"] == 1
+    row = engine.tick(perimeter_motion=True)
+    assert row["no_motion_seconds"] == 0
+
+
+def test_live_no_motion_does_not_abort_authorized_takeoff():
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True)
+    for _ in range(8):
+        engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True, approve=True)
+    assert engine.state == "Simulated launch"
+    for _ in range(5):
+        row = engine.tick(perimeter_motion=False)
+    assert row["g4_state"] == "In flight"
+    assert row["power"]["g4_kw"] == 2
+
+
+def test_scenario_d_per_system_power_breakdown():
+    """Keep the synthetic 46 kW baseline distinct from G4 and G7."""
+    rows = replay()["timeline"]
+    for second, expected in [
+        (0, (46.0, 2.0, 0.04, 48.04)),
+        (21, (46.0, 3.0, 0.065, 49.065)),
+    ]:
+        p = rows[second]["power"]
+        assert (p["background_kw"], p["g4_kw"], p["g7_kw"], p["total_kw"]) == expected
+        assert round(p["background_kw"] + p["g4_kw"] + p["g7_kw"], 3) == p["total_kw"]
+
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True)
+    for _ in range(5):
+        off_row = engine.tick(perimeter_motion=False, observation_valid=True)
+    assert off_row["g4_state"] == "Powering off"
+    p = off_row["power"]
+    assert (p["background_kw"], p["g4_kw"], p["g7_kw"], p["total_kw"]) == (
+        46.0, 0.0, 0.04, 46.04
+    )
+
+
+def test_g7_optional_checkbox_a_ap_b_and_live_gate():
+    """Regression: original v3 page plus opt-in G7 across A/A′ and B."""
+    from dashboard.app import app
+    client = app.test_client()
+    page = client.get("/").get_data(as_text=True)
+    assert 'data-tab="A"' in page
+    assert 'data-tab="AP"' in page
+    assert 'data-tab="B"' in page
+    assert 'id="gauges"' in page
+    assert 'id="opGauges"' in page
+    assert 'id="g7Integrated"' in page
+    assert 'g === "G7"' in page  # G7 is selectable in B
+    assert "g7SelectionChanged()" in page
+    assert 'id="scenarioDCard"' not in page
+    meta = client.get("/api/meta").get_json()
+    assert "G7" in meta["guests"]
+    for weights in meta["priorities"].values():
+        assert "G7" in weights
+
+    assert client.post("/api/g7-enabled", json={"enabled": "yes"}).status_code == 400
+    assert client.post("/api/g7-enabled", json={"enabled": True}).get_json()["enabled"] is True
+    assert client.get("/api/g7-enabled").get_json()["enabled"] is True
+    assert client.post("/api/g7-enabled", json={"enabled": False}).get_json()["enabled"] is False
+    assert client.get("/api/g7-enabled").get_json()["enabled"] is False
+
+
+def test_g7_camera_alert_changes_only_g7_guest_resource_mode(monkeypatch):
+    """Alert reservation: 0.040 → 0.065 kW without changing base cards."""
+    from dashboard import app as dashboard_module
+    from vision import g7_state
+    before = dashboard_module.RAW["card"]["G7"]["resources"]["power_modes"][0]["power_kw"]["nominal"]
+    monkeypatch.setattr(g7_state, "load_camera_status", lambda root: {
+        "camera_online": True, "deck_activity": "MOVEMENT_DETECTED"
+    })
+    raw = dashboard_module._g7_camera_resource_raw(dashboard_module.RAW)
+    card_mode = next(m for m in raw["card"]["G7"]["resources"]["power_modes"] if m["id"] == "active")
+    assert card_mode["power_kw"]["nominal"] == 0.065
+    assert dashboard_module.RAW["card"]["G7"]["resources"]["power_modes"][0]["power_kw"]["nominal"] == before
+
+
+def test_g7_alert_power_tracks_valid_latched_activity():
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True, g7_alert=True)
+    row = engine.tick(perimeter_motion=True, g7_alert=True)
+    assert row["g4_state"] == "Starting"
+    assert row["power"]["g7_kw"] == 0.065
+    row = engine.tick(perimeter_motion=False, g7_alert=False, observation_valid=True)
+    assert row["g4_state"] == "Starting"
+    assert row["power"]["g7_kw"] == 0.04
+    assert row["power"]["g4_kw"] == 3
+    # Camera disconnection doesn't generate another valid no-motion second.
+    row = engine.tick(perimeter_motion=False, g7_alert=False, observation_valid=False)
+    assert row["power"]["g7_kw"] == 0.04
+    assert row["g4_state"] == "Starting"
+
+
+def test_original_v3_gauge_endpoints_restore_A_and_B():
+    """The ZIP-based v3 dashboard requires /api/decision and B fleet fields."""
+    from dashboard.app import app
+    client = app.test_client()
+
+    # This endpoint was accidentally omitted during the G7 UI import:
+    a = client.post("/api/decision", json={
+        "priority": "survey",
+        "installed": {"G1": "mast"}, "adds": {}, "overrides": [],
+    })
+    assert a.status_code == 200, a.get_data(as_text=True)[:400]
+    j = a.get_json()
+    assert "error" not in j
+    assert "baseline" in j and "final" in j and "start_usage" in j
+    assert "usage" in j["baseline"]
+
+    # Original v3 Scenario B expects these keys for the resource and ops dials.
+    b = client.post("/api/b", json={
+        "priority": "survey", "crew": 14,
+        "aboard": ["G2", "G3", "G4", "G5", "G7"], "overrides": [],
+    })
+    assert b.status_code == 200, b.get_data(as_text=True)[:400]
+    k = b.get_json()
+    assert "error" not in k
+    for key in ("rows", "static", "fleet_check", "horizon_min",
+                "d4_timing", "response_limits", "modes"):
+        assert key in k
+    assert "usage" in k["fleet_check"]
+    assert "G7" in k["aboard"]
+    assert "G7" in k["modes"]
+    assert "G7" in k["rows"][0]
+    assert client.get("/preview").status_code == 200

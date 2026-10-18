@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scenario A Decision</title>
+<style>
+:root{--bg:#0b1220;--panel:#0f1a2e;--panel2:#132139;--line:#22324f;--ink:#e6edf7;--mute:#8a9bb8;
+  --green:#3ddc84;--amber:#f5a524;--red:#ff5c5c;--cyan:#5cc8ff;--ghost:#55657f;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{padding:16px 22px 10px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:21px} h1 span{color:var(--mute);font-weight:400}
+.console{font-family:var(--mono);font-size:13px;margin-top:6px;color:var(--amber)}
+.console.status{color:var(--cyan)}
+main{display:grid;grid-template-columns:300px 1fr;gap:14px;padding:14px 22px 22px}
+aside,.card{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+aside{padding:14px;align-self:start;position:sticky;top:10px}
+h3{margin:12px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mute)}
+aside h3:first-child{margin-top:0}
+select,input[type=number],textarea{width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:inherit;font-size:13px}
+textarea{font-family:var(--mono);font-size:12px;min-height:54px}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.w{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.w label{font-size:11px;color:var(--mute)} .w input{text-align:center;padding:5px 2px}
+.gr{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.gr .nm{color:var(--mute);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kn{display:grid;grid-template-columns:1fr 80px;gap:6px;align-items:center;margin:4px 0;font-size:12px;color:var(--mute)}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--cyan)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.content{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{padding:14px}
+.hero{font-size:24px;font-weight:800;letter-spacing:.2px}
+.hero .v{font-family:var(--mono);padding:2px 10px;border-radius:8px;margin-right:8px}
+.v-YES{background:rgba(61,220,132,.15);color:var(--green);border:1px solid var(--green)}
+.v-YES-IF{background:rgba(245,165,36,.13);color:var(--amber);border:1px solid var(--amber)}
+.v-NO,.v-INFEASIBLE{background:rgba(255,92,92,.13);color:var(--red);border:1px solid var(--red)}
+.v-NOT-NOW{background:rgba(92,200,255,.12);color:var(--cyan);border:1px solid var(--cyan)}
+.v-FEASIBLE{background:rgba(61,220,132,.15);color:var(--green);border:1px solid var(--green)}
+.flow{display:grid;grid-template-columns:1fr 40px 1fr;gap:10px;align-items:stretch;margin-top:12px}
+.box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px}
+.box .t{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mute)}
+.box .s{font-family:var(--mono);font-weight:800;font-size:16px;display:inline-block;padding:2px 8px;border-radius:6px;margin:6px 0}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:4px 10px;font-size:13px;margin-top:6px}
+.kv .k{color:var(--mute)}
+ul{margin:2px 0;padding-left:18px} li{margin:2px 0}
+.rec{margin-top:10px;padding:8px 12px;border:1px solid rgba(245,165,36,.45);background:rgba(245,165,36,.08);border-radius:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:var(--panel2);border:none;color:var(--mute);padding:6px 12px;cursor:pointer;font-weight:600}
+.seg button.on{background:var(--cyan);color:#04121f}
+.gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.g{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.g .tt{font-size:12px;font-weight:700} .g svg{width:100%;max-width:180px;display:block;margin:0 auto}
+.g .vv{font-family:var(--mono);font-weight:700;margin-top:-6px} .g .ss{font-size:11px;color:var(--mute);min-height:1.4em}
+.g.over{border-color:var(--red)} .g.over .vv{color:var(--red)} .g.tight .vv{color:var(--amber)}
+.needle{transition:transform .5s ease}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--mute);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+td.n{font-family:var(--mono);text-align:right}
+tr.fixed td:last-child{color:var(--green);font-weight:700} tr.bad td{color:var(--red)}
+tr.bind td:first-child::after{content:" · binding";color:var(--red);font-size:11px;font-weight:700}
+.chip{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--amber);color:var(--amber);margin:2px}
+.mute{color:var(--mute)} .err{color:var(--red);font-family:var(--mono)}
+.busy{opacity:.55}
+@media (max-width:1000px){main{grid-template-columns:1fr}aside{position:static}.gauges{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Scenario A <span>· baseline → action → final decision (preview)</span></h1>
+  <div class="console">&gt; EXECUTION_ERROR: You cannot scale out. You must allocate, deny, or steal from another system.</div>
+  <div class="console status" id="status">&gt; loading…</div>
+</header>
+<main>
+  <aside>
+    <h3>Priority file</h3>
+    <select id="pri"></select>
+    <div class="w" id="weights" style="margin-top:6px"></div>
+    <h3>Starting set (installed)</h3>
+    <div id="inst"></div>
+    <h3>Candidates to embark</h3>
+    <div id="cands"></div>
+    <h3>Jury overrides</h3>
+    <div id="knobs"></div>
+    <textarea id="ov" placeholder="card.G4.resources.power_modes.charging_initial.power_kw.nominal=70"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn" id="reset">Reset to defaults</button><button class="btn" id="run">Run optimizer</button></div>
+  </aside>
+  <section class="content" id="content">
+    <div class="card">
+      <div class="hero" id="hero">…</div>
+      <div class="flow">
+        <div class="box"><div class="t">1 · Baseline — requested combination, everyone at full power</div>
+          <div class="s" id="bStatus">…</div><div id="bBody"></div></div>
+        <div class="arrow">➜</div>
+        <div class="box"><div class="t">2 · Final decision — after the optimizer acts</div>
+          <div class="s" id="fStatus">…</div><div id="fBody"></div></div>
+      </div>
+      <div id="rec"></div>
+    </div>
+    <div class="card">
+      <div class="row" style="align-items:center">
+        <h3 style="margin:0;flex:1">Resource use</h3>
+        <div class="seg" id="view" style="flex:0 0 auto"><button data-v="before">Before (requested)</button><button data-v="after" class="on">After (final decision)</button><button data-v="start">Starting set</button></div>
+      </div>
+      <div class="mute" style="font-size:12px;margin-top:6px">White needle = the selected view, grey needle = the other one. Red = over capacity, amber = less than 20 % left.</div>
+      <div class="gauges" id="gauges"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Before → after, every ship capacity</h3>
+      <div id="table"></div>
+    </div>
+    <div class="card mute" id="proof" style="font-size:12.5px"></div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = x => x == null ? "–" : (Math.abs(x) >= 100 ? Math.round(x) : Math.round(x*100)/100).toLocaleString();
+let META, GUESTS = [], D = null, VIEW = "after";
+const START = {G1:"mast", G2:"bay2", G3:"bay1"};
+const KNOBS = [["Cruise power reserve (kW)","ship.power.reserve_kw.cruise"],["Reserve, genset down (kW)","ship.power.degraded_reserve_kw.cruise"],
+  ["Cooling at 30 °C (kW)","ship.cooling.capacity_at_30c_kw"],["Mass margin (t)","ship.mass.margin_t"],["Stability budget (t-eq)","ship.mass.stability_budget_t_eq"]];
+const valueAt = path => path.split(".").slice(1).reduce((n,k)=> n==null?n:n[k], META.ship);
+
+function build(){
+  $("#pri").innerHTML = Object.keys(META.priorities).map(p=>`<option ${p==="survey"?"selected":""}>${p}</option>`).join("");
+  weights();
+  $("#inst").innerHTML = GUESTS.map(g=>{
+    const G = META.guests[g], cfgs = G.configs.map(c=>c.id), def = START[g] || (G.configs.find(c=>c.preferred)||G.configs[0]).id;
+    return `<div class="gr"><input type="checkbox" id="i_${g}" ${START[g]?"checked":""}><b>${g}</b>
+      <select id="ic_${g}" style="flex:1">${cfgs.map(c=>`<option ${c===def?"selected":""}>${c}</option>`).join("")}</select></div>`;}).join("");
+  KNOBS.forEach(k=>k.push(valueAt(k[1])));
+  $("#knobs").innerHTML = KNOBS.map((k,i)=>`<div class="kn"><span>${k[0]}</span><input type="number" step="any" id="k${i}" value="${k[2]}"></div>`).join("");
+  cands();
+  $$("#inst input,#inst select").forEach(e=>e.addEventListener("change",()=>{cands();run();}));
+  $$("#knobs input").forEach(e=>e.addEventListener("change",run));
+  $("#pri").addEventListener("change",()=>{weights();run();});
+  $("#ov").addEventListener("change",run); $("#run").addEventListener("click",run);
+  $("#reset").addEventListener("click",()=>{ $("#ov").value=""; KNOBS.forEach((k,i)=>$("#k"+i).value=k[2]); weights(); run(); });
+  $$("#view button").forEach(b=>b.addEventListener("click",()=>{ $$("#view button").forEach(x=>x.classList.toggle("on",x===b)); VIEW=b.dataset.v; drawGauges(); }));
+}
+function weights(){
+  const p = $("#pri").value;
+  $("#weights").innerHTML = GUESTS.map(g=>`<div><label>${g}</label><input type="number" data-g="${g}" value="${META.priorities[p][g] ?? 1}"></div>`).join("");
+  $$("#weights input").forEach(e=>e.addEventListener("change",run));
+}
+function cands(){
+  const prev = {}; $$("#cands input").forEach(e=>prev[e.dataset.g]=e.checked);
+  const free = GUESTS.filter(g=>!$("#i_"+g).checked);
+  $("#cands").innerHTML = free.map(g=>`<div class="gr"><input type="checkbox" data-g="${g}" ${(prev[g] ?? g==="G4")?"checked":""}><b>${g}</b><span class="nm">${esc(META.guests[g].name)}</span></div>`).join("") || `<span class="mute">none</span>`;
+  $$("#cands input").forEach(e=>e.addEventListener("change",run));
+}
+function overrides(){
+  const p = $("#pri").value, ov = [];
+  KNOBS.forEach((k,i)=>{ const v = +$("#k"+i).value; if (v !== +k[2]) ov.push(`${k[1]}=${v}`); });
+  $$("#weights input").forEach(e=>{ if (+e.value !== (META.priorities[p][e.dataset.g] ?? 1)) ov.push(`priority.${p}.weights.${e.dataset.g}=${e.value}`); });
+  return ov.concat($("#ov").value.split("\n").map(s=>s.trim()).filter(Boolean));
+}
+async function run(){
+  const installed = {}, adds = {};
+  GUESTS.forEach(g=>{ if ($("#i_"+g).checked) installed[g] = $("#ic_"+g).value; });
+  $$("#cands input").forEach(e=>{ if (e.checked) adds[e.dataset.g] = "auto"; });
+  const body = {priority:$("#pri").value, installed, adds, overrides:overrides()};
+  $("#content").classList.add("busy");
+  $("#status").textContent = `> re-running OR-Tools CP-SAT for ${Object.keys(installed).join("+")}${Object.keys(adds).length?" + "+Object.keys(adds).join("+"):""} …`;
+  let j; try { j = await (await fetch("/api/decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})).json(); } catch(e){ j={error:String(e)}; }
+  $("#content").classList.remove("busy");
+  if (j.error){ $("#status").innerHTML = `<span class="err">&gt; ${esc(j.error)}</span>`; return; }
+  D = j; render();
+}
+const LBL = {power_normal:"Power", power_degraded:"Power (genset down)", power_line:"Power line", cooling_normal:"Cooling", cooling_degraded:"Cooling (degraded)",
+  mass:"Mass", stability:"Stability", deck_space:"Deck space (bays)", mast:"Mast slot", hangar:"Hangar", satcom:"SATCOM", backbone:"Backbone", los_radio:"LOS radio", compute:"Compute", installation_time:"Crane time in port"};
+function headline(f){
+  const adds = D.adds.join("+");
+  if (!D.adds.length) return `<span class="v v-YES">YES</span> starting set as installed`;
+  if (!f.ok) return `<span class="v v-${f.verdict}">${f.verdict}</span> ${esc(adds)} cannot be admitted`;
+  const acts = f.actions.map(a=> a.type==="remove" ? `remove ${a.guest}` : a.type==="throttle" ? `run ${a.guest} at low power` : a.type==="relocate" ? `move ${a.guest}` : `interlock ${a.guest}`);
+  return `<span class="v v-${f.verdict}">${f.verdict}</span> ${acts.length ? esc(acts.join(" + ")) + " to admit " : "admit "}${esc(adds)}`;
+}
+function render(){
+  const b = D.baseline, f = D.final;
+  $("#hero").innerHTML = headline(f);
+  $("#bStatus").className = "s v-"+b.status; $("#bStatus").textContent = b.status;
+  $("#bBody").innerHTML = `<div class="kv"><span class="k">requested</span><span>${Object.keys(D.installed).join("+")}${D.adds.length?" + "+D.adds.join("+"):""}</span>
+    <span class="k">violated</span><span>${b.binding.length ? `<ul>${b.binding_text.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>` : "nothing — every capacity holds"}</span></div>`;
+  $("#fStatus").className = "s v-"+f.verdict; $("#fStatus").textContent = f.verdict;
+  const steps = (f.steps||[]);
+  const bt = steps.flatMap(s=>s.binding_text.length ? s.binding_text : s.binding.map(x=>LBL[x]||x));
+  $("#fBody").innerHTML = f.ok ? `<div class="kv">
+      <span class="k">binding constraint</span><span>${bt.length?`<ul>${bt.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:"none"}</span>
+      <span class="k">action</span><span>${f.actions.length?`<ul>${f.actions.map(a=>`<li>${esc(a.text)}</li>`).join("")}</ul>`:"no change to the guests aboard"}</span>
+      <span class="k">capability lost</span><span class="mono">${fmt(f.capability_lost)}</span>
+      <span class="k">final mission utility</span><span class="mono"><b>${fmt(f.U)}</b> <span class="mute">(starting set ${fmt(D.u_start)})</span></span>
+      <span class="k">final set</span><span class="mono">${(f.set||[]).join("+")}</span>
+      ${steps.length>1?`<span class="k">order</span><span>${f.order.join(" then ")} (best order by mission value)</span>`:""}
+    </div>` : `<div class="kv"><span class="k">why</span><span>${esc(f.sentence||"")}</span></div>`;
+  $("#rec").innerHTML = D.recommendation ? `<div class="rec">⚠ ${esc(D.recommendation)}</div>` : "";
+  drawGauges(); drawTable();
+  const ov = D.overrides;
+  $("#proof").innerHTML = `Re-optimized with OR-Tools CP-SAT on every change: <b>${D.solves}</b> solver runs in <b>${D.elapsed_s} s</b> (ceiling 30 s), priority file <b>${esc(D.priority)}</b>.
+    ${ov.length ? `<div style="margin-top:6px">Jury overrides in memory: ${ov.map(o=>`<span class="chip">${esc(o)}</span>`).join("")} — files on disk are untouched; <b>Reset to defaults</b> clears them.</div>` : `<div style="margin-top:6px">No jury overrides — default parameters from <span style="font-family:var(--mono)">config/</span> and the cards.</div>`}`;
+  $("#status").textContent = `> baseline ${b.status} → final ${f.verdict} · ${D.solves} CP-SAT runs in ${D.elapsed_s} s${ov.length?" · "+ov.length+" override(s)":""}`;
+}
+const U = (rows,n) => (rows||[]).find(r=>r.resource.startsWith(n));
+const sets = () => ({before:D.baseline.usage, after:D.final.usage && D.final.usage.length ? D.final.usage : D.baseline.usage, start:D.start_usage});
+const GA = [["POWER (kW)","power (normal"],["COOLING LOOP","cooling (normal"],["DECK SPACE","Bay"],["MAST POSITIONS","mast slots"],
+            ["MASS","mass"],["DATA LINKS","SATCOM"],["COMPUTE","CPU cores"],["RESPONSE TIME",null]];
+const R=70,CX=90,CY=86,SPAN=1.2,fr=x=>Math.max(0,Math.min(1,x/SPAN));
+function arc(a,b){const p=t=>[CX+R*Math.cos(Math.PI*(1-t)),CY-R*Math.sin(Math.PI*(1-t))];const[x0,y0]=p(a),[x1,y1]=p(b);return `M${x0},${y0} A${R},${R} 0 0 1 ${x1},${y1}`;}
+function gsvg(){return `<svg viewBox="0 0 180 100"><path d="${arc(0,1)}" stroke="#1d2a44" stroke-width="16" fill="none"/>
+  <path d="${arc(0,fr(.8))}" stroke="var(--green)" stroke-width="10" fill="none"/><path d="${arc(fr(.8),fr(1))}" stroke="var(--amber)" stroke-width="10" fill="none"/>
+  <path d="${arc(fr(1),1)}" stroke="var(--red)" stroke-width="10" fill="none"/>
+  <g class="needle gh" style="transform-origin:${CX}px ${CY}px"><line x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY-R+6}" stroke="var(--ghost)" stroke-width="3" stroke-linecap="round"/></g>
+  <g class="needle mn" style="transform-origin:${CX}px ${CY}px"><line x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY-R+4}" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+  <circle cx="${CX}" cy="${CY}" r="5" fill="#fff"/></svg>`;}
+function pick(rows,n){ if(n==="Bay"){const a=U(rows,"Bay 1"),b=U(rows,"Bay 2");return a&&b?{used:a.used+b.used,capacity:a.capacity+b.capacity,unit:"bays"}:null;} return U(rows,n); }
+function drawGauges(){
+  if (!$("#gauges").children.length) $("#gauges").innerHTML = GA.map((g,i)=>`<div class="g" id="g${i}"><div class="tt">${g[0]}</div>${gsvg()}<div class="vv"></div><div class="ss"></div></div>`).join("");
+  const S = sets(), cur = S[VIEW], other = VIEW==="after" ? S.before : S.after;
+  const ang = x => -90 + 180*fr(x);
+  GA.forEach((g,i)=>{
+    const el = $("#g"+i);
+    if (!g[1]){ el.querySelector(".mn").style.transform=`rotate(${ang(D.elapsed_s/30)}deg)`; el.querySelector(".gh").style.opacity=0;
+      el.querySelector(".vv").textContent=`${D.elapsed_s} s / 30 s`; el.querySelector(".ss").textContent="all solver runs vs A.8 ceiling"; return; }
+    const a = pick(cur,g[1]), o = pick(other,g[1]);
+    if (!a){ el.querySelector(".vv").textContent="–"; return; }
+    const r = a.used/a.capacity;
+    el.querySelector(".mn").style.transform=`rotate(${ang(r)}deg)`;
+    const gh = el.querySelector(".gh"); if (o){ gh.style.opacity=1; gh.style.transform=`rotate(${ang(o.used/o.capacity)}deg)`; } else gh.style.opacity=0;
+    el.classList.toggle("over", r>1+1e-9); el.classList.toggle("tight", r<=1 && r>.8);
+    el.querySelector(".vv").textContent = `${fmt(a.used)} / ${fmt(a.capacity)} ${a.unit}`;
+    el.querySelector(".ss").textContent = o ? `${VIEW==="after"?"before":"after"}: ${fmt(o.used)}` : "";
+  });
+}
+const GROUP_ROWS = {power_normal:["power (normal"],power_degraded:["power (genset_down"],power_line:["line "],cooling_normal:["cooling"],cooling_degraded:["cooling"],
+  mass:["mass"],stability:["stability"],deck_space:["Bay 1","Bay 2"],mast:["mast slots"],satcom:["SATCOM"],backbone:["backbone"],los_radio:["LOS radio"],compute:["CPU cores","RAM","accelerators"]};
+function drawTable(){
+  const bef = D.baseline.usage, aft = D.final.usage||[], bind = new Set(D.baseline.binding);
+  const isB = n => [...bind].some(g=>(GROUP_ROWS[g]||[]).some(p=>n.startsWith(p)));
+  $("#table").innerHTML = `<table><tr><th>resource</th><th>before (requested)</th><th>after (final)</th><th>capacity</th><th></th><th>change</th></tr>${
+    bef.map(b=>{ const a = U(aft,b.resource), ob = b.used > b.capacity+1e-9, oa = a && a.used > a.capacity+1e-9;
+      const ch = !a ? "–" : ob && !oa ? "✗ → ✓ fixed" : oa ? "✗ still over" : (a.used<b.used-1e-9 ? "↓ "+fmt(b.used-a.used) : a.used>b.used+1e-9 ? "↑ "+fmt(a.used-b.used) : "=");
+      return `<tr class="${ob&&!oa?"fixed":""} ${oa?"bad":""} ${isB(b.resource)?"bind":""}"><td>${esc(b.resource)}</td><td class="n" style="${ob?"color:var(--red)":""}">${fmt(b.used)}</td>
+        <td class="n">${a?fmt(a.used):"–"}</td><td class="n">${fmt(b.capacity)}</td><td>${b.unit}</td><td>${ch}</td></tr>`; }).join("")}</table>`;
+}
+(async ()=>{
+  META = await (await fetch("/api/meta")).json();
+  GUESTS = Object.keys(META.guests).sort((a,b)=>(+a.replace(/\D/g,""))-(+b.replace(/\D/g,"")));
+  build(); run();
+})();
+</script>
+</body>
+</html>

@@ -47,7 +47,9 @@ input[type=range]{width:100%;accent-color:var(--cyan)}
 .g{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 8px 8px;text-align:center;position:relative}
 .g .t{font-size:12px;font-weight:700;letter-spacing:.4px}
 .g svg{width:100%;max-width:190px;display:block;margin:2px auto 0}
-.g .v{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:-6px}
+.g{display:flex;flex-direction:column}
+.g .t{order:0} .g .v{order:1} .g svg{order:2} .g .s{order:3}
+.g .v{font-family:var(--mono);font-size:21px;font-weight:800;margin:6px 0 0;line-height:1.2}
 .g .s{font-size:11px;color:var(--mute);min-height:2.6em}
 .g.over{border-color:var(--red)}
 .g.over .v{color:var(--red)}
@@ -133,7 +135,116 @@ td.num{font-family:var(--mono);text-align:right}
   padding:10px 12px;font-size:12.5px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.45);pointer-events:none;display:none}
 #tip b{color:var(--ink)} #tip .k{color:var(--mute)} #tip .hl{color:var(--amber)} #tip .ok{color:var(--green)}
 #tip hr{border:none;border-top:1px solid var(--line);margin:6px 0}
+.hero{font-size:22px;font-weight:800;margin-top:2px}
+.hero .v{font-family:var(--mono);padding:2px 10px;border-radius:8px;margin-right:8px}
+.v-INFEASIBLE{background:rgba(255,92,92,.13);color:var(--red);border:1px solid var(--red)}
+.v-FEASIBLE{background:rgba(61,220,132,.15);color:var(--green);border:1px solid var(--green)}
+.flow{display:grid;grid-template-columns:1fr 34px 1fr;gap:10px;margin-top:12px}
+.dbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px}
+.dbox .t{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mute)}
+.dbox .st{font-family:var(--mono);font-weight:800;font-size:15px;display:inline-block;padding:2px 8px;border-radius:6px;margin:6px 0}
+.flow .arrow{display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--mute)}
+.fkv{display:grid;grid-template-columns:140px 1fr;gap:4px 10px;font-size:13px;margin-top:4px}
+.fkv .k{color:var(--mute)} .fkv ul{margin:0;padding-left:16px}
+.recbox{margin-top:10px;padding:8px 12px;border:1px solid rgba(245,165,36,.45);background:rgba(245,165,36,.08);border-radius:8px}
+.ovchip{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--amber);color:var(--amber);margin:2px}
+.cap tr.fixed td:last-child{color:var(--green);font-weight:700}
+@media (max-width:1000px){.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg)}}
+.bigset{font-family:var(--mono);font-size:21px;font-weight:800;letter-spacing:.3px;margin:2px 0 8px;word-break:break-word}
+.bigset .lb{display:block;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
+#aview button{white-space:nowrap;padding:6px 10px}
+.nl{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--mute);align-items:center}
+.nl i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.nl b{color:var(--ink)} .nl .mono{color:var(--ink)}
+.b3{display:grid;grid-template-columns:1.3fr 1.2fr .85fr;gap:10px;margin-top:10px}
+.b3 .dbox h4{margin:0 0 6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
+.b3 .big{font-family:var(--mono);font-weight:800;font-size:17px;padding:3px 9px;border-radius:7px;display:inline-block;margin-bottom:8px}
+.b3 table{font-size:12.5px} .b3 td{padding:3px 4px;border-bottom:1px solid var(--line)} .b3 td:first-child{color:var(--mute);white-space:nowrap}
+.b3 .three{margin-top:8px;font-size:12.5px} .b3 .three div{margin:3px 0} .b3 .three b{display:inline-block;min-width:118px;color:var(--mute);font-weight:600}
+.big.ok{background:rgba(61,220,132,.15);color:var(--green);border:1px solid var(--green)}
+.big.warn{background:rgba(245,165,36,.13);color:var(--amber);border:1px solid var(--amber)}
+.big.bad{background:rgba(255,92,92,.13);color:var(--red);border:1px solid var(--red)}
+.big.info{background:rgba(92,200,255,.12);color:var(--cyan);border:1px solid var(--cyan)}
+.dbox.flash{box-shadow:0 0 0 2px var(--cyan) inset;transition:box-shadow .2s}
+.marks{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.marks button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:16px;padding:4px 10px;font-size:12px;cursor:pointer}
+.marks button:hover{border-color:var(--cyan)} .marks button .m{font-family:var(--mono);color:var(--amber);margin-right:6px}
+#opState .chip b{color:var(--ink)} #opState .chip{color:var(--mute)} #opState .chip.alert{border-color:var(--amber);color:var(--amber)}
+.opt.excluded{opacity:.5} .opt.excluded .bar>i{background:var(--ghost)}
+@media (max-width:1100px){.b3{grid-template-columns:1fr}}
+.xbox{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid var(--red);border-radius:3px;color:var(--red);font-size:11px;font-weight:800;line-height:1}
+.g.static .v{color:var(--mute)} .g.static .needle.main line{stroke:var(--mute)}
 .busy{opacity:.55;transition:opacity .2s}
+.dbox details{margin-top:10px;border-top:1px solid var(--line);padding-top:6px}
+.dbox summary{cursor:pointer;color:var(--cyan);font-size:12px;font-weight:600;list-style:none}
+.dbox summary::before{content:"▸ "} .dbox details[open] summary::before{content:"▾ "}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;margin-top:2px}
+.kv .k{color:var(--mute)} .kv b{font-weight:700}
+.bignum{font-family:var(--mono);font-size:24px;font-weight:800;margin:2px 0 4px}
+.bignum .ar{color:var(--mute);font-weight:400;margin:0 6px}
+.dlstrip{position:relative;height:8px;background:#1d2a44;border-radius:4px;margin:12px 0 4px}
+.dlstrip i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--green)}
+.dlstrip i.bad{background:var(--red)}
+.dlstrip b{position:absolute;top:-5px;bottom:-5px;width:2px;background:#fff}
+.dlcap{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)} .dlcap b{color:var(--ink)}
+.kpis{display:grid;grid-template-columns:20px 64px 14px 1fr;gap:7px 6px;font-size:13.5px;margin-top:4px;align-items:center}
+.kpis .k{color:var(--mute)}
+.kpis .st{font-weight:800} .st.ok{color:var(--green)} .st.wn{color:var(--amber)} .st.bd{color:var(--red)}
+.evl{font-size:12.5px;margin-top:6px;padding:6px 8px;border-left:3px solid var(--amber);background:rgba(245,165,36,.07);border-radius:4px}
+.evl .mono{color:var(--ink)}
+.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.phases button{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--mute);padding:6px 9px;text-align:left;cursor:pointer;font-size:11.5px}
+.phases button b{display:block;color:var(--mute);font-size:13px}
+.phases button.past b{color:var(--ink)}
+.phases button.on{border-color:var(--cyan);background:rgba(92,200,255,.12);color:var(--cyan)}
+.phases button.on b{color:var(--cyan)}
+.dbox.active{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset}
+.dbox.future{opacity:.82;border-style:dashed}
+.dbox .sub{font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--mute);margin:10px 0 3px}
+.b3 table.vs td{width:46%;color:var(--ink);white-space:normal} .b3 table.vs td.x{width:8%;text-align:center;color:var(--amber);font-weight:800}
+.b3 table.vs th,.b3 table.opts th{font-size:10px;padding:3px 4px}
+.b3 table.opts td{white-space:normal} .b3 table.opts td:first-child{color:var(--ink)}
+table.opts tr.sel td{background:rgba(61,220,132,.08)}
+.infbox{margin:2px 0 8px;padding:8px 10px;border:1px solid rgba(255,92,92,.5);background:rgba(255,92,92,.08);border-radius:8px;font-size:12.5px}
+.pbar{display:grid;grid-template-columns:112px 1fr;gap:1px 8px;align-items:center;margin:6px 0;font-size:12px}
+.pbar .pl{color:var(--mute)} .pbar .pv{grid-column:2;font-size:11.5px;color:var(--mute);font-family:var(--mono)}
+.pbar.live .pl{color:var(--cyan);font-weight:700}
+.ptrack{position:relative;height:14px;background:#1d2a44;border-radius:4px}
+.ptrack .pd{position:absolute;left:0;top:0;bottom:0;background:var(--cyan);border-radius:4px;transition:width .5s}
+.ptrack .pd.over{background:var(--red)}
+.ptrack .pc{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;background:#fff;border-radius:2px;transition:left .7s cubic-bezier(.2,.9,.3,1.2)}
+.ltrack{position:relative;height:30px;border-radius:8px;overflow:hidden;cursor:pointer;background:#1f2b40}
+.lseg{position:absolute;top:0;bottom:0;font-size:11px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 5px;line-height:30px;border-right:1.5px solid #0b1220;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.lev{position:absolute;top:0;bottom:0;border-left:3px dashed;margin-left:-1.5px;pointer-events:none}
+.ltrack .lcur{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#fff;pointer-events:none;box-shadow:0 0 4px #000}
+.bstatic{display:grid;grid-template-columns:minmax(0,460px);gap:10px;padding:0 14px 14px}
+.bstatic .dbox h4{margin:0 0 6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
+.ship{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.slot{background:#16243d;border:1px dashed var(--line);border-radius:8px;padding:6px 7px;min-height:74px;font-size:12px}
+.slot .sn{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--mute)}
+.slot .gg{display:inline-block;font-family:var(--mono);font-weight:700;padding:1px 6px;border-radius:5px;background:var(--panel);border:1px solid var(--line);margin:4px 4px 0 0}
+.slot .sf{font-size:11px;color:var(--mute);margin-top:4px}
+.cbar{height:12px;background:#1d2a44;border-radius:4px;position:relative;margin:5px 0 2px}
+.cbar i{position:absolute;left:0;top:0;bottom:0;background:var(--ghost);border-radius:4px}
+.cbar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:#fff}
+.rt{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--line)}
+.rt .mono{white-space:nowrap}
+table.moments tr{cursor:pointer} table.moments tr:hover td{background:rgba(255,255,255,.03)}
+table.moments tr.now td{background:rgba(92,200,255,.12)} table.moments td.m{font-family:var(--mono);color:var(--amber);white-space:nowrap}
+@media (max-width:1100px){.bstatic{grid-template-columns:1fr}.phases{grid-template-columns:repeat(2,1fr)}.ship{grid-template-columns:repeat(2,1fr)}}
+/* G7 additions only — all existing v3 dashboard controls remain unchanged. */
+#g7Integrated{margin:12px 22px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+#g7Integrated h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
+.g7-live-grid{display:grid;grid-template-columns:minmax(230px,1fr) minmax(260px,1fr);gap:14px}
+.g7-metric{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}
+.g7-readout{border:1px solid var(--line);background:var(--panel2);border-radius:7px;padding:8px;font-family:var(--mono);font-size:12px}
+.g7-readout strong{display:block;font-size:16px;color:var(--ink)}
+.g7-status{border-left:4px solid var(--ghost);padding:10px;background:var(--panel2);border-radius:6px;margin:7px 0}
+.g7-status.detected{border-color:var(--amber)} .g7-status.preparing{border-color:var(--cyan)}
+.g7-status.ready{border-color:var(--green)} .g7-status.off{border-color:var(--ghost)}
+#g7Integrated img{width:100%;max-width:620px;border:1px solid var(--line);border-radius:7px;display:block;min-height:180px;object-fit:contain}
+#g7Integrated button{width:auto;flex:none}
+@media(max-width:840px){.g7-live-grid{grid-template-columns:1fr}}
 .hide{display:none!important}
 @media (max-width:1100px){.gauges{grid-template-columns:repeat(2,1fr)} main{grid-template-columns:1fr} aside{position:static;max-height:none}.two{grid-template-columns:1fr}}
 </style>
@@ -142,7 +253,7 @@ td.num{font-family:var(--mono);text-align:right}
 <div id="tip"></div>
 <header>
   <h1>The Physics Engine <span>· A Strictly Finite Budget</span></h1>
-  <div class="console">&gt; EXECUTION_ERROR: You cannot scale out. You must allocate, deny, or steal from another system.</div>
+  <div class="console">&gt; PHYSICAL LIMIT: NO SCALE-OUT AVAILABLE — allocate, deny, or steal from another system.</div>
   <div class="console status" id="status">&gt; loading engine…</div>
 </header>
 <div class="tabs">
@@ -150,48 +261,27 @@ td.num{font-family:var(--mono);text-align:right}
   <button class="tab" data-tab="AP">A′ · Under way</button>
   <button class="tab" data-tab="B">B · Right of Way</button>
 </div>
-
-<section class="card" id="g7CameraCard" aria-live="polite" style="margin:14px 22px">
-  <h3>G7 · Live camera deck activity (advisory)</h3>
-  <div class="two">
-    <div><img id="g7Preview" alt="Live perimeter camera preview, annotated with detection region" style="display:none;width:100%;max-width:540px;border-radius:8px;margin:6px 0;border:1px solid var(--line)"><div id="g7PreviewFallback" class="mute">Waiting for BRIO 101 live preview…</div><div><div id="g7CameraStatus" class="mono">Loading camera status…</div>
-      <div id="g7CameraDetails" class="mono" style="margin-top:5px">—</div><div id="g7CameraAge" class="mute" style="margin-top:6px">Camera status is not a safety clearance</div></div>
-    <div><b>Recent activity events</b><div id="g7CameraEvents" class="log mono" style="max-height:150px">None yet</div></div>
-  </div>
-  <p class="mute" style="font-size:12px">Motion is detected in a marked region, not a person; NO_MOVEMENT_DETECTED does not mean a clear deck. No automatic G4 flight or G6 suppression commands are issued. Scenario D will be added separately.</p>
-</section>
-
-<section class="card" id="scenarioDCard" style="margin:14px 22px">
-  <h3>Scenario D · G7 Perimeter Watch → G4 Simulated Response</h3>
-  <div class="mute" style="margin:4px 0 10px">180 s · 1 s steps · prerecorded demonstration; no physical drone commands. Camera alert does not certify flight-deck clearance.</div>
-  <div class="row" style="flex-wrap:wrap">
-    <button class="btn" type="button" id="dReplay">Load 181-step replay</button>
-    <button class="btn" type="button" id="dPlay">Play</button>
-    <button class="btn" type="button" id="dPause">Pause</button>
-    <a class="btn" style="text-decoration:none" href="/scenario/D">Scenario D link</a>
-  </div>
-  <label for="dTime">Replay time: <span id="dTimeText">0 s</span></label>
-  <input id="dTime" type="range" min="0" max="180" value="0" step="1" style="width:100%">
-  <div class="two">
+<section id="g7Integrated" class="hide" aria-live="polite">
+  <h3>G7 · Live maritime perimeter camera → G4 simulated readiness</h3>
+  <div class="g7-live-grid">
     <div>
-      <h3>Response telemetry</h3>
-      <div id="dStatus" class="mono">Load replay to view data</div>
-      <h3>Resource gauges</h3>
-      <div id="dGauges" class="mono">Power — · Cooling —</div>
-      <h3>Constraint / launch check</h3>
-      <div id="dChecks" class="mono">Awaiting scenario</div>
+      <img id="g7IntegratedPreview" alt="Latest annotated G7 perimeter camera frame" />
+      <div class="mute" style="font-size:11px;margin-top:4px">Local BRIO 101 camera · motion-only detector · annotated region</div>
     </div>
     <div>
-      <h3>Event timeline</h3>
-      <div id="dEventLog" class="log" style="max-height:220px">No events yet</div>
-      <h3>Live camera → G4 simulation</h3>
-      <div class="mute">Start the camera, then run <span class="mono">py vision/scenario_d_live_bridge.py --port 5051</span>. Live samples are distinct from this scripted replay.</div>
-      <div class="row" style="margin:8px 0">
-        <button class="btn" id="dLiveRefresh" type="button">Refresh live status</button>
-        <button class="btn" id="dLiveApprove" type="button">Operator approve (simulated)</button>
+      <div id="g7Detection" class="g7-status">Waiting for camera…</div>
+      <div id="g7Drone" class="g7-status">G4 simulated preparation: waiting for camera…</div>
+      <div class="g7-metric">
+        <div class="g7-readout">G7 model load<strong id="g7Power">— kW</strong></div>
+        <div class="g7-readout">G4 demo load<strong id="g4Power">— kW</strong></div>
+        <div class="g7-readout">G4 + G7 (demo)<strong id="g7Combined">— kW</strong></div>
+        <div class="g7-readout">Demo total, incl. 46 kW baseline<strong id="g7Total">— kW</strong></div>
       </div>
-      <div id="dLiveResult" class="mono">Not connected</div>
-      <div id="dLiveEventLog" class="log mono" style="max-height:100px"></div>
+      <div class="row" style="justify-content:flex-start;flex-wrap:wrap">
+        <button class="btn" type="button" id="g7Approve">Operator approve (simulation only)</button>
+        <span id="g7Age" class="mute" style="font-size:11px">Waiting for valid camera frames</span>
+      </div>
+      <div class="mute" style="font-size:11px;margin-top:7px">The existing dials use the resource governor's guest manifest for G7 mass, mast occupancy, compute, data and power. The G4 preparation status and 46 kW baseline above are separate demo telemetry, not extra power added to those governor dials. No physical drone commands.</div>
     </div>
   </div>
 </section>
@@ -243,6 +333,10 @@ td.num{font-family:var(--mono);text-align:right}
       <div id="weightsB" class="mute" style="font-size:12px;margin-top:4px"></div>
       <h3>Crew aboard (D5)</h3>
       <div class="seg" id="crewB"><button data-v="14" class="on">14</button><button data-v="6">6</button><button data-v="0">0</button></div>
+      <h3>Fleet aboard</h3>
+      <div class="explain">Fixed by Scenario B (PDF): G2, G3, G4, G5 aboard. Other guests are not part of this scenario (✕).
+        The fleet is still checked against every ship capacity like Scenario A.</div>
+      <div id="fleetB"></div>
       <h3>Jury knobs (in memory only)</h3>
       <div id="knobsB"></div>
       <label>Extra overrides (<span class="mono">scn.*</span> for the scenario)</label>
@@ -252,47 +346,45 @@ td.num{font-family:var(--mono);text-align:right}
   </aside>
 
   <section class="content" id="content">
+    <div id="bTop" class="hide" style="display:flex;flex-direction:column;gap:14px">
+      <div class="card" id="bSummary">
+        <h3 id="bTitle">Scenario B</h3>
+        <div id="fleetStrip"></div>
+        <div class="phases" id="bPhase"></div>
+        <div class="b3">
+          <div class="dbox" id="d3box"></div>
+          <div class="dbox" id="d4box"></div>
+          <div class="dbox" id="outbox"></div>
+        </div>
+      </div>
+      <div class="card hide">
+        <div class="verdict"><div class="pill v-NOT-NOW" id="bpill">D3</div><div class="sentence" id="bsent"></div></div>
+        <div id="bextra" style="margin-top:8px"></div>
+      </div>
+      <div class="card timeline">
+        <h3>Timeline · scrub or play — the gauges and lanes below follow the minute</h3>
+        <div class="scrub"><button class="btn small" id="play">▶ Play</button><input type="range" id="tslider" min="0" max="90" value="0"><b class="mono" id="tlabel">min 0</b></div>
+        <h3 style="margin-top:10px">Key moments · click a row to jump</h3>
+        <div id="bMarks"></div>
+        <h3 style="margin-top:10px">Operational state at this minute</h3>
+        <div class="chips" id="opState"></div>
+        <div class="gauges" id="opGauges" style="padding:10px 0 0"></div>
+        <div class="chips hide" id="chips"></div>
+      </div>
+    </div>
       <div class="card hide" id="checkCard">
         <h3 id="checkTitle">Capacity check</h3>
-        <div class="verdict"><div class="pill" id="cpill">…</div><div class="sentence" id="csent"></div></div>
-        <div class="explain" style="margin-top:8px">Every ship capacity, judged on the mission envelope (cruise power, hottest seawater, one genset down)
-          with every guest of the combination at full power. Red = over capacity, amber = less than 20 % left.</div>
-        <div id="ctable"></div>
-        <div id="installNotice" class="note hide"></div>
-        <div class="note">Capacity checks are hypothetical. D1 authorization and the independent
-        physical model must also agree before installing a guest.</div>
-        <div class="row" style="margin-top:10px;justify-content:flex-start">
-          <button class="btn small" id="checkG6">Independent G6 physical check</button>
-          <span id="g6Verification" class="mono" style="font-size:12px;flex:4"></span>
+        <div class="hero" id="hero">…</div>
+        <div class="flow">
+          <div class="dbox"><div class="t" id="bT">1 · Baseline — requested combination, everyone at full power</div>
+            <div class="st" id="bStatus">…</div><div id="bBody"></div></div>
+          <div class="arrow">➜</div>
+          <div class="dbox"><div class="t" id="fT">2 · Final decision — after the optimizer acts</div>
+            <div class="st" id="fStatus">…</div><div id="fBody"></div></div>
         </div>
-        <div id="altBox" class="hide">
-          <h3 style="margin-top:16px">Suggested alternatives</h3>
-          <div class="explain">Ways to make it work, ranked by mission value under the priority file (Σ weight × capability).
-            Click one to see its gauges and capacities.</div>
-          <div class="board" id="alts2"></div>
-        </div>
+        <div id="rec"></div>
       </div>
-      <div class="card hide" id="decisionCard">
-      <h3>2 · D1 Admission decision (not just a capacity screen)</h3>
-      <div class="verdict"><div class="pill" id="dpill">…</div><div class="sentence" id="dsent"></div></div>
-      <div id="dvalue" style="margin-top:9px"></div>
-      <div id="dactions" style="margin-top:9px"></div>
-      <div id="devidence" class="note" style="margin-top:10px"></div>
-    </div>
-    <div class="card hide" id="placementCard">
-      <h3>3 · D2 Placement after the proposed D1 decision</h3>
-      <div class="explain">These are the guests that remain aboard <b>if</b> the D1 proposal is carried out. Guests displaced by D1 are intentionally absent.</div>
-      <div id="massCompare" style="margin:12px 0"></div>
-      <div id="dplacement"></div>
-      <div id="doperability" style="margin-top:10px"></div>
-      <div id="gaugeCompare" class="row" style="margin-top:12px;justify-content:flex-start;gap:8px">
-        <button class="btn small" id="showRequested" style="flex:0 0 auto">Show requested loads</button>
-        <button class="btn small" id="showProposed" style="flex:0 0 auto">Show D1 proposed loads</button>
-        <span id="gaugeStage" class="mute" style="flex:1;font-size:12px"></span>
-      </div>
-      <div class="explain" style="margin-top:7px">The resource table above always shows the original request. The gauges below can show either the original or the D1 proposal; neither result certifies installation or all operating states.</div>
-    </div>
-    <div class="card" id="boardCard">
+      <div class="card" id="boardCard">
         <h3 id="boardTitle">Decision board</h3>
         <div class="explain">Each card is one choice for the guests that are not aboard yet. The engine judges every card on the
           mission envelope (cruise power, 30 °C seawater, one genset down) and scores it with the priority file:
@@ -301,7 +393,12 @@ td.num{font-family:var(--mono);text-align:right}
         <div class="board" id="board"></div>
       </div>
     <div class="card" style="padding:0">
+      <div id="viewBar" class="hide" style="display:flex;align-items:center;gap:10px;padding:12px 14px 0">
+        <h3 style="margin:0">Resource use</h3><div id="needleLegend" class="nl" style="flex:1"></div>
+        <div class="seg" id="aview" style="flex:0 0 auto"><button data-v="before">Before (requested)</button><button data-v="after" class="on">After (final decision)</button><button data-v="start">Starting set</button></div>
+      </div>
       <div class="gauges" id="gauges"></div>
+      <div id="bStatic" class="bstatic hide"></div>
       <div class="legend" id="legend">
         <span><i style="background:var(--green)"></i>within budget</span>
         <span><i style="background:var(--amber)"></i>last 20 %</span>
@@ -311,6 +408,19 @@ td.num{font-family:var(--mono);text-align:right}
       </div>
     </div>
 
+      <div class="card hide" id="checkDetail">
+        <h3 id="ctTitle">Before → after, every ship capacity</h3>
+        <div class="explain" style="margin-top:8px">Judged on the mission envelope (cruise power, hottest seawater, one genset down).
+          Before = the requested combination with everyone at full power; after = the final decision. ✗ → ✓ = fixed by the optimizer.</div>
+        <div id="ctable"></div>
+        <div id="altBox" class="hide">
+          <h3 style="margin-top:16px">Other options</h3>
+          <div class="explain">Every way the engine found to make it work, ranked by mission value under the priority file
+            (Σ weight × capability). Click one to compare it with the requested combination.</div>
+          <div class="board" id="alts2"></div>
+        </div>
+        <div id="proof" class="mute" style="margin-top:14px;font-size:12.5px"></div>
+      </div>
     <!-- A / A′ output -->
     <div id="outA">
       <div class="sectionTitle" id="detailTitle">Details</div>
@@ -340,20 +450,6 @@ td.num{font-family:var(--mono);text-align:right}
 
     <!-- B output -->
     <div id="outB" class="hide">
-      <div class="card">
-        <div class="verdict"><div class="pill v-NOT-NOW" id="bpill">D3</div><div class="sentence" id="bsent"></div></div>
-        <div id="bextra" style="margin-top:8px"></div>
-      </div>
-      <div class="card timeline">
-        <h3>Timeline · scrub or play to watch the variables move</h3>
-        <div class="scrub"><button class="btn small" id="play">▶ Play</button><input type="range" id="tslider" min="0" max="90" value="0"><b class="mono" id="tlabel">min 0</b></div>
-        <div class="chips" id="chips"></div>
-        <svg id="tchart" viewBox="0 0 900 190" preserveAspectRatio="none"></svg>
-        <div class="legend" style="padding:4px 0 0">
-          <span><i style="background:var(--cyan)"></i>guest load kW</span><span><i style="background:var(--red)"></i>power reserve kW</span>
-          <span><i style="background:var(--amber)"></i>cooling capacity kW</span><span><i style="background:var(--green)"></i>G4 battery %</span>
-        </div>
-      </div>
       <div class="card" id="lanesCard">
         <h3>Guest activities across the timeline</h3>
         <div class="explain">Each lane is one guest; colour = what it is doing that minute, straight from the simulator.
@@ -364,11 +460,7 @@ td.num{font-family:var(--mono);text-align:right}
         <div class="chips" id="shipChips"></div>
         <div class="note" id="bnote"></div>
       </div>
-      <div class="two">
-        <div class="card"><h3>Options simulated and scored (Σ weight × capability-minutes)</h3><div id="bopts"></div>
-          <h3>What each guest got</h3><div id="bcaps"></div></div>
-        <div class="card"><h3>Event log (D3 · D4 · ship)</h3><div class="log" id="blog"></div></div>
-      </div>
+      <div class="card" style="margin-top:14px"><h3>Event log (D3 · D4 · ship) — decisions and rationales</h3><div class="log" id="blog"></div></div>
     </div>
   </section>
 </main>
@@ -390,7 +482,7 @@ const KNOBS_A = [
   {id:"sat", label:"SATCOM capacity", path:"ship.data.satcom_mbps", min:1, max:20, step:1, unit:"Mbit/s"},
 ];
 const KNOBS_B = [
-  {id:"bt",  label:"Battery report minute", path:"scn.timeline.0.t", min:2, max:30, step:1, unit:"min"},
+  {id:"bt",  label:"Battery report minute", path:"scn.timeline.0.t", min:2, max:20, step:1, unit:"min"},
   {id:"dl",  label:"Drone must land within (G4 card)", path:"card.G4.special_events.0.recovery_deadline_minutes", min:4, max:40, step:1, unit:"min"},
   {id:"tt",  label:"Genset trip minute", path:"scn.timeline.1.t", min:5, max:60, step:1, unit:"min"},
   {id:"tr",  label:"Reserve after the trip", path:"scn.timeline.1.reserve_kw", min:30, max:200, step:5, unit:"kW"},
@@ -451,8 +543,8 @@ function gaugeSVG(invert){
 function renderGaugeShells(defs){
   $("#gauges").innerHTML = defs.map((d,i)=>`<div class="g" id="g${i}"><div class="bind"></div><div class="t">${d.title}</div>${gaugeSVG(d.invert)}<div class="v">–</div><div class="s"></div></div>`).join("");
 }
-function setGauge(i, {used, cap, unit, sub, before, bind, invert, show}){
-  const el = $("#g"+i); if (!el) return;
+function setGauge(i, {used, cap, unit, sub, before, bind, invert, show, neutral}){
+  const el = typeof i === "string" ? $("#"+i) : $("#g"+i); if (!el) return;
   const angle = x => -90 + 180 * f(x);
   const ratio = (cap ? used / cap : 0);
   el.querySelector(".main").style.transform = `rotate(${angle(ratio)}deg)`;
@@ -460,7 +552,7 @@ function setGauge(i, {used, cap, unit, sub, before, bind, invert, show}){
   if (before != null && cap){ gh.style.opacity = 1; gh.style.transform = `rotate(${angle(before/cap)}deg)`; }
   else gh.style.opacity = 0;
   const over = invert ? ratio < .2 : ratio > 1 + 1e-9, tight = invert ? ratio < .35 : ratio > .8;
-  el.classList.toggle("over", !!over); el.classList.toggle("tight", !over && tight);
+  el.classList.toggle("over", !neutral && !!over); el.classList.toggle("tight", !neutral && !over && tight); el.classList.toggle("static", !!neutral);
   el.querySelector(".v").textContent = show || (used == null ? "–" : `${fmt(used)} / ${fmt(cap)} ${unit}`);
   el.querySelector(".s").innerHTML = sub || "";
   el.querySelector(".bind").textContent = bind ? "BINDING" : "";
@@ -523,11 +615,7 @@ function readA(){
 }
 function weightOverrides(){
   const p = $("#pri").value, out = [];
-  $$("#weights input").forEach(i=>{
-    const basis = META.priorities[p][i.dataset.g];
-    if (basis !== undefined && +i.value !== basis)
-      out.push(`priority.${p}.weights.${i.dataset.g}=${i.value}`);
-  });
+  $$("#weights input").forEach(i=>{ if (+i.value !== META.priorities[p][i.dataset.g]) out.push(`priority.${p}.weights.${i.dataset.g}=${i.value}`); });
   return out;
 }
 function weightTip(p, g, now){
@@ -551,8 +639,7 @@ function placeTip(el){
 }
 function renderWeights(){
   const p = $("#pri").value;
-  $("#weights").innerHTML = GUESTS.filter(g => META.priorities[p][g] !== undefined)
-    .map(g=>`<div><label>${g}</label><input type="number" min="0" max="20" step="1" data-g="${g}" value="${META.priorities[p][g]}"></div>`).join("");
+  $("#weights").innerHTML = GUESTS.map(g=>`<div><label>${g}</label><input type="number" min="0" max="20" step="1" data-g="${g}" value="${META.priorities[p][g]}"></div>`).join("");
   $$("#weights input").forEach(i=>i.addEventListener("input", schedule));
   $$("#weights > div").forEach(box=>{
     const inp = box.querySelector("input"), g = inp.dataset.g;
@@ -570,7 +657,7 @@ function renderInstalled(inst){
     return `<div class="guestrow"><input type="checkbox" id="ic_${g}" ${inst&&inst[g]?"checked":""}><b>${g}</b>
       <select id="is_${g}" title="${G.name}">${opts}</select></div>`;
   }).join("");
-  GUESTS.forEach(g=>{ $("#ic_"+g).addEventListener("change",()=>{refreshCand(); schedule();}); $("#is_"+g).addEventListener("change",schedule); });
+  GUESTS.forEach(g=>{ $("#ic_"+g).addEventListener("change",()=>{refreshCand(); schedule(); if(g==="G7")g7SelectionChanged();}); $("#is_"+g).addEventListener("change",schedule); });
   refreshCand();
 }
 function refreshCand(){
@@ -710,123 +797,152 @@ function renderAddList(){
 function readCheck(){
   const b = readA(), adds = {};
   $$("#addList .addrow").forEach(r=>{ if (r.querySelector("input").checked) adds[r.dataset.g] = r.querySelector("select").value; });
-  return {priority:b.priority, installed:b.installed, adds, overrides:b.overrides};
-}
-function findMass(rows){ return (rows||[]).find(r=>r.resource === "mass"); }
-function showCheckGauges(stage){
-  if (!CHECK) return;
-  const d = CHECK.d1, accepted = d && ["YES", "YES-IF"].includes(d.verdict) && d.usage && d.usage.length;
-  const proposal = stage === "proposed" && accepted;
-  if (proposal){
-    // Requested overload remains explicit in the Stage 1 resource table.
-    gaugesA({result:{elapsed_s:d.elapsed_s, binding:[]}, before:CHECK.usage,
-             after:d.usage, demand:[]});
-  } else {
-    gaugesA({result:{elapsed_s:CHECK.elapsed_s, binding:CHECK.binding}, before:CHECK.before,
-             after:CHECK.fits?CHECK.usage:[], demand:CHECK.fits?[]:CHECK.usage});
-  }
-  $("#ghostLegend").innerHTML = `<i style="background:var(--ghost)"></i>${proposal?"requested before D1":"before (installed only)"}`;
-  $("#showRequested").disabled = !accepted;
-  $("#showProposed").disabled = !accepted;
-  $("#gaugeStage").textContent = proposal ? "Gauges: D1 proposed (white); requested (ghost)" : "Gauges: requested configuration";
-}
-function renderDecisionCheck(j){
-  const d = j.d1;
-  $("#decisionCard").classList.remove("hide");
-  if (!d){
-    $("#dpill").className="pill v-NOT-NOW";
-    $("#dpill").textContent="NOT EVALUATED";
-    $("#dsent").textContent=j.d1_note;
-    $("#dvalue").textContent="Capacity is not a D1 admission decision.";
-    $("#dactions").textContent="";
-    $("#devidence").textContent="Multiple candidates require step-by-step D1 admissions. No installation is authorized by this capacity screen.";
-    $("#placementCard").classList.add("hide");
-    return;
-  }
-  $("#dpill").className="pill v-"+d.verdict;
-  $("#dpill").textContent=d.verdict;
-  $("#dsent").textContent=d.sentence;
-  const value=d.value;
-  const tradeoff=value && value.before!=null && value.after!=null
-    ? `Mission value ${value.before} → ${value.after}${value.after<value.before?" (decreases; captain may decline)":""}.` : "";
-  $("#dvalue").textContent=`D1 decision time ${d.elapsed_s ?? "–"} s. ${tradeoff}`;
-  $("#dactions").innerHTML = `<b>D1 required actions</b>${d.actions.length
-    ? `<ul class="clean">${d.actions.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>`
-    : `<div class="mute">${d.verdict==="YES"?"No displacement required.":"No authorized action proposed."}</div>`}`;
-  const notes=[];
-  if (d.warning) notes.push(d.warning);
-  if (d.integration_warning) notes.push(d.integration_warning);
-  if (d.solver_crosscheck.length) notes.push("Solver cross-check warnings: "+d.solver_crosscheck.join("; "));
-  if (d.physical_crosscheck){
-    const p=d.physical_crosscheck;
-    notes.push(`Independent physical snapshot: ${p.status||"UNKNOWN"}; full admission ${p.full_admission_status||"NOT_EVALUATED"}. ${p.basis||p.reason||""}`);
-    (p.failed_constraints||[]).forEach(c=>notes.push(`Physical constraint: ${c}`));
-  }
-  notes.push("This is a conditional governor proposal, not an instruction to install, remove, or operate hardware.");
-  $("#devidence").textContent=notes.join(" ");
-  const accepted=["YES", "YES-IF"].includes(d.verdict) && d.usage.length && Object.keys(d.placement).length;
-  $("#placementCard").classList.toggle("hide", !accepted);
-  if (!accepted) return;
-  const current=findMass(j.usage), proposed=findMass(d.usage);
-  const massDisplay=(r)=>r?`${fmt(r.used)} / ${fmt(r.capacity)} ${esc(r.unit)}`:"not available";
-  $("#massCompare").innerHTML = `<div class="two">
-    <div><span class="tag ${j.fits?"ok":"bad"}">Requested configuration</span><div class="mono">Mass ${massDisplay(current)}</div></div>
-    <div><span class="tag ok">D1 proposed configuration</span><div class="mono">Mass ${massDisplay(proposed)}</div></div>
-  </div>`;
-  const displaced = Object.keys(j.installed).filter(g=>!Object.prototype.hasOwnProperty.call(d.placement,g));
-  $("#dplacement").innerHTML = `<table><tr><th>Guest retained aboard</th><th>D2 placement and power line</th></tr>${Object.entries(d.placement).map(([g,place])=>`<tr><td><b>${esc(g)}</b></td><td>${esc(place)}</td></tr>`).join("")}</table>`
-    + (displaced.length ? `<div class="note">Displaced by D1: <b>${displaced.map(esc).join(", ")}</b>. Not aboard after this proposal, so no D2 placement is assigned.</div>` : "");
-  const rules=[...d.standing_rules,...d.operability];
-  $("#doperability").innerHTML=rules.length?`<b>Standing operational restrictions</b><ul class="clean">${rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
-}
+  return {priority:b.priority, installed:b.installed, adds, overrides:b.overrides};}
+let DEC = null, AVIEW = "after", AALT = null;
+const postJSON = async (url, body) => (await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)})).json();
+const BLBL = {power_normal:"power", power_degraded:"power, one genset down", power_line:"power line", cooling_normal:"cooling",
+  cooling_degraded:"cooling (degraded)", mass:"mass", stability:"stability", deck_space:"deck space", mast:"mast slot", hangar:"hangar",
+  satcom:"SATCOM", backbone:"backbone", los_radio:"LOS radio", compute:"compute", installation_time:"crane time in port"};
 async function runCheck(){
   const body = readCheck();
   $("#content").classList.add("busy");
-  $("#status").textContent = `> checking ${Object.keys(body.installed).join("+")}${Object.keys(body.adds).length?" + "+Object.keys(body.adds).join("+"):""} against every ship capacity …`;
-  let j; try { j = await (await fetch("/api/check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})).json(); } catch(e){ j={error:String(e)}; }
+  $("#status").textContent = `> re-running OR-Tools CP-SAT for ${Object.keys(body.installed).join("+")}${Object.keys(body.adds).length?" + "+Object.keys(body.adds).join("+"):""} …`;
+  let j, k;
+  try { [j, k] = await Promise.all([postJSON("/api/decision", body), postJSON("/api/check", body)]); } catch(e){ j = {error:String(e)}; }
   $("#content").classList.remove("busy");
-  if (j.error){ $("#status").innerHTML = `<span class="err">&gt; ${esc(j.error)}</span>`; return; }
-  CHECK = j;
-  const notice = $("#installNotice");
-  notice.textContent = j.installation_warning || "";
-  notice.classList.toggle("hide", !j.installation_warning);
-  const start = Object.keys(j.installed).join("+"), added = j.adds.length ? " + " + j.adds.join(" + ") : "";
-  $("#status").textContent = `> ${j.fits?"CAPACITY FIT":"CAPACITY OVERLOAD"} in ${j.elapsed_s} s${j.installation_warning?" · admission NOT-NOW":""}${j.overrides.length?" · overrides: "+j.overrides.join(", "):""}`;
-  $("#checkTitle").textContent = `Capacity check — ${start}${added} · priority file '${j.priority}'`;
-  $("#cpill").className = "pill " + (j.fits ? "v-FITS" : "v-NOFIT");
-  $("#cpill").textContent = j.fits ? "CAPACITY FIT" : "OVER CAPACITY";
-  if (j.fits){
-    const rows = j.usage.filter(u=>u.free_pct!=null).sort((a,b)=>a.free_pct-b.free_pct).slice(0,2);
-    $("#csent").innerHTML = `Every capacity holds with ${start}${added} all at full power. Tightest: ${rows.map(u=>`<b>${esc(u.resource)}</b> ${u.free_pct} % free`).join(", ")}.
-      Mission value <b>${j.U}</b>${j.adds.length?` (starting set ${j.u_start})`:""}.`;
-  } else {
-    $("#csent").innerHTML = `<b>Breaks:</b><ul class="clean">${j.binding_text.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`;
+  if (j.error || (k && k.error)){ $("#status").innerHTML = `<span class="err">&gt; ${esc(j.error || k.error)}</span>`; return; }
+  DEC = j; CHECK = k; AALT = null;
+  $("#bT").textContent = "1 · Baseline — requested combination, everyone at full power";
+  $("#fT").textContent = "2 · Final decision — after the optimizer acts";
+  const b = j.baseline, f = j.final, start = Object.keys(j.installed).join("+"), added = j.adds.length ? " + " + j.adds.join(" + ") : "";
+  $("#checkTitle").textContent = `Scenario A — ${start}${added} · priority file '${j.priority}'`;
+  // headline: the decision in one line
+  let hero;
+  if (!j.adds.length) hero = `<span class="v v-YES">YES</span>starting set as installed`;
+  else if (!f.ok) hero = `<span class="v v-${f.verdict}">${f.verdict}</span>${esc(j.adds.join("+"))} cannot be admitted`;
+  else {
+    const acts = f.actions.map(a=> a.type==="remove" ? `remove ${a.guest}` : a.type==="throttle" ? `run ${a.guest} at low power` : a.type==="relocate" ? `move ${a.guest}` : `interlock ${a.guest}`);
+    hero = `<span class="v v-${f.verdict}">${f.verdict}</span>${acts.length ? esc(acts.join(" + ")) + " to admit " : "admit "}${esc(j.adds.join("+"))}`;
   }
-  capTable(j.usage, j.binding);
-  renderDecisionCheck(j);
-  showCheckGauges(j.d1 && ["YES", "YES-IF"].includes(j.d1.verdict) ? "proposed" : "requested");
-  $("#status").textContent = `> ${j.fits?"FITS":"DOES NOT FIT"} in ${j.elapsed_s} s${j.fits?"":" — needles show what the combination would need; red = over capacity"}${j.overrides.length?" · overrides: "+j.overrides.join(", "):""}`;
-  $("#altBox").classList.toggle("hide", j.fits);
-  if (!j.fits){
-    $("#alts2").innerHTML = j.alternatives.length ? j.alternatives.map((a,i)=>{
-      const d = Math.round((a.U - j.u_start)*100)/100;
+  $("#hero").innerHTML = hero;
+  // 1 · baseline
+  $("#bStatus").className = "st v-" + b.status; $("#bStatus").textContent = b.status;
+  $("#bBody").innerHTML = `<div class="bigset"><span class="lb">requested set</span>${reqSet()}</div><div class="fkv">
+    <span class="k">violated</span><span>${b.binding.length ? `<ul>${b.binding_text.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>` : "nothing — every capacity holds"}</span></div>`;
+  // 2 · final decision
+  $("#fStatus").className = "st v-" + f.verdict; $("#fStatus").textContent = f.verdict;
+  const steps = f.steps || [];
+  const bt = steps.flatMap(s=> s.binding_text.length ? s.binding_text : s.binding.map(x=>BLBL[x]||x));
+  $("#fBody").innerHTML = f.ok ? `<div class="bigset"><span class="lb">final set</span>${(f.set||[]).join(" + ")}</div><div class="fkv">
+      <span class="k">binding constraint</span><span>${bt.length ? `<ul>${bt.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>` : "none"}</span>
+      <span class="k">action</span><span>${f.actions.length ? `<ul>${f.actions.map(a=>`<li>${esc(a.text)}</li>`).join("")}</ul>` : "no change to the guests aboard"}</span>
+      <span class="k">capability lost</span><span class="mono">${fmt(f.capability_lost)}</span>
+      <span class="k">final mission utility</span><span class="mono"><b>${fmt(f.U)}</b> <span class="mute">(starting set ${fmt(j.u_start)})</span></span>
+      ${steps.length > 1 ? `<span class="k">order</span><span>${f.order.join(" then ")} (best order by mission value)</span>` : ""}
+    </div>` : `<div class="bigset"><span class="lb">final set</span>—</div><div class="fkv"><span class="k">why</span><span>${esc(f.sentence||"")}</span></div>`;
+  $("#rec").innerHTML = j.recommendation ? `<div class="recbox">⚠ ${esc(j.recommendation)}</div>` : "";
+  drawAGauges(); drawCompare(f.usage && f.usage.length ? f.usage : null, "after (final)");
+  // other options (only when the request does not fit as is)
+  $("#altBox").classList.toggle("hide", !k || k.fits);
+  if (k && !k.fits){
+    $("#alts2").innerHTML = k.alternatives.length ? k.alternatives.map((a,i)=>{
+      const d = Math.round((a.U - k.u_start)*100)/100;
       return `<div class="bc ${a.recommended?"rec":""}" data-i="${i}">
         <div class="hd"><span class="nm" style="font-size:14px">${esc(a.kind)}</span></div>
         ${a.recommended?'<span class="recb">★ HIGHEST MISSION VALUE</span>':""}
         <div class="lbl">mission value</div><div class="val">${a.U} <span style="color:${d>0?"var(--green)":d<0?"var(--red)":"var(--mute)"}">(${d>0?"+":""}${d} vs starting set)</span></div>
         <div class="lbl">what changes</div><ul>${a.changes.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
-        <div class="lbl">ends with aboard</div><div class="mono" style="font-size:12px">${a.set.join("+")}</div>
-      </div>`; }).join("") : `<span class="err">no alternative keeps every hard constraint — see what breaks above</span>`;
+        <div class="lbl">ends with aboard</div><div class="mono" style="font-size:12px">${a.set.join("+")}</div></div>`; }).join("")
+      : `<span class="err">no option keeps every hard constraint — see what is violated above</span>`;
     $$("#alts2 .bc").forEach(el=>el.addEventListener("click", ()=>{
-      $$("#alts2 .bc").forEach(x=>x.classList.toggle("sel", x===el));
-      const a = CHECK.alternatives[+el.dataset.i];
-      capTable(a.usage, []);
-      gaugesA({result:{elapsed_s:CHECK.elapsed_s, binding:[]}, before:CHECK.before, after:a.usage, demand:[]});
-      $("#gaugeStage").textContent = `Gauges: capacity-only alternative (${a.kind}); D1/D2 proposal above unchanged`;
-      $("#ghostLegend").innerHTML = `<i style="background:var(--ghost)"></i>starting installed set`;
-      $("#status").textContent = `> showing hypothetical capacity alternative: ${a.kind} — verify admission separately`;
+      const sel = !el.classList.contains("sel");
+      $$("#alts2 .bc").forEach(x=>x.classList.toggle("sel", sel && x===el));
+      AALT = sel ? CHECK.alternatives[+el.dataset.i] : null;
+      drawAGauges(); drawCompare(AALT ? AALT.usage : (DEC.final.usage && DEC.final.usage.length ? DEC.final.usage : null), AALT ? "after (this option)" : "after (final)");
+      $("#status").textContent = AALT ? `> comparing the requested combination with: ${AALT.kind}` : `> back to the final decision`;
     }));
   }
+  // proof that every change re-runs the optimizer
+  const ov = j.overrides;
+  $("#proof").innerHTML = `Re-optimized with OR-Tools CP-SAT on every change: <b>${j.solves}</b> solver runs in <b>${j.elapsed_s} s</b> (ceiling 30 s), priority file <b>${esc(j.priority)}</b>.
+    ${ov.length ? `<div style="margin-top:6px">Jury overrides in memory: ${ov.map(o=>`<span class="ovchip">${esc(o)}</span>`).join("")} — files on disk are untouched; <b>Reset</b> clears them.</div>`
+               : `<div style="margin-top:6px">No jury overrides — default parameters from <span class="mono">config/</span> and the cards.</div>`}`;
+  $("#status").textContent = `> baseline ${b.status} → final ${f.verdict} · ${j.solves} CP-SAT runs in ${j.elapsed_s} s${ov.length?" · "+ov.length+" override(s)":""}`;
+}
+function reqSet(){ return DEC ? [...Object.keys(DEC.installed), ...DEC.adds].join(" + ") : ""; }
+function viewLabel(v){
+  if (v === "before") return `<b>Requested</b> <span class="mono">${esc(reqSet())}</span>`;
+  if (v === "start") return `<b>${TAB==="AP" ? "Aboard now" : "Starting set"}</b> <span class="mono">${esc(Object.keys(DEC.installed).join(" + "))}</span>`;
+  if (AALT) return `<b>Option</b> ${esc(AALT.kind)} → <span class="mono">${esc(AALT.set.join(" + "))}</span>`;
+  const f = DEC.final;
+  return f.ok ? `<b>${TAB==="AP" ? "Final (next port)" : "Final"}</b> <span class="mono">${esc((f.set||[]).join(" + "))}</span>` : `<b>Final</b> — (not admitted; showing requested)`;
+}
+async function runAP(){
+  const a = readA(), cand = a.candidate, swap = !!a.swap;
+  if (!cand){ $("#hero").textContent = "Every guest is installed — untick one to make a candidate."; return; }
+  const portBody = {priority:a.priority, installed:a.installed, adds: (cand in a.installed) ? {} : {[cand]:"auto"}, overrides:a.overrides};
+  $("#content").classList.add("busy");
+  $("#status").textContent = `> at sea: classify_admission(${cand}${swap?", swap "+a.swap:""}) + next-port optimisation …`;
+  let r, j;
+  try { [r, j] = await Promise.all([postJSON("/api/admit", a), postJSON("/api/decision", portBody)]); } catch(e){ r = {error:String(e)}; }
+  $("#content").classList.remove("busy");
+  if (r.error || (j && j.error)){ $("#status").innerHTML = `<span class="err">&gt; ${esc(r.error || j.error)}</span>`; return; }
+  DEC = j; AALT = null;
+  $("#bT").textContent = "1 · Now — at sea (A.11 installation window, crew rule D5)";
+  $("#fT").textContent = "2 · Final decision — at the next port call (same optimizer as Scenario A)";
+  const res = r.result, st = res.state || a.state, f = j.final;
+  const start = Object.keys(a.installed).join(" + "), req = swap ? `${start} (swap ${a.swap})` : `${start} + ${cand}`;
+  $("#checkTitle").textContent = `Scenario A′ — ${req} · at sea · priority file '${r.priority}'`;
+  const later = swap ? "" : ` → <span class="v v-${f.verdict}">${f.verdict}</span>at the next port call`;
+  $("#hero").innerHTML = `<span class="v v-${res.verdict}">${res.verdict}</span>${esc(swap ? "swap " + a.swap : cand)} now${later}`;
+  // 1 · now, at sea — the engine's at-sea verdict (A.11 windows, crew rule D5)
+  $("#bStatus").className = "st v-" + res.verdict; $("#bStatus").textContent = res.verdict;
+  const ship = `crew ${st.crew} · ${st.speed_kn} kn · course ${st.course} · deck ${st.deck} · sea state ${st.sea_state} · wind ${st.wind_kn} kn`;
+  $("#bBody").innerHTML = `<div class="bigset"><span class="lb">requested at sea</span>${esc(req)}</div><div class="fkv">
+    <span class="k">ship state</span><span>${esc(ship)}</span>
+    ${(res.window_unmet||[]).length ? `<span class="k">window not open</span><span><ul>${res.window_unmet.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></span>` : ""}
+    <span class="k">engine says</span><span>${esc(res.sentence)}</span></div>`;
+  // 2 · final decision at the next port call (same optimiser as Scenario A)
+  $("#fStatus").className = "st v-" + f.verdict; $("#fStatus").textContent = f.verdict;
+  const steps = f.steps || [], bt = steps.flatMap(x=> x.binding_text.length ? x.binding_text : x.binding.map(y=>BLBL[y]||y));
+  $("#fBody").innerHTML = f.ok ? `<div class="bigset"><span class="lb">final set at the next port</span>${(f.set||[]).join(" + ")}</div><div class="fkv">
+      <span class="k">binding constraint</span><span>${bt.length ? `<ul>${bt.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : "none"}</span>
+      <span class="k">action</span><span>${f.actions.length ? `<ul>${f.actions.map(x=>`<li>${esc(x.text)}</li>`).join("")}</ul>` : "no change to the guests aboard"}</span>
+      <span class="k">capability lost</span><span class="mono">${fmt(f.capability_lost)}</span>
+      <span class="k">final mission utility</span><span class="mono"><b>${fmt(f.U)}</b> <span class="mute">(now ${fmt(j.u_start)})</span></span>
+      ${res.next_port_sentence ? `<span class="k">engine (next port)</span><span>${esc(res.next_port_sentence)}</span>` : ""}
+    </div>` : `<div class="bigset"><span class="lb">final set at the next port</span>—</div><div class="fkv"><span class="k">why</span><span>${esc(f.sentence||"")}</span></div>`;
+  $("#rec").innerHTML = j.recommendation ? `<div class="recbox">⚠ ${esc(j.recommendation)}</div>` : "";
+  $("#altBox").classList.add("hide");
+  drawAGauges(); drawCompare(f.usage && f.usage.length ? f.usage : null, "after (next port)");
+  const ov = j.overrides;
+  $("#proof").innerHTML = `At sea: engine verdict in <b>${res.elapsed_s} s</b>. Next port: OR-Tools CP-SAT re-run, <b>${j.solves}</b> solver runs in <b>${j.elapsed_s} s</b> (ceiling 30 s).
+    ${ov.length ? `<div style="margin-top:6px">Jury overrides in memory: ${ov.map(o=>`<span class="ovchip">${esc(o)}</span>`).join("")} — <b>Reset</b> clears them.</div>` : ""}`;
+  $("#status").textContent = `> at sea ${res.verdict} → next port ${f.verdict} · ${j.solves} CP-SAT runs`;
+}
+function drawAGauges(){
+  if (DEC){
+    const ghostView = AVIEW === "after" ? "before" : "after";
+    $("#needleLegend").innerHTML = `<span><i style="background:#fff"></i>white needle: ${viewLabel(AVIEW)}</span>
+      <span><i style="background:var(--ghost)"></i>grey needle: ${viewLabel(ghostView)}</span>`;
+  }
+  if (!DEC) return;
+  const before = DEC.baseline.usage, after = AALT ? AALT.usage : (DEC.final.usage && DEC.final.usage.length ? DEC.final.usage : before), start = DEC.start_usage;
+  const main = AVIEW === "before" ? before : AVIEW === "start" ? start : after;
+  const ghost = AVIEW === "after" ? before : after;
+  gaugesA({result:{elapsed_s:DEC.elapsed_s, binding: AVIEW === "before" ? DEC.baseline.binding : []}, before: ghost, after: main, demand: []});
+}
+function drawCompare(afterRows, label){
+  const bef = DEC.baseline.usage, bind = new Set(DEC.baseline.binding);
+  const isB = n => [...bind].some(g => (GROUP_ROWS[g]||[]).some(p => n.startsWith(p)));
+  $("#ctable").innerHTML = `<table class="cap"><tr><th>ship capacity</th><th>before (requested)</th><th>${esc(label)}</th><th>capacity</th><th></th><th>free after</th><th></th><th>change</th></tr>${
+    bef.map(b=>{ const a = afterRows ? U(afterRows, b.resource) : null, cur = a || b;
+      const ob = b.used > b.capacity + 1e-9, oa = a && a.used > a.capacity + 1e-9, r = cur.capacity ? cur.used/cur.capacity : 0;
+      const col = (a ? oa : ob) ? "var(--red)" : r > .8 ? "var(--amber)" : "var(--green)";
+      const ch = !a ? "–" : ob && !oa ? "✗ → ✓ fixed" : oa ? "✗ still over" : a.used < b.used - 1e-9 ? "↓ " + fmt(b.used - a.used) : a.used > b.used + 1e-9 ? "↑ " + fmt(a.used - b.used) : "=";
+      return `<tr class="${ob && !oa && a ? "fixed" : ""} ${oa ? "over" : ""} ${isB(b.resource) ? "bind" : ""}"><td>${esc(b.resource)}</td>
+        <td class="num" style="${ob?"color:var(--red)":""}">${fmt(b.used)}</td><td class="num">${a ? fmt(a.used) : "–"}</td><td class="num">${fmt(b.capacity)}</td><td>${b.unit}</td>
+        <td class="num">${cur.free_pct==null?"–":cur.free_pct+" %"}</td><td class="bar"><div class="meter"><i style="width:${Math.min(100,100*r)}%;background:${col}"></i></div></td><td>${ch}</td></tr>`; }).join("")}</table>`;
 }
 function capTable(usage, binding){
   const bind = new Set(binding||[]);
@@ -855,10 +971,25 @@ async function runDefaults(){
 }
 
 // ---------- B ----------
-const GB = [{title:"POWER (kW)"},{title:"COOLING LOOP"},{title:"DRONE BATTERY", invert:true},{title:"SHIP SPEED"},
-            {title:"MASS"},{title:"DATA LINKS"},{title:"COMPUTE"},{title:"RESPONSE TIME"}];
+// B: resources that move with the timeline are gauges; static ones (deck, mast, mass, stability) and
+// response time are drawn by type in #bStatic
+const GB = [{title:"POWER (kW)"},{title:"COOLING LOOP"},{title:"DATA LINKS"},{title:"COMPUTE"}];
+const FLEET_DEFAULT = ["G2","G3","G4","G5"]; // Scenario B fleet as the PDF narrates it — fixed
+function renderFleet(sel){
+  $("#fleetB").innerHTML = GUESTS.map(g=>{
+    const on = sel.includes(g);
+    const box = g === "G7"
+      ? `<input type="checkbox" data-g="G7" ${on?"checked":""} title="Enable live G7 camera in Scenario B">`
+      : (on ? `<input type="checkbox" data-g="${g}" checked disabled>`
+            : `<span class="xbox" title="not part of Scenario B">✕</span>`);
+    return `<div class="guestrow" style="grid-template-columns:22px 34px 1fr;${on?"":"opacity:.55"}">${box}
+      <b style="${on||g==="G7"?"":"text-decoration:line-through"}">${g}</b><span class="mute" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(META.guests[g].name)}</span></div>`;}).join("");
+  const g7 = $("#fleetB input[data-g='G7']");
+  if (g7) g7.addEventListener("change",()=>{ g7SelectionChanged(); schedule(); });
+}
 function readB(){
   return {priority:$("#priB").value, crew:+$("#crewB .on").dataset.v,
+          aboard: $$("#fleetB input").filter(e=>e.checked).map(e=>e.dataset.g),
           overrides:[...knobOverrides($("#knobsB"), KNOBS_B), ...lines("#ovB")]};
 }
 async function runB(){
@@ -869,23 +1000,22 @@ async function runB(){
   $("#content").classList.remove("busy");
   if (j.error){ $("#status").innerHTML = `<span class="err">&gt; ${esc(j.error)}</span>`; return; }
   BDATA = j; const d = j.decision;
-  $("#status").textContent = `> D3 at min ${d.t}: ${d.decision} (executed min ${d.t_exec}) in ${d.elapsed_s} s${j.overrides.length?" · overrides: "+j.overrides.join(", "):""}`;
+  $("#status").textContent = `> D3 at min ${d.t}: ${d.decision.replace(/_/g," ").toUpperCase()} (executed min ${d.t_exec}, crew ${d.crew}) in ${d.elapsed_s} s${j.overrides.length?" · overrides: "+j.overrides.join(", "):""}`;
   $("#bpill").textContent = d.decision.replace(/_/g," ").toUpperCase();
+  if (d.infeasible) $("#status").innerHTML = `<span class="err">&gt; D3 at min ${d.t}: NO FEASIBLE OPTION — ${esc(d.infeasible.reason)}</span>`;
   $("#bsent").innerHTML = `<b>${esc(d.decision_desc)}</b><div style="margin-top:6px">${esc(d.rationale)}</div>`;
-  $("#bextra").innerHTML = `<span class="tag warn">deadline: land by min ${d.deadline ?? "–"}</span> <span class="tag">${esc(d.confirmation||"")}</span>
+  const fc = j.fleet_check || {fits:true, binding_text:[]};
+  $("#bextra").innerHTML = `<div style="margin-bottom:6px"><span class="tag ${fc.fits?"ok":"bad"}">fleet ${esc(j.aboard.join("+"))}: ${fc.fits?"fits every ship capacity":"exceeds ship capacity"}</span>
+      ${fc.fits ? "" : `<span class="err" style="font-size:12px">${esc(fc.binding_text.join("; "))} — B still runs, as the PDF narrates; tick fewer guests for an admissible fleet</span>`}</div>
+    <span class="tag warn">deadline: land by min ${d.deadline ?? "–"}</span> <span class="tag">${esc(d.confirmation||"")}</span>
     ${(d.conflicts||[]).map(c=>`<span class="tag bad" title="${esc(c)}">conflict: ${esc(c.split(":")[0])}</span>`).join(" ")}
     <div style="margin-top:6px"><b>Cost to the loser:</b> ${esc(d.cost_to_loser)}</div>`;
-  const best = Math.max(...d.options.map(o=>o.U));
-  $("#bopts").innerHTML = d.options.map(o=>`<div class="opt ${o.feasible?"":"bad"}" style="margin:8px 0">
-     <div class="row" style="justify-content:space-between"><span><b>${o.option}</b> ${o.option===d.decision?'<span class="tag ok">chosen</span>':""} ${o.feasible?"":'<span class="tag bad">infeasible</span>'}</span><span class="mono" style="flex:0">${o.U}</span></div>
-     <div class="bar"><i style="width:${Math.max(2,100*o.U/best)}%"></i></div>
-     <div class="mute" style="font-size:12px">${esc(o.desc)}${o.violations.length?" — <span class='err'>"+esc(o.violations.join("; "))+"</span>":""}</div></div>`).join("");
-  const H = 90;
-  $("#bcaps").innerHTML = `<table><tr><th>guest</th><th>weight</th><th>capability-min / ${H}</th></tr>${Object.entries(j.caps).map(([g,v])=>`<tr><td>${g} <span class="mute">${esc(META.guests[g].name)}</span></td><td class="num">${j.weights[g]}</td><td class="num">${fmt(v)}</td></tr>`).join("")}</table>
-    <div class="mute" style="font-size:12px;margin-top:4px">${j.lost.G4_ditched?"<span class='err'>drone ditched</span>":`drone landed min ${j.lost.G4_landed ?? "–"}`} · survey progress lost ${j.lost.G3_progress_lost_min} min · legs done ${j.lost.G3_legs_done}</div>`;
+  const Hz = j.horizon_min || 90;
   $("#tslider").max = j.rows.length - 1;
   drawChart();
   drawLanes();
+  renderBSummary(j);
+  renderBStatic(j);
   setT(Math.min(+$("#tslider").value, j.rows.length-1));
 }
 // ---------- B · guest lanes ----------
@@ -899,31 +1029,39 @@ const LANE_CAT = {   // activity → [category label, colour]
   off:["shed (off)","#c0504d"]};
 const NOT_ABOARD = ["not aboard","#1f2b40"];
 const cat = st => LANE_CAT[st] || ["other","#46566f"];
+const STATE_LABEL = {full:"Operating", surveying:"Surveying", in_flight:"In flight", low:"Low power", charging:"Charging",
+  charging_initial:"Charging", charging_followup:"Charging (top-up)", landing:"Recovering", ramp_recovery:"Recovering",
+  holding:"Holding", awaiting_recovery:"Awaiting recovery", cradle:"Stowed", standby:"Standby", off:"Shed", ditched:"Ditched"};
+const stLabel = st => STATE_LABEL[st] || String(st ?? "–").replace(/_/g," ");
 function drawLanes(){
-  const rows = BDATA.rows, n = rows.length, W = 900;
-  const used = new Map();
+  const rows = BDATA.rows, n = rows.length, used = new Map();
+  const pct = t => (100*t/n).toFixed(3) + "%";
+  const tTrip = (BDATA.log.find(l=>l.kind==="event" && /genset trip/.test(l.text))||{}).t;
+  const evAt = (t, col) => t==null ? "" : `<div class="lev" style="left:${pct(t+0.5)};border-color:${col}"></div>`;
+  const evLines = evAt(BDATA.decision.t, "var(--amber)") + evAt(tTrip, "var(--red)");
   $("#lanes").innerHTML = GUESTS.map(g=>{
     const aboard = BDATA.aboard.includes(g);
-    let rects = "";
-    if (!aboard){ rects = `<rect x="0" y="0" width="${W}" height="30" fill="${NOT_ABOARD[1]}"/>`; used.set(NOT_ABOARD[0], NOT_ABOARD[1]); }
+    let segs = "";
+    if (!aboard){ used.set(NOT_ABOARD[0], NOT_ABOARD[1]);
+      segs = `<div class="lseg" style="left:0;width:100%;background:${NOT_ABOARD[1]};color:var(--mute);text-shadow:none">not aboard in Scenario B</div>`; }
     else {
       let start = 0;
       for (let t=1; t<=n; t++){
         if (t===n || rows[t][g] !== rows[start][g]){
-          const [lab,col] = cat(rows[start][g]); used.set(lab,col);
-          const x0 = W*start/n, w = W*(t-start)/n;
-          rects += `<rect x="${x0.toFixed(1)}" y="0" width="${(w+0.6).toFixed(1)}" height="30" fill="${col}"><title>${g} ${rows[start][g]} · min ${start}–${t-1}</title></rect>`;
-          if (t<n) rects += `<line x1="${(W*t/n).toFixed(1)}" x2="${(W*t/n).toFixed(1)}" y1="0" y2="30" stroke="#0b1220" stroke-width="1.5"/>`;
+          const st = rows[start][g], [lab,col] = cat(st); used.set(lab,col);
+          segs += `<div class="lseg" style="left:${pct(start)};width:${pct(t-start)};background:${col}" title="${g} ${esc(stLabel(st))} · min ${start}–${t-1}">${t-start >= 4 ? esc(stLabel(st)) : ""}</div>`;
           start = t;
         }
       }
     }
     return `<div class="lane"><div><div class="ln">${g} · ${esc(META.guests[g].name)}</div><div class="now" id="now_${g}"></div></div>
-      <svg viewBox="0 0 ${W} 30" preserveAspectRatio="none" data-g="${g}">${rects}<line class="lcur" x1="0" x2="0" y1="0" y2="30" stroke="#fff" stroke-width="3"/></svg></div>`;
+      <div class="ltrack" data-g="${g}">${segs}${aboard ? evLines : ""}<div class="lcur"></div></div></div>`;
   }).join("");
-  $("#laneLegend").innerHTML = [...used].map(([l,c])=>`<span><i style="background:${c};height:8px"></i>${l}</span>`).join("");
-  $$("#lanes svg").forEach(sv=>sv.addEventListener("click", ev=>{
-    const r = sv.getBoundingClientRect(); setT(Math.max(0, Math.min(n-1, Math.floor((ev.clientX - r.left)/r.width * n))));
+  $("#laneLegend").innerHTML = [...used].map(([l,c])=>`<span><i style="background:${c};height:8px"></i>${l}</span>`).join("")
+    + `<span><i style="background:var(--amber);height:3px"></i>min ${BDATA.decision.t} D3 battery alert</span>`
+    + (tTrip!=null ? `<span><i style="background:var(--red);height:3px"></i>min ${tTrip} D4 genset trip</span>` : "");
+  $$("#lanes .ltrack").forEach(tr=>tr.addEventListener("click", ev=>{
+    const r = tr.getBoundingClientRect(); setT(Math.max(0, Math.min(n-1, Math.floor((ev.clientX - r.left)/r.width * n))));
   }));
   const d = BDATA.decision;
   $("#bnote").innerHTML = `Simulated minutes (one step = 1 min, ${n} min shown; options scored over <span class="mono">horizon_min</span> in <span class="mono">config/ops.yaml</span> from the decision).
@@ -934,10 +1072,10 @@ function drawLanes(){
 }
 function laneCursor(t){
   if (!BDATA) return;
-  const n = BDATA.rows.length, x = 900*(t+0.5)/n, r = BDATA.rows[t];
-  $$("#lanes .lcur").forEach(l=>{ l.setAttribute("x1",x); l.setAttribute("x2",x); });
+  const n = BDATA.rows.length, r = BDATA.rows[t];
+  $$("#lanes .lcur").forEach(l=>{ l.style.left = (100*(t+0.5)/n).toFixed(3) + "%"; });
   GUESTS.forEach(g=>{ const el = $("#now_"+g); if (!el) return;
-    el.innerHTML = BDATA.aboard.includes(g) ? `Now: <b>${r[g]}</b> <span style="color:${cat(r[g])[1]}">■</span>` : "Now: not aboard"; });
+    el.innerHTML = BDATA.aboard.includes(g) ? `Now: <b>${esc(stLabel(r[g]))}</b> <span style="color:${cat(r[g])[1]}">■</span>` : "Now: not aboard"; });
   const chip = (k,v,alert) => `<span class="chip ${alert?"alert":""}">${k}: <b>${v}</b></span>`;
   $("#shipChips").innerHTML = [
     chip("posture", r.posture), chip("speed kn", r.speed_kn), chip("course", r.course), chip("noise", r.noise),
@@ -948,7 +1086,265 @@ function laneCursor(t){
     chip("location", "at sea")].join("");
 }
 
+function bayText(fb1, fb2){
+  const pl = (BDATA.fleet_check||{}).placement || {}, where = {"Bay 1":[], "Bay 2":[], "Flight deck":[], "Mast":[]};
+  Object.entries(pl).forEach(([g,c])=>{
+    const id = String(c);
+    if (/bay1/.test(id)) where["Bay 1"].push(g);
+    if (/bay2/.test(id)) where["Bay 2"].push(g);
+    if (/flight_deck|hangar|roof/.test(id)) where["Flight deck"].push(g);
+    if (/mast/.test(id)) where["Mast"].push(g);
+  });
+  const tag = (k, row) => where[k].length ? `${k}: ${where[k].join(" + ")}${row && row.used > row.capacity + 1e-9 ? " (over)" : ""}` : null;
+  return [tag("Bay 1", fb1), tag("Bay 2", fb2), tag("Flight deck"), tag("Mast")].filter(Boolean).join(" · ") || `Bay 1 ${fmt(fb1.used)} · Bay 2 ${fmt(fb2.used)}`;
+}
+const FIELD = {course_keeping:"Course", noise_level:"Noise", speed_knots:"Speed"};
+function parseConflict(c){
+  const m = /^(\w+):\s*G3\s*(.*?)\s+vs\s+G4\s*(.*?)(\s*\(implied.*\))?$/.exec(c);
+  if (!m) return [c, "", ""];
+  const clean = x => x.replace(/=/g,"").replace(/\s*&\s*/g,", ").replace(/≥(\S+), ≤(\S+)/, "$1–$2");
+  const f = FIELD[m[1]] || m[1].replace(/_/g," "), u = f==="Speed" ? " kn" : "";
+  return [f, clean(m[2]) + u, clean(m[3]) + u + (m[4] ? " (manoeuvre freedom)" : "")];
+}
+// D4 facts used by the D4 box, the live bar and the response-time panel
+function d4Facts(j){
+  const log = j.log, rows = j.rows;
+  const trip = log.find(l=>l.kind==="event" && /genset trip/.test(l.text));
+  const decl = log.find(l=>l.kind==="D4" && l.order);
+  const execd = log.filter(l=>l.kind==="D4" && l.step);
+  const restores = log.filter(l=>l.kind==="D4" && /^restore/.test(l.text));
+  const off = e => +(((/\[\+([\d.]+) s\]/.exec(e.text))||[])[1] || 0);
+  const load = e => +(((/load now ([\d.]+) kW/.exec(e.step.text))||[])[1]);
+  // bursts: steps issued at the same minute form one shed sequence
+  const bursts = [...new Set(execd.map(e=>e.t))].map(t=>execd.filter(e=>e.t===t));
+  const seq = bursts.length ? Math.max(...bursts.map(b=>Math.max(...b.map(off)))) : null;
+  return {trip, decl, execd, restores, bursts, first: execd.length ? Math.min(...execd.map(off)) : null, seq, load};
+}
+let PHASES = [];
+function markPhase(t){
+  if (!PHASES.length) return;
+  let cur = 0; PHASES.forEach((p,i)=>{ if (p.t0 <= t) cur = i; });
+  $$("#bPhase button").forEach((b,i)=>{ b.classList.toggle("on", i===cur); b.classList.toggle("past", PHASES[i].t0 <= t); });
+  ["d3box","d4box","outbox"].forEach(id=>{
+    const ph = PHASES.find(p=>p.box===id);
+    $("#"+id).classList.toggle("active", PHASES[cur].box===id);
+    $("#"+id).classList.toggle("future", !!ph && ph.t0 > t);
+  });
+  $$("#bMarks tr[data-t]").forEach(tr=>tr.classList.toggle("now", +tr.dataset.t === t));
+}
+function renderBSummary(j){
+  const d = j.decision, rows = j.rows, log = j.log, fc = j.fleet_check || {fits:true, binding_text:[]}, lost = j.lost;
+  const W = j.weights, pri = d.priority, Hz = j.horizon_min || 90, inf = d.infeasible;
+  const lim = (j.response_limits||{}).arbitration_s ?? 2;
+  $("#bTitle").textContent = `Scenario B — priority file '${pri}' · crew ${d.crew} · fleet ${j.aboard.join("+")}`;
+  $("#fleetStrip").innerHTML = "";          // fleet fixed by Scenario B (PDF): no admission verdict shown here
+  const F = d4Facts(j), trip = F.trip;
+  const tAfter = rows.filter(r=>r.t>=d.t_exec);
+  const firstStop = tAfter.find(r=>r.G3!=="surveying"), resume = firstStop ? tAfter.find(r=>r.t>firstStop.t && r.G3==="surveying") : null;
+  const opt = Object.fromEntries(d.options.map(o=>[o.option, o]));
+  const ex = opt[d.executed_policy || d.decision] || {};
+  // ---- phases (follow the slider)
+  const tLand = lost.G4_landed != null ? lost.G4_landed : lost.G4_ditched ? d.deadline : null;
+  const d4End = trip ? Math.max(trip.t, ...F.execd.map(e=>e.t), ...F.restores.map(e=>e.t)) : null;
+  const tOut = tLand == null ? null : Math.max(tLand, d4End != null ? d4End + 1 : 0);
+  PHASES = [{k:"Normal operation", t0:0, box:null}, {k:"D3 · Right of way", t0:d.t, box:"d3box"}];
+  if (trip) PHASES.push({k:"D4 · Degradation" + (F.bursts.length ? ` <span style="color:var(--amber)">▲ shed min ${F.bursts.map(b=>b[0].t).join(", ")}</span>` : ""), t0:trip.t, box:"d4box"});
+  if (tOut != null && tOut < rows.length) PHASES.push({k:"Mission outcome", t0:tOut, box:"outbox"});
+  PHASES.sort((a,b)=>a.t0-b.t0);
+  PHASES.forEach((p,i)=>{ p.t1 = i+1 < PHASES.length ? PHASES[i+1].t0 - 1 : rows.length - 1; });
+  $("#bPhase").innerHTML = PHASES.map(p=>`<button data-t="${p.t0}">min ${p.t0}${p.t1>p.t0?"–"+p.t1:""}<b>${p.k}</b></button>`).join("");
+  $$("#bPhase button").forEach(b=>b.addEventListener("click", ()=>setT(+b.dataset.t)));
+  // ---- D3 (fixed: the decision taken at the alert)
+  const ev = log.find(l=>l.kind==="event" && l.t===d.t) || {}, bm = /battery ([\d.]+) %/.exec(ev.text||"");
+  const r0 = rows[d.t] || rows[0], conf = (d.conflicts||[]).map(parseConflict);
+  const g4wins = !inf && d.decision !== "wait_for_leg_end";
+  const NAME = {recover_then_resume:"RECOVER → RESUME", suspend_survey:"SUSPEND SURVEY", wait_for_leg_end:"WAIT FOR LEG END"};
+  const ok = d.elapsed_s <= lim;
+  const pause = firstStop ? (resume ? resume.t - d.t : null) : 0;     // same basis as the engine's cost text (from the alert)
+  const legMin = r0.g3_leg_min;
+  const trade = inf ? "drone lost in every option"
+    : d.decision==="wait_for_leg_end" ? "drone recovery waits for the leg end"
+    : d.decision==="suspend_survey" ? `leg abandoned: ${lost.G3_progress_lost_min} min lost, full ${legMin ?? "–"}-min leg to re-run`
+    : `−${lost.G3_progress_lost_min} min progress / ${pause ?? "–"} min pause, leg re-run`;
+  // crew (D5): execution mode and timing exactly as the simulation reports them
+  const conf0 = d.confirmation || "", human = /^human/.test(conf0), noCrew = /no crew/.test(conf0);
+  const execDelay = d.t_exec - d.t;
+  const crewMode = human ? "human-confirmed" : noCrew ? "automatic (no crew aboard)" : "automatic — confirmation would miss the deadline";
+  const crewLine = `<b>${d.crew}</b> crew · ${crewMode} → executed <b>min ${d.t_exec}</b>${execDelay ? ` (+${execDelay} min)` : " (immediately)"}`;
+  const wWin = g4wins ? W.G4 : W.G3, wLose = g4wins ? W.G3 : W.G4;
+  const whyLine = inf ? "—" : `'${esc(pri)}': ${g4wins?"G4":"G3"} w=${wWin} ${wWin>wLose?">":wWin<wLose?"<":"="} ${g4wins?"G3":"G4"} w=${wLose}`
+      + (wWin < wLose ? ` · waiting for the leg end would ditch the drone (hard constraint)` : "");
+  const land = lost.G4_landed, dlOk = land != null && land <= d.deadline;
+  const span = Math.max(d.deadline, land ?? d.deadline) - d.t || 1;
+  let h = `<h4>D3 · Right of way · min ${d.t}</h4>`;
+  h += inf ? `<span class="big bad">NO FEASIBLE OPTION</span>
+      <div class="infbox">${esc(inf.reason)}.<br><span class="mute">No option is returned as a decision; the timeline shows the drone-first emergency attempt.</span></div>`
+           : `<span class="big ${dlOk?"ok":"bad"}">${NAME[d.decision] || d.decision}</span>`;
+  h += `<div class="kv">
+      <span class="k">Priority</span><span>${inf ? "—" : g4wins ? "<b>G4</b> Drone" : "<b>G3</b> Survey"}</span>
+      <span class="k">Preempted</span><span>${inf ? "—" : g4wins ? "<b>G3</b> Survey" : "<b>G4</b> Drone"}</span>
+      <span class="k">Why</span><span>${whyLine}</span>
+      <span class="k">Crew (D5)</span><span>${crewLine}</span>
+      <span class="k">Trade-off</span><span>${esc(trade)}</span>
+      <span class="k">Decision time</span><span class="mono">${d.elapsed_s} s ${ok?'<span style="color:var(--green)">✓</span>':'<span class="err">✗</span>'} <span class="mute">/ ${lim} s</span></span>
+    </div>
+    <div class="dlstrip"><i class="${dlOk?"":"bad"}" style="width:${(100*((land ?? d.deadline) - d.t)/span).toFixed(1)}%"></i><b style="left:${(100*(d.deadline - d.t)/span).toFixed(1)}%"></b></div>
+    <div class="dlcap"><span>Landing: <b>${land != null ? "min " + land : "ditched"}</b></span><span>Deadline: <b>min ${d.deadline}</b> ${dlOk?'<span style="color:var(--green)">✓</span>':'<span class="err">✗</span>'}</span></div>
+    <details><summary>Why this decision?</summary>
+      <div class="sub">Conflict at min ${d.t} — why both can not run</div>
+      <table class="vs"><tr><th>G3 survey needs</th><th></th><th>G4 drone needs</th></tr>
+      ${conf.map(([f,a,b])=>`<tr><td>${esc(f)}: <b>${esc(a)}</b></td><td class="x">↔</td><td>${esc(f)}: <b>${esc(b)}</b></td></tr>`).join("")}
+      <tr><td>leg in progress: <b>${r0.g3_progress ?? "–"} / ${r0.g3_leg_min ?? "–"} min</b></td><td class="x">↔</td>
+        <td>battery <b>${bm?bm[1]:"?"} %</b> → land by <b>min ${d.deadline}</b></td></tr></table>
+      <div class="sub">Options — hard constraints first, then the score</div>
+      <table class="opts"><tr><th>Option</th><th>Drone</th><th>Survey</th><th>Constraint</th><th>U</th><th>Result</th></tr>
+      ${d.options.map(o=>{ const sel = !inf && o.option===d.decision, fb = inf && o.option===inf.fallback, oc = o.outcome || {};
+        const res = sel ? '<span class="tag ok">Selected</span>' : o.feasible ? '<span class="tag">Feasible</span>'
+                  : '<span class="tag bad">Infeasible</span>' + (fb ? ' <span class="tag warn">shown</span>' : "");
+        return `<tr class="${sel?"sel":""}"><td><b>${o.option.replace(/_/g," ")}</b></td><td>${esc(oc.drone||"–")}</td><td>${esc(oc.survey||"–")}</td>
+          <td>${o.feasible?'<span style="color:var(--green)">satisfied</span>':'<span class="err">violated</span>'}</td><td class="mono">${o.U}</td><td>${res}</td></tr>`; }).join("")}</table>
+      <div class="three">
+        <div><b>Rule</b>drop every option that breaks a hard constraint (drone lands by min ${d.deadline}), then take the highest
+          U = Σ w × capability-min ÷ ${Hz} ('${esc(pri)}': G3 w=${W.G3} · G4 w=${W.G4})</div>
+        <div><b>Cost of preemption</b>${esc(d.cost_to_loser)}</div>
+        <div><b>Execution (D5)</b>min ${d.t_exec} · ${esc(d.confirmation||"")}</div>
+      </div>
+    </details>`;
+  $("#d3box").innerHTML = h;
+  // ---- D4 (decision fixed at the trip; the power bar follows the slider)
+  let d4 = `<h4>D4 · Generator failure · ${trip?"min "+trip.t:"no genset trip"}</h4>`;
+  if (trip){
+    const b = rows[Math.max(0, trip.t-1)], a = rows[trip.t];
+    const over = rows.filter(r=>r.t>=trip.t && (r.power_kw > r.reserve_kw + 1e-9 || r.power_kw > r.cooling_cap_kw + 1e-9));
+    const peaks = F.bursts.map(bu=>({t:bu[0].t, before:F.load(bu[0]) + bu[0].step.freed_kw, after:F.load(bu[bu.length-1]), cap:rows[bu[0].t].reserve_kw}));
+    const scale = 1.08 * Math.max(b.reserve_kw, ...rows.map(r=>Math.max(r.power_kw, r.reserve_kw)), ...peaks.map(p=>p.before));
+    BSCALE = scale;
+    const shedKw = F.execd.reduce((x,e)=>x + (e.step.freed_kw||0), 0);
+    const bar = (lab, dem, cap, cls, id) => `<div class="pbar ${cls||""}"><div class="pl"${id?` id="${id}L"`:""}>${lab}</div>
+      <div class="ptrack"><i class="pd ${dem>cap+1e-9?"over":""}"${id?` id="${id}D"`:""} style="width:${(100*dem/scale).toFixed(1)}%"></i><b class="pc"${id?` id="${id}C"`:""} style="left:${(100*cap/scale).toFixed(1)}%"></b></div>
+      <div class="pv"${id?` id="${id}V"`:""}>demand ${fmt(dem)} / capacity ${fmt(cap)} kW · margin ${fmt(cap-dem)} kW</div></div>`;
+    d4 += F.execd.length
+      ? `<span class="big warn">SHED EXECUTED</span>`
+      : `<span class="big warn">CAPACITY REDUCED</span> <span class="tag">PLAN ARMED</span>`;
+    d4 += `<div class="bignum">${b.reserve_kw}<span class="ar">→</span>${a.reserve_kw} kW</div>
+      ${bar("Now · min 0", rows[0].power_kw, rows[0].reserve_kw, "live", "d4l")}
+      ${peaks.map((pk,i)=>{ const bu = F.bursts[i], rs = F.restores.filter(e=>e.t>=pk.t);
+        return `<div class="evl">min ${pk.t}: <span class="mono">${fmt(pk.before)} → ${fmt(pk.after)} kW</span> of ${fmt(pk.cap)} ·
+          ${bu.map(e=>`${e.step.guest} → ${stLabel(e.step.to)}`).join(", ")}${rs.length ? ` · restored min ${rs[rs.length-1].t}` : ""}</div>`; }).join("")}
+      <div class="kv" style="margin-top:6px">
+        <span class="k">Shed</span><span class="mono">${fmt(shedKw)} kW${F.execd.length ? ` · ${F.execd.length} action${F.execd.length>1?"s":""}` : " · none needed"}</span>
+        <span class="k">Execution</span><span>${F.execd.length ? `automatic · first action <span class="mono">${F.first} s</span> ${F.first <= ((j.response_limits||{}).first_shed_s ?? 5) ? '<span style="color:var(--green)">✓</span>' : '<span class="err">✗</span>'} / ${(j.response_limits||{}).first_shed_s ?? 5} s` : "plan armed · automatic, no crew confirmation"}</span>
+        <span class="k">Overload time</span><span class="mono">${over.length} min ${over.length ? '<span class="err">✗</span>' : '<span style="color:var(--green)">✓</span>'}</span>
+      </div>`;
+    const decl = F.decl, prot = new Set((decl&&decl.protected)||[]);
+    const tB = F.execd.length ? Math.max(0, F.execd[0].t - 1) : b.t, tA = F.execd.length ? F.execd[F.execd.length-1].t : a.t;
+    const rb = rows[tB], ra = rows[tA], M = j.modes || {};
+    d4 += `<details><summary>View degradation plan</summary>
+      <div class="sub">Demand vs capacity at the key minutes</div>
+      ${bar(`Before trip · min ${b.t}`, b.power_kw, b.reserve_kw)}
+      ${bar(`After trip · min ${a.t}`, a.power_kw, a.reserve_kw)}
+      ${peaks.map(p=>bar(`Overload · min ${p.t}`, p.before, p.cap) + bar(`After shed · min ${p.t}`, p.after, p.cap)).join("")}
+      ${decl ? `<div class="sub">Shed order armed at min ${decl.t} (${decl.compute_ms} ms) — cheapest capability first</div>
+        <div style="font-size:12px">${decl.order.map((o,i)=>`${i+1}. ${o.kind} <b>${o.guest}</b> ${o.from}→${o.to} <span class="mute">${fmt(o.freed_kw)} kW · cost ${fmt(o.cost)}</span>`).join("<br>")}
+        ${(decl.protected||[]).length ? `<br><span class="mute">protected: ${esc(decl.protected.join(", "))}</span>` : ""}</div>` : ""}
+      <div class="sub">Capability loss per guest · min ${tB} → min ${tA}</div>
+      <table><tr><td class="mute">guest</td><td class="mute">before</td><td class="mute">after</td><td class="mute">loss</td></tr>
+      ${j.aboard.map(g=>{ const mb = rb[g], ma = ra[g], m = M[g] || {};
+        let loss = 0; if (m[mb] && m[ma] && m[mb].capability > 0) loss = Math.round(100*(m[mb].capability - m[ma].capability)/m[mb].capability);
+        return `<tr><td><b>${g}</b></td><td>${esc(stLabel(mb))}</td><td>${esc(stLabel(ma))}${prot.has(g)?' <span class="tag ok">protected</span>':""}</td>
+          <td class="mono" style="${loss>0?"color:var(--amber)":""}">${loss} %</td></tr>`; }).join("")}</table>
+      <div class="three">${F.execd.length
+        ? `<div><b>Executed</b>${F.execd.map(e=>`min ${e.t}: ${esc(e.text)}`).join("<br>")}</div>
+           <div><b>Timing</b>first action +${F.first} s (limit ${(j.response_limits||{}).first_shed_s ?? 5} s) · full sequence +${F.seq} s (limit ${(j.response_limits||{}).full_shed_s ?? 60} s) · automatic: D4 does not wait for crew confirmation</div>`
+        : `<div><b>Executed</b>nothing — demand stays inside the degraded reserve.
+            <button class="btn small" id="tryShed" style="margin-top:4px">Try: reserve 60 kW after the trip</button></div>`}
+        ${F.restores.length ? `<div><b>Restored</b>${F.restores.map(e=>`min ${e.t}: ${esc(e.text)}`).join("<br>")}</div>` : ""}</div>
+    </details>`;
+  } else d4 += `<span class="big info">NO EVENT</span>`;
+  $("#d4box").innerHTML = d4;
+  const ts = $("#tryShed");
+  if (ts) ts.addEventListener("click", ()=>{
+    const inp = $("#knobsB input[data-k=tr]"); if (!inp) return;
+    inp.value = 60; inp.dispatchEvent(new Event("input"));
+  });
+  // ---- mission outcome (fixed: end of the simulation)
+  const viol = rows.filter(r=>r.power_kw > r.reserve_kw + 1e-9 || r.power_kw > r.cooling_cap_kw + 1e-9).length;
+  const surveyDone = lost.G3_legs_done > 0;
+  const survey = surveyDone ? `Completed${lost.G3_legs_done>1?" ×"+lost.G3_legs_done:""}`
+               : resume ? "Resumed — leg still running" : firstStop ? "Abandoned — re-run later" : "Running";
+  const head = lost.G4_ditched ? ["bad", "DRONE LOST"] : viol ? ["bad", "OVERLOAD"]
+             : surveyDone ? ["ok", "SUCCESS"] : ["warn", resume ? "SUCCESS · SURVEY IN PROGRESS" : "SUCCESS · SURVEY DEFERRED"];
+  const mk = c => c==="ok" ? '<span class="st ok">✓</span>' : c==="wn" ? '<span class="st wn">!</span>' : '<span class="st bd">✗</span>';
+  $("#outbox").innerHTML = `<h4>Mission outcome</h4>
+    <span class="big ${head[0]}">${head[1]}</span>
+    <div class="kpis">
+      <span>🚁</span><span class="k">Drone</span>${mk(lost.G4_ditched?"bd":"ok")}<span>${lost.G4_ditched ? '<span class="err">Ditched</span>' : `<b>Recovered</b> · min ${lost.G4_landed}`}</span>
+      <span>🌊</span><span class="k">Survey</span>${mk(surveyDone?"ok":"wn")}<span><b>${survey}</b></span>
+      <span>⚡</span><span class="k">Overload</span>${mk(viol?"bd":"ok")}<span><span class="mono"><b>${viol} min</b></span></span>
+    </div>
+    <details><summary>Details</summary>
+      <div class="sub">Survey</div>
+      <div style="font-size:12.5px">progress lost ${lost.G3_progress_lost_min} min · downtime ${firstStop ? (resume ? `${resume.t-firstStop.t} min` : `from min ${firstStop.t}`) : "0 min"} · legs completed ${lost.G3_legs_done}</div>
+      <div class="sub">Capability retention (time-based)</div>
+      <div class="chips">${Object.entries(j.caps).map(([g,c])=>`<span class="chip">${g} <b>${Math.round(100*c/Hz)}%</b></span>`).join("")}</div>
+      <div class="mute" style="font-size:11.5px;margin-top:4px">active capability-minutes ÷ ${Hz}-min horizon × 100 — utilisation, not mission success
+        (a recovered drone charging on deck scores low here).</div>
+      <div class="mute" style="font-size:11.5px;margin-top:8px">Fleet ${esc(j.aboard.join("+"))} fixed by Scenario B · installation check (A.3/A.4):
+        ${fc.fits ? "admissible" : "not admissible — " + esc((fc.binding||[]).join(", "))}.</div>
+    </details>
+`;
+  // ---- key moments (time · event · guest state · resource state · decision)
+  const M = [];
+  const add = (t, evt, dec) => { if (t != null && t >= 0 && t < rows.length) M.push({t, evt, dec}); };
+  add(0, "survey begins", "—");
+  add(d.t, `drone battery ${bm?bm[1]+" %":"alert"} → G3 ↔ G4 conflict`, inf ? "D3: no feasible option" : "D3 decided");
+  const chg = rows.find(r=>r.t>d.t && r.G3 !== rows[d.t].G3);
+  if (chg) add(chg.t, `G3 → ${stLabel(chg.G3)}`, "D3 executed");
+  if (trip) add(trip.t, `genset trip → reserve ${rows[Math.max(0,trip.t-1)].reserve_kw} → ${rows[trip.t].reserve_kw} kW`, F.execd.some(e=>e.t===trip.t) ? "D4 shed" : "D4 plan armed");
+  F.bursts.forEach(bu=>{ if (!trip || bu[0].t !== trip.t) add(bu[0].t, "overload → " + bu.map(e=>`${e.step.kind} ${e.step.guest}`).join(", "), "D4 executed"); });
+  if (lost.G4_landed != null) add(lost.G4_landed, "drone landed", "outcome");
+  else if (lost.G4_ditched) add(d.deadline, "drone ditched", "outcome");
+  if (resume) add(resume.t, "survey resumed", "outcome");
+  M.sort((a,b)=>a.t-b.t);
+  $("#bMarks").innerHTML = `<table class="moments"><tr><th>min</th><th>event</th><th>guest state (G3 · G4)</th><th>power demand / capacity</th><th>decision</th></tr>
+    ${M.map(m=>{ const r = rows[m.t]; return `<tr data-t="${m.t}"><td class="m">${m.t}</td><td>${esc(m.evt)}</td>
+      <td>${esc(stLabel(r.G3))} · ${esc(stLabel(r.G4))}</td><td class="mono">${fmt(r.power_kw)} / ${fmt(r.reserve_kw)} kW</td><td>${esc(m.dec)}</td></tr>`; }).join("")}</table>`;
+  $$("#bMarks tr[data-t]").forEach(tr=>tr.addEventListener("click", ()=>setT(+tr.dataset.t)));
+}
+let BSCALE = 220;
+// static resources and response time, drawn by type (fixed during the Scenario B run)
+function renderBStatic(j){
+  const fu = (j.fleet_check||{}).usage || [], pl = (j.fleet_check||{}).placement || {};
+  const slots = [["Bay 1", /bay1/, U(fu,"Bay 1")], ["Bay 2", /bay2/, U(fu,"Bay 2")], ["Flight deck · hangar", /flight_deck|hangar/, null], ["Mast", /mast/, U(fu,"mast slots")]];
+  const taken = new Set();
+  const cell = ([name, re, row]) => {
+    const gs = Object.entries(pl).filter(([g,c])=>!taken.has(g) && re.test(String(c))).map(([g])=>g);
+    gs.forEach(g=>taken.add(g));
+    const foot = row ? (row.used > row.capacity + 1e-9 ? `${gs.length} guests share ${fmt(row.capacity)} ${row.unit}` : `${fmt(row.used)} / ${fmt(row.capacity)} ${row.unit} used`)
+                     : (gs.length ? "occupied" : "free");
+    return `<div class="slot"><div class="sn">${name}</div>${gs.map(g=>`<span class="gg" title="${esc(META.guests[g].name)} · ${esc(pl[g])}">${g}</span>`).join("") || '<span class="mute" style="font-size:11.5px">free</span>'}
+      <div class="sf">${foot}</div></div>`;
+  };
+  const cbar = (name, row) => { if (!row) return "";
+    const sc = 1.05 * Math.max(row.used, row.capacity);
+    return `<div style="font-size:12.5px;margin-top:6px">${name} <span class="mono" style="float:right">${fmt(row.used)} / ${fmt(row.capacity)} ${row.unit}</span></div>
+      <div class="cbar"><i style="width:${(100*row.used/sc).toFixed(1)}%"></i><b style="left:${(100*row.capacity/sc).toFixed(1)}%"></b></div>`; };
+  const L = j.response_limits || {}, d = j.decision, F = d4Facts(j), T = j.d4_timing || {};
+  const pass = ok => ok ? '<span class="tag ok">PASS</span>' : '<span class="tag bad">FAIL</span>';
+  const rt = (k, v, tag) => `<div class="rt"><span>${k}</span><span><span class="mono">${v}</span> ${tag}</span></div>`;
+  $("#bStatic").innerHTML = `
+    <div class="dbox"><h4>Response time</h4>
+      ${rt("D3 decision", `${d.elapsed_s} s / ${L.arbitration_s ?? 2} s`, pass(d.elapsed_s <= (L.arbitration_s ?? 2)))}
+      ${F.execd.length ? rt("D4 first action", `${F.first} s / ${L.first_shed_s ?? 5} s`, pass(F.first <= (L.first_shed_s ?? 5)))
+                       : rt("D4 first action", "N/A", '<span class="tag">no shedding required</span>')}
+      ${F.execd.length ? rt("D4 full sequence", `${F.seq} s / ${L.full_shed_s ?? 60} s`, pass(F.seq <= (L.full_shed_s ?? 60)))
+                       : rt("D4 full sequence", "N/A", '<span class="tag">no shedding required</span>')}
+      ${F.decl ? rt("D4 plan computed", `${F.decl.compute_ms} ms`, "") : ""}
+      <div class="mute" style="font-size:11.5px;margin-top:6px">Limits from <span class="mono">config/ship.yaml</span> (A.8); D4 command spacing ${T.step_interval_s ?? "–"} s.</div></div>`;
+}
+
 function drawChart(){
+  if (!$("#tchart")) return;
   const rows = BDATA.rows, W = 900, H = 190, pad = 22, n = rows.length;
   const ymax = Math.max(220, ...rows.map(r=>Math.max(r.reserve_kw, r.cooling_cap_kw, r.power_kw)));
   const x = i => pad + (W-2*pad) * i/(n-1), y = v => H - pad - (H-2*pad) * v/ymax, yb = v => H - pad - (H-2*pad) * v/100;
@@ -969,20 +1365,96 @@ function setT(t){
   const r = BDATA.rows[t], st = BDATA.static, d = BDATA.decision;
   $("#tslider").value = t; $("#tlabel").textContent = `min ${t}`;
   const prev = BDATA.rows[0];
-  setGauge(0,{used:r.power_kw, cap:r.reserve_kw, unit:"kW", before:prev.power_kw, sub:`guest load vs continuous reserve · posture <b>${r.posture}</b>`});
-  setGauge(1,{used:r.cooling_kw, cap:r.cooling_cap_kw, unit:"kW", before:prev.cooling_kw, sub:`capacity follows seawater temperature (A.2, linear 12→30 °C)`});
+  const tTripG = (BDATA.log.find(l=>l.kind==="event" && /genset trip/.test(l.text))||{}).t;
+  const capTxt = tTripG != null ? `capacity ${prev.reserve_kw} → ${BDATA.rows[tTripG].reserve_kw} kW at min ${tTripG}` : `capacity ${prev.reserve_kw} kW`;
+  setGauge(0,{used:r.power_kw, cap:r.reserve_kw, unit:"kW", before:prev.power_kw, sub:`${capTxt} · margin <b>${fmt(r.reserve_kw - r.power_kw)} kW</b>`});
+  setGauge(1,{used:r.cooling_kw, cap:r.cooling_cap_kw, unit:"kW", before:prev.cooling_kw, sub:`margin <b>${fmt(r.cooling_cap_kw - r.cooling_kw)} kW</b> · capacity follows seawater (A.2)`});
+  if ($("#d4lD")){
+    $("#d4lD").style.width = (100*r.power_kw/BSCALE).toFixed(1) + "%"; $("#d4lD").classList.toggle("over", r.power_kw > r.reserve_kw + 1e-9);
+    $("#d4lC").style.left = (100*r.reserve_kw/BSCALE).toFixed(1) + "%";
+    $("#d4lL").textContent = `Now · min ${t}`;
+    $("#d4lV").textContent = `demand ${fmt(r.power_kw)} / capacity ${fmt(r.reserve_kw)} kW · margin ${fmt(r.reserve_kw - r.power_kw)} kW`;
+  }
+  markPhase(t);
   const bat = r.g4_battery;
-  setGauge(2,{used:bat, cap:100, unit:"%", invert:true, show: bat==null?"–":`${fmt(bat)} %`, sub:`G4 <b>${r.G4}</b>${d.deadline!=null?` · land by min ${d.deadline}`:""}`});
-  setGauge(3,{used:r.speed_kn, cap:Math.max(...BDATA.rows.map(x=>x.speed_kn), 1), unit:"kn", show:`${r.speed_kn} kn`, sub:`posture <b>${r.posture}</b> · dial = fastest speed in this run`});
-  setGauge(4,{used:st.mass_t, cap:st.mass_cap_t, unit:"t", sub:"B fleet as the PDF narrates it — A.4 would refuse it; B skips admission"});
-  setGauge(5,{used:r.satcom_mbps, cap:st.satcom_cap, unit:"Mbit/s", sub:`acoustic ${r.acoustic?"<b style='color:var(--green)'>on</b>":"off"} · drone video ${r.los_video?"<b style='color:var(--green)'>on</b>":"off"}`});
-  setGauge(6,{used:st.cpu, cap:st.cpu_cap, unit:"cores", sub:"pooled cluster, 80 % allocatable (A.7)"});
-  const lim = META.response_time.arbitration_s;
-  setGauge(7,{used:d.elapsed_s, cap:lim, unit:"s", show:`${d.elapsed_s} s / ${lim} s`, sub:`D3 decision · D4 first shed ≤ ${META.response_time.first_shed_s} s`});
+  // operational state (not a capacity): drone, speed, course, noise, deck, genset
+  const pm = (((META.card||{}).G4||{}).resources||{}).power_modes || [];
+  const initMin = (pm.find(m=>m.id==="charging_initial")||{}).max_duration_minutes;
+  const onDeck = ["charging_initial","charging_followup","standby","cradle"].includes(r.G4);
+  let drone;
+  if (onDeck && initMin){
+    const done = BDATA.rows.slice(0, t+1).filter(x=>x.G4==="charging_initial").length;
+    drone = (r.G4==="charging_followup" || done>=initMin) ? `relaunch-ready (initial ${initMin} min charge done)` : `charging ${done}/${initMin} min (landed at ${fmt(r.g4_battery)} %)`;
+  } else drone = r.G4 === "ditched" ? "DITCHED" : `${r.G4.replace("_"," ")} · battery ${fmt(r.g4_battery)} %`;
+  const low = !onDeck && r.g4_battery != null && r.g4_battery < 20;
+  const oc = (k,v,alert) => `<span class="chip ${alert?"alert":""}">${k}: <b>${v}</b></span>`;
+  $("#opState").innerHTML = [oc("drone G4", drone, low || r.G4==="ditched"), oc("ship speed", `${r.speed_kn} kn`), oc("posture", r.posture),
+    oc("course", r.course), oc("noise", r.noise), oc("deck", r.deck), oc("genset", r.genset_tripped?"one tripped":"all online", r.genset_tripped),
+    oc("reserve", `${r.reserve_kw} kW`, r.genset_tripped)].join("");
+  // decision-relevant state, second line
+  const landed = BDATA.lost.G4_landed, dl = d.deadline;
+  let dline;
+  if (t < d.t) dline = oc("drone deadline", "no alert yet");
+  else if (landed != null && t >= landed) dline = oc("drone deadline", `landed min ${landed} (deadline ${dl}) ✓`);
+  else if (BDATA.lost.G4_ditched) dline = oc("drone deadline", `missed — ditched at min ${dl}`, true);
+  else dline = oc("drone deadline", `in ${dl - t} min · landing min ${landed ?? "?"} ${landed != null && landed <= dl ? "✓" : "✗"}`, dl - t <= 3);
+  // posture transition (A.6): last request not yet established
+  const reqs = BDATA.log.filter(l=>l.kind==="ship" && l.t<=t && /^request /.test(l.text));
+  let post = oc("posture change", "none pending");
+  if (reqs.length){
+    const q = reqs[reqs.length-1], m = /request (\w+) posture .*ready in (\d+) min/.exec(q.text);
+    const done = BDATA.log.some(l=>l.kind==="ship" && l.t>=q.t && l.t<=t && m && l.text.startsWith(m[1]+" posture established"));
+    if (m && !done) post = oc("posture change", `→ ${m[1]}, ready in ${Math.max(0, q.t + (+m[2]) - t)} min (A.6)`, true);
+    else if (m) post = oc("posture change", `${m[1]} established`);
+  }
+  const prog = r.g3_progress != null ? `${r.g3_progress}/${r.g3_leg_min} min` : "–";
+  const sv = oc("survey leg", `${prog} · listening ${r.acoustic ? "✓" : "✕"}`, !r.acoustic && r.G3!=="cradle" && r.G3!=="charging");
+  const ph = r.reserve_kw - r.power_kw, chd = r.cooling_cap_kw - r.cooling_kw;
+  const hr = oc("headroom", `power ${fmt(ph)} kW · cooling ${fmt(chd)} kW`, ph < 10 || chd < 10);
+  $("#opState").innerHTML += hr;
+  // ---- operational gauges
+  const OG = [["DRONE BATTERY", true], ["LANDING DEADLINE", true], ["SURVEY LEG", false], ["POSTURE CHANGE", false]];
+  if (!$("#og0")) $("#opGauges").innerHTML = OG.map((g,i)=>`<div class="g" id="og${i}"><div class="bind"></div><div class="t">${g[0]}</div>${gaugeSVG(g[1])}<div class="v">–</div><div class="s"></div></div>`).join("");
+  // 0 · drone: battery airborne, initial-charge progress on deck (card: charging_initial duration)
+  if (onDeck && initMin){
+    const done = BDATA.rows.slice(0, t+1).filter(x=>x.G4==="charging_initial").length;
+    const ready = r.G4 === "charging_followup" || done >= initMin;
+    $("#og0 .t").textContent = "DRONE CHARGE";
+    setGauge("og0", {used: ready ? initMin : done, cap: initMin, unit:"min", neutral:true,
+      show: ready ? "relaunch-ready" : `${done} / ${initMin} min`, sub: `on deck · landed at ${fmt(r.g4_battery)} %`});
+  } else {
+    $("#og0 .t").textContent = "DRONE BATTERY";
+    setGauge("og0", {used: r.g4_battery, cap: 100, unit:"%", invert:true, show: `${fmt(r.g4_battery)} %`,
+      sub: `G4 ${r.G4.replace("_"," ")} · 20 % triggers the emergency (card)`});
+  }
+  // 1 · landing deadline: minutes left of the card window
+  const win = dl - d.t;
+  if (t < d.t) setGauge("og1", {used:null, show:"no alert yet", neutral:true, sub:`window ${win} min after the battery alert`});
+  else if (landed != null && t >= landed) setGauge("og1", {used: dl - landed, cap: win, unit:"min", neutral:true,
+      show: `landed ${dl - landed} min early`, sub: `landed min ${landed} · deadline min ${dl}`});
+  else if (BDATA.lost.G4_ditched) setGauge("og1", {used:0, cap:win, unit:"min", invert:true, show:"missed", sub:`deadline min ${dl}`});
+  else setGauge("og1", {used: Math.max(0, dl - t), cap: win, unit:"min", invert:true, show: `${dl - t} min left`,
+      sub: `deadline min ${dl} · landing planned min ${landed ?? "?"}`});
+  // 2 · survey leg progress and acoustic link
+  setGauge("og2", {used: r.g3_progress ?? 0, cap: r.g3_leg_min || 1, unit:"min", neutral:true,
+    show: `${r.g3_progress ?? "–"} / ${r.g3_leg_min ?? "–"} min`, sub: `G3 ${r.G3.replace("_"," ")} · listening ${r.acoustic ? "✓" : "✕"}`});
+  // 3 · posture change (A.6): progress of the pending transition
+  {
+    const reqs2 = BDATA.log.filter(l=>l.kind==="ship" && l.t<=t && /^request /.test(l.text));
+    const q = reqs2[reqs2.length-1], m = q && /request (\w+) posture .*ready in (\d+) min/.exec(q.text);
+    const done = m && BDATA.log.some(l=>l.kind==="ship" && l.t>=q.t && l.t<=t && l.text.startsWith(m[1]+" posture established"));
+    if (m && !done) setGauge("og3", {used: t - q.t, cap: +m[2], unit:"min", neutral:true,
+        show: `→ ${m[1]} in ${Math.max(0, q.t + (+m[2]) - t)} min`, sub: `requested min ${q.t} · ${m[2]} min transition (A.6)`});
+    else setGauge("og3", {used: 1, cap: 1, unit:"", neutral:true, show: r.posture, sub: m ? `${m[1]} established` : "no change requested"});
+  }
+  const fu = (BDATA.fleet_check||{}).usage || [], fc = U(fu,"CPU cores");
+  setGauge(2,{used:r.satcom_mbps, cap:st.satcom_cap, unit:"Mbit/s", sub:`SATCOM · acoustic ${r.acoustic?"<b style='color:var(--green)'>on</b>":"off"} · drone video ${r.los_video?"<b style='color:var(--green)'>on</b>":"off"}`});
+  setGauge(3, fc ? {used:fc.used, cap:fc.capacity, unit:"cores", sub:"fleet compute, pooled cluster (A.7)"}
+                 : {used:st.cpu, cap:st.cpu_cap, unit:"cores", sub:"pooled cluster, 80 % allocatable (A.7)"});
   $("#chips").innerHTML = BDATA.aboard.map(g=>`<span class="chip">${g} ${r[g]}</span>`).join("") + `<span class="chip">reserve ${r.reserve_kw} kW</span>`;
   laneCursor(t);
-  const n = +$("#tchart").dataset.n, pad = +$("#tchart").dataset.pad, cx = pad + (900-2*pad)*t/(n-1);
-  const c = $("#cursor"); if (c){ c.setAttribute("x1",cx); c.setAttribute("x2",cx); }
+  if ($("#tchart")){ const n = +$("#tchart").dataset.n, pad = +$("#tchart").dataset.pad, cx = pad + (900-2*pad)*t/(n-1);
+    const c = $("#cursor"); if (c){ c.setAttribute("x1",cx); c.setAttribute("x2",cx); } }
   $("#blog").innerHTML = BDATA.log.map(l=>`<div class="${l.t<=t?"past":""} ${l.t===t?"now":""}"><span class="k-${l.kind}">[${String(l.t).padStart(2," ")} ${l.kind}]</span> ${esc(l.text)}</div>`).join("");
 }
 $("#tslider").addEventListener("input", e=>setT(+e.target.value));
@@ -993,9 +1465,67 @@ $("#play").addEventListener("click", ()=>{
   playing = setInterval(()=>{ const t = +$("#tslider").value + 1; if (t > +$("#tslider").max){ clearInterval(playing); playing=null; $("#play").textContent="▶ Play"; return; } setT(t); }, 180);
 });
 
+// ---------- G7 live camera integration (additive to the unchanged v3 UI) ----------
+let G7_LAST_ACTIVITY = null, G7_LAST_ON = null, G7_REQUEST_BUSY = false;
+function g7Checked() {
+  if (TAB === "B") return !!$("#fleetB input[data-g='G7']")?.checked;
+  return !!$("#ic_G7")?.checked;
+}
+async function g7SelectionChanged() {
+  const enabled = g7Checked();
+  $("#g7Integrated").classList.toggle("hide", !enabled);
+  if (G7_LAST_ON === enabled) return;
+  G7_LAST_ON = enabled;
+  try {
+    await fetch("/api/g7-enabled",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({enabled})});
+  } catch (e) { $("#g7Detection").textContent="G7 enable request failed: "+e; }
+  if (enabled) refreshG7Integrated();
+}
+async function refreshG7Integrated() {
+  if (!g7Checked() || G7_REQUEST_BUSY) return;
+  G7_REQUEST_BUSY=true;
+  try {
+    const [cs,ls] = await Promise.all([
+      fetch("/api/g7-camera", {cache:"no-store"}),
+      fetch("/api/scenario/d/live", {cache:"no-store"})
+    ]);
+    if (!cs.ok || !ls.ok) throw Error("Camera/relay HTTP response unavailable");
+    const c=await cs.json(), state=await ls.json(), live=state.latest, p=live?.power;
+    const valid=c.camera_online && c.deck_activity !== "UNKNOWN" && c.deck_activity !== "INITIALIZING";
+    const act=valid && c.movement_detected ? "ALERT" : valid ? "MONITORING" : "UNKNOWN";
+    $("#g7Detection").textContent="G7: "+c.deck_activity+" · changed pixels "+(c.changed_pixels??"—");
+    $("#g7Detection").className="g7-status "+(act==="ALERT"?"detected":"off");
+    $("#g7Age").textContent="Camera: "+(c.camera_online?"online":"unavailable")+" · age "+(c.age_seconds??"—")+" s";
+    const g4=live?.g4_state||"Waiting for bridge";
+    $("#g7Drone").textContent="G4: "+g4+(g4==="Starting"||g4==="Awaiting approval"?
+      " · No-motion countdown "+(live.no_motion_seconds??0)+"/5 s":"")+" · operator authorization "+(live?.operator_authorized?"YES":"NO");
+    $("#g7Drone").className="g7-status "+(g4==="Awaiting approval"?"ready":g4==="Starting"?"preparing":"off");
+    $("#g7Power").textContent=valid?(act==="ALERT"?"0.065":"0.040")+" kW":"UNKNOWN";
+    $("#g4Power").textContent=p?p.g4_kw.toFixed(3)+" kW":"— kW";
+    $("#g7Combined").textContent=p?(p.g4_kw+p.g7_kw).toFixed(3)+" kW":"— kW";
+    $("#g7Total").textContent=p?p.total_kw.toFixed(3)+" kW":"— kW";
+    if(valid) {
+      const im=$("#g7IntegratedPreview");
+      if(im) im.src="/api/g7-preview.jpg?t="+Date.now();
+    }
+    if(G7_LAST_ACTIVITY!==null && act!==G7_LAST_ACTIVITY && valid) schedule();
+    if(valid) G7_LAST_ACTIVITY=act;
+  } catch(e){ $("#g7Detection").textContent="G7 live status unavailable: "+e; }
+  finally{G7_REQUEST_BUSY=false;}
+}
+$("#g7Approve").addEventListener("click",async()=>{
+  if (!confirm("Authorize SIMULATED G4 launch? Independent launch-deck clearance remains necessary.")) return;
+  const res=await fetch("/api/scenario/d/live/sample", {method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({perimeter_motion:false,deck_obstructed:false,operator_approval:true,observation_valid:false})});
+  if (!res.ok) { $("#g7Drone").textContent="Simulated approval failed: HTTP "+res.status; return; }
+  refreshG7Integrated();
+});
+setInterval(refreshG7Integrated,1000);
+
 // ---------- wiring ----------
 let timer = null;
-function schedule(){ clearTimeout(timer); timer = setTimeout(()=> TAB==="B" ? runB() : TAB==="A" ? runCheck() : runA(), 350); }
+function schedule(){ clearTimeout(timer); timer = setTimeout(()=> TAB==="B" ? runB() : TAB==="A" ? runCheck() : runAP(), 350); }
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function segs(id){ $$(id+" button").forEach(b=>b.addEventListener("click",()=>{ $$(id+" button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); schedule(); })); }
 
@@ -1013,17 +1543,20 @@ function switchTab(t){
   TAB = t; $$(".tab").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
   const isB = t==="B";
   $("#inA").classList.toggle("hide", isB); $("#outA").classList.toggle("hide", isB);
-  $("#inB").classList.toggle("hide", !isB); $("#outB").classList.toggle("hide", !isB);
+  $("#inB").classList.toggle("hide", !isB); $("#outB").classList.toggle("hide", !isB); $("#bTop").classList.toggle("hide", !isB);
+  $("#bStatic").classList.toggle("hide", !isB);
   $("#apState").classList.toggle("hide", t!=="AP");
   $("#candBox").classList.toggle("hide", t!=="AP"); $("#presets").classList.add("hide");
-  $("#addBox").classList.toggle("hide", t!=="A"); $("#checkCard").classList.toggle("hide", t!=="A");
-  $("#decisionCard").classList.toggle("hide", t!=="A"); $("#placementCard").classList.toggle("hide", t!=="A" || !CHECK || !CHECK.d1 || !["YES","YES-IF"].includes(CHECK.d1.verdict));
+  $("#addBox").classList.toggle("hide", t!=="A"); const aLike = t==="A" || t==="AP";
+  $("#checkCard").classList.toggle("hide", !aLike); $("#viewBar").classList.toggle("hide", !aLike); $("#checkDetail").classList.toggle("hide", !aLike);
   $("#boardCard").classList.add("hide"); $("#detailTitle").classList.add("hide");
-  if (t==="A") $("#outA").classList.add("hide");
-  $("#legend").querySelectorAll("span")[3].classList.toggle("hide", false);
+  if (aLike) $("#outA").classList.add("hide");
+  $("#legend").querySelectorAll("span")[3].classList.toggle("hide", aLike);
+  $("#legend").querySelectorAll("span")[4].classList.toggle("hide", aLike);
   if (isB){ renderGaugeShells(GB); runB(); }
-  else if (t==="AP"){ renderGaugeShells(GA); loadScenario($("#swap").checked?"A_prime_drone_swap":"A_prime_underway"); runA(); }
+  else if (t==="AP"){ renderGaugeShells(GA); loadScenario($("#swap").checked?"A_prime_drone_swap":"A_prime_underway"); runAP(); }
   else { renderGaugeShells(GA); loadScenario("A_landlord_survey_max"); renderAddList(); runCheck(); }
+  g7SelectionChanged();
 }
 
 (async function init(){
@@ -1033,136 +1566,34 @@ function switchTab(t){
   $("#pri").innerHTML = $("#priB").innerHTML = pris.map(p=>`<option>${p}</option>`).join("");
   $("#priB").value = META.scenarios.B_right_of_way.priority || "survey";
   setDefaults(KNOBS_A); setDefaults(KNOBS_B);
+  // consistent ranges: the landing window can not outlast the reported battery; the alert falls in the first half of the leg
+  {
+    const sb = META.scenarios.B_right_of_way, rep0 = (sb.timeline||[]).find(e=>e.event==="battery_report") || {};
+    const drain = ((META.ops||{}).d3||{}).battery_drain_pct_per_min, leg = ((sb.guests||{}).G3||{}).leg_min;
+    const dl = KNOBS_B.find(k=>k.id==="dl"), bt = KNOBS_B.find(k=>k.id==="bt");
+    if (rep0.battery_pct && drain) dl.max = Math.max(dl.def, Math.floor(rep0.battery_pct / drain));
+    if (leg) bt.max = Math.max(bt.def, Math.floor(leg / 2));
+    dl.label += ` (≤ ${dl.max} min: battery ${rep0.battery_pct ?? "?"} % runs out)`;
+  }
   buildKnobs($("#knobsA"), KNOBS_A); buildKnobs($("#knobsB"), KNOBS_B);
   segs("#crewA"); segs("#crewB");
   $("#pri").addEventListener("change", ()=>{ renderWeights(); $("#defaults").innerHTML=""; schedule(); });
-  $("#priB").addEventListener("change", ()=>{
-    const weights = META.priorities[$("#priB").value];
-    $("#weightsB").textContent = "weights " + GUESTS.filter(g => weights[g] !== undefined)
-      .map(g=>`${g}:${weights[g]}`).join(" "); schedule();
-  });
+  $("#priB").addEventListener("change", ()=>{ $("#weightsB").textContent = "weights " + GUESTS.map(g=>`${g}:${META.priorities[$("#priB").value][g]}`).join(" "); schedule(); });
   $("#priB").dispatchEvent(new Event("change"));
   ["#cand","#spd","#course","#deck","#sea","#wind"].forEach(id=>$(id).addEventListener("change", schedule));
   $("#swap").addEventListener("change", ()=>{ loadScenario($("#swap").checked?"A_prime_drone_swap":"A_prime_underway"); schedule(); });
   $("#ovA").addEventListener("change", schedule); $("#ovB").addEventListener("change", schedule);
-  $("#runA").addEventListener("click", ()=> TAB==="A" ? runCheck() : runA());
+  $("#runA").addEventListener("click", ()=> TAB==="A" ? runCheck() : runAP());
   $$("#presets [data-preset]").forEach(b=>b.addEventListener("click", ()=>{ loadScenario(b.dataset.preset, true); schedule(); })); $("#runB").addEventListener("click", runB);
   $("#runDef").addEventListener("click", runDefaults);
-  $("#showRequested").addEventListener("click", ()=>showCheckGauges("requested"));
-  $("#showProposed").addEventListener("click", ()=>showCheckGauges("proposed"));
-  $("#checkG6").addEventListener("click", async ()=>{
-    const el = $("#g6Verification"); el.textContent = "Evaluating G6 physical snapshot…";
-    try {
-      const response = await fetch("/api/physical-g6");
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      el.textContent = `Physical ${data.status} · Assessment ${data.assessment_status} · Full admission ${data.full_admission_status} · ${data.note || ""}`;
-    } catch(err) {el.textContent = `G6 verification unavailable: ${err}`;}
-  });
   $("#resetA").addEventListener("click", ()=>{ buildKnobs($("#knobsA"), KNOBS_A); $("#ovA").value=""; switchTab(TAB); });
   $("#resetB").addEventListener("click", ()=>{ buildKnobs($("#knobsB"), KNOBS_B); $("#ovB").value=""; runB(); });
   $$(".tab").forEach(b=>b.addEventListener("click", ()=>switchTab(b.dataset.tab)));
+  renderFleet(FLEET_DEFAULT);
+  renderFleet(META.scenarios.B_right_of_way.aboard || FLEET_DEFAULT);
+  $$("#aview button").forEach(b=>b.addEventListener("click", ()=>{ $$("#aview button").forEach(x=>x.classList.toggle("on", x===b)); AVIEW = b.dataset.v; drawAGauges(); }));
   switchTab("A");
 })();
-
-async function refreshG7Camera(){
-  try {
-    const response = await fetch("/api/g7-camera", {cache:"no-store"});
-    if (!response.ok) throw new Error("HTTP "+response.status);
-    const j = await response.json();
-    const status = document.getElementById("g7CameraStatus");
-    const age = document.getElementById("g7CameraAge");
-    const events = document.getElementById("g7CameraEvents");
-    const value = j.camera_online ? j.deck_activity : "OFFLINE / UNKNOWN";
-    status.textContent = value + (j.changed_pixels == null ? "" : " · changed pixels "+j.changed_pixels);
-    status.style.color = value === "MOVEMENT_DETECTED" ? "var(--amber)" : "var(--ink)";
-    const img = document.getElementById("g7Preview");
-    const fallback = document.getElementById("g7PreviewFallback");
-    img.style.display = j.camera_online ? "block" : "none";
-    fallback.style.display = j.camera_online ? "none" : "block";
-    if (j.camera_online) img.src = "/api/g7-preview.jpg?t=" + Date.now();
-    fallback.textContent = j.reason || "Camera offline / stale";
-        document.getElementById("g7CameraDetails").textContent = "Current threshold sample: "+(j.positive_motion_sample?"POSITIVE":"negative/unknown")+" · Changed pixels: "+(j.changed_pixels??"—")+" · Zone: perimeter surveillance";
-    age.textContent = "Last update: " + (j.timestamp_utc || "never") +
-      " · age: " + (j.age_seconds == null ? "unknown" : j.age_seconds+"s") +
-      " · safety clearance: NEVER VERIFIED";
-    const history = Array.isArray(j.events) ? j.events.slice(-10).reverse() : [];
-    events.textContent = history.length
-      ? history.map(e => e.timestamp_utc + "  " + e.deck_activity).join("\n")
-      : "No activity transitions recorded";
-  } catch (error) {
-    document.getElementById("g7CameraStatus").textContent = "CAMERA STATUS UNAVAILABLE";
-    document.getElementById("g7Preview").style.display = "none";
-    document.getElementById("g7PreviewFallback").style.display = "block";
-    document.getElementById("g7CameraAge").textContent = String(error);
-  }
-}
-refreshG7Camera();
-setInterval(refreshG7Camera, 1000);
-
-
-let DROWS=[], DEVENTS=[], DPLAY=null;
-const dEl=id=>document.getElementById(id);
-function dDraw(t){
-  if (!DROWS.length) return;
-  t=Math.min(180,Math.max(0,Number(t)||0));
-  const r=DROWS[t], p=r.power;
-  dEl("dTime").value=t; dEl("dTimeText").textContent=t+" s";
-  dEl("dStatus").textContent="G7 "+r.g7_status+" · G4 "+r.g4_state+
-    " · battery "+r.g4_battery_percent+"% · operator authorization "+
-    (r.operator_authorized?"YES (simulation)":"NO");
-  dEl("dGauges").textContent="Total power "+p.total_kw.toFixed(3)+"/"+p.power_capacity_kw+
-    " kW (margin "+p.power_margin_kw.toFixed(3)+")"+
-    " · Cooling estimate "+p.thermal_demand_kw.toFixed(3)+"/"+p.cooling_capacity_kw+
-    " kW · G7 "+p.g7_kw.toFixed(3)+" kW · G4 "+p.g4_kw.toFixed(3)+" kW";
-  const all={...r.launch_checks,...p.checks};
-  dEl("dChecks").textContent=Object.entries(all).map(([k,v])=>(v?"PASS ":"HOLD ")+k).join(" · ");
-  dEl("dEventLog").textContent=DEVENTS.filter(e=>e.second<=t).map(e=>
-    e.second+"s: "+e.event).join("\n")||"No event yet";
-}
-async function dLoad(){
-  try {
-    const response=await fetch("/api/scenario/d",{cache:"no-store"});
-    if(!response.ok)throw new Error("HTTP "+response.status);
-    const data=await response.json();
-    DROWS=data.timeline;DEVENTS=data.events;dDraw(0);
-  }catch(e){dEl("dStatus").textContent="Replay unavailable: "+e;}
-}
-dEl("dReplay").addEventListener("click",dLoad);
-dEl("dTime").addEventListener("input",e=>dDraw(e.target.value));
-dEl("dPlay").addEventListener("click",()=>{
-  if(DPLAY)return;
-  DPLAY=setInterval(()=>{
-    const t=Number(dEl("dTime").value);
-    if(t>=180){clearInterval(DPLAY);DPLAY=null;return;}
-    dDraw(t+1);
-  },300);
-});
-dEl("dPause").addEventListener("click",()=>{if(DPLAY)clearInterval(DPLAY);DPLAY=null;});
-dEl("dLiveRefresh").addEventListener("click",async()=>{
-  try {const j=await (await fetch("/api/scenario/d/live")).json();
-    dEl("dLiveResult").textContent="Live tick "+j.second+" · G4 "+
-      (j.latest?.g4_state||"standby")+" · latest "+(j.latest?.g7_status||"awaiting samples")+
-      " · "+(j.latest?.power?.total_kw??"—")+" kW";
-    dEl("dLiveEventLog").textContent=(j.events||[]).slice(-8).map(x=>x.second+"s "+x.event).join("\\n");}
-  catch(e){dEl("dLiveResult").textContent=String(e);}
-});
-dEl("dLiveApprove").addEventListener("click",async()=>{
-  if(!confirm("Authorize SIMULATED G4 launch, subject to independent deck/resource checks?"))return;
-  try{
-    const r=await fetch("/api/scenario/d/live/sample",{method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({perimeter_motion:false,deck_obstructed:false,operator_approval:true})});
-    const j=await r.json();
-    dEl("dLiveResult").textContent=(j.g4_state||j.error||"Unknown")+
-      " · "+(j.events||[]).join(" · ");
-  }catch(e){dEl("dLiveResult").textContent=String(e);}
-});
-setInterval(()=>dEl("dLiveRefresh").click(),2000);
-if(location.pathname==="/scenario/D"){
-  dLoad();
-  setTimeout(()=>dEl("scenarioDCard").scrollIntoView(),150);
-}
 </script>
 </body>
 </html>

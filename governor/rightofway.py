@@ -285,6 +285,11 @@ def simulate(raw, ops, scn, weights, policy, t_decision=None, crew=None, t_exec=
         req["G4"] = {"in_flight": G["G4"].modes["standby"]["kw"], "landing": G["G4"].modes["standby"]["kw"],
                      "charging_initial": G["G4"].windows[0]["total_kw"], "charging_followup": G["G4"].modes["full"]["kw"],
                      "ditched": G["G4"].modes["standby"]["kw"]}[g4["act"]]
+        # v3 B permits optional fleet guests (including live G7). Those loads
+        # must enter the original D4 budget, not just the static check.
+        for guest in scn["aboard"]:
+            if guest not in req:
+                req[guest] = G[guest].modes["full"]["kw"]
         # protected loads this minute
         prot = set(s.protect)
         if g3["act"] == "charging":
@@ -343,12 +348,17 @@ def simulate(raw, ops, scn, weights, policy, t_decision=None, crew=None, t_exec=
         cap["G3"] = 1.0 if (g3["act"] == "surveying" and ship["posture"] == "survey") else 0.0
         cap["G4"] = 1.0 if ((g4["act"] == "in_flight" and g4["deadline"] is None) or
                             (g4["ready"] and ship["posture"] == "flight_ops")) else 0.0
+        for guest in scn["aboard"]:
+            if guest not in cap:
+                cap[guest] = G[guest].modes[granted[guest]]["capability"]
         if s.t_decision is not None and s.t_decision <= t < s.t_decision + H:
             for g in s.caps:
                 s.caps[g] += cap[g]
         s.rows.append({"t": t, "posture": ship["posture"], "speed_kn": ship["speed_kn"], "reserve_kw": cap_p,
                        "power_kw": round(load, 1), "cooling_kw": round(load, 1), "cooling_cap_kw": round(cool_cap, 1),
                        "G2": granted["G2"], "G3": g3["act"], "G4": g4["act"], "G5": granted["G5"],
+                       **{guest: granted[guest] for guest in scn["aboard"]
+                          if guest not in ("G2", "G3", "G4", "G5")},
                        "g4_battery": round(g4["battery"], 1), "satcom_mbps": G["G5"].data["satcom"] if granted["G5"] != "off" else 0,
                        "acoustic": g3["act"] == "surveying", "los_video": g4["act"] == "in_flight",
                        "course": ship["course"], "noise": ship["noise"], "deck": ship["deck"],

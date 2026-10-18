@@ -31,10 +31,11 @@ def safety_checks(cfg, deck_obstructed=False):
     return checks
 
 
-def demand(cfg, seconds, alert, preflight):
+def demand(cfg, seconds, alert, preflight, g4_off=False):
     background = cfg["background_ship_load_kw"]
     g7 = cfg["g7_alert_kw"] if alert else cfg["g7_monitoring_kw"]
-    g4 = cfg["g4_preflight_kw"] if preflight else cfg["g4_standby_kw"]
+    g4 = (0.0 if g4_off else
+          cfg["g4_preflight_kw"] if preflight else cfg["g4_standby_kw"])
     total = background + g7 + g4
     # Conservative screening: synthetic all-electrical-to-heat total; the
     # real vessel physical checker allocates cooling to paths and positions.
@@ -69,10 +70,12 @@ class ScenarioD:
         self.authorized = False
         self.launch_time = None
         self.deck_obstructed = False
+        self.no_motion_seconds = 0
         self.events = []
         self.timeline = []
 
-    def tick(self, perimeter_motion=False, deck_obstructed=False, approve=False):
+    def tick(self, perimeter_motion=False, deck_obstructed=False, approve=False,
+             observation_valid=True, g7_alert=None):
         self.time += 1
         t = self.time
         self.deck_obstructed = bool(deck_obstructed)
@@ -81,11 +84,41 @@ class ScenarioD:
         if self.scripted:
             valid_motion = t in (20, 21)
             approve = t == self.cfg["operator_approval_at_s"]
-        self.confirm = self.confirm + 1 if valid_motion else 0
-        if valid_motion and not self.alert:
+        # Live only: five consecutive *valid* no-motion observations power G4 down.
+        # Unknown/stale camera frames do not count as an empty surveillance zone.
+        # This is a DEMO power policy, not evidence an object has left the scene.
+        if self.state == "Powering off":
+            self.state = "Off"
+            notes.append("Simulated G4 shutdown complete (0 kW ship-side draw)")
+        self.confirm = self.confirm + 1 if valid_motion and observation_valid else 0
+        if not self.scripted:
+            if valid_motion and observation_valid:
+                self.no_motion_seconds = 0
+            elif observation_valid and self.state in ("Starting", "Awaiting approval"):
+                self.no_motion_seconds += 1
+                if self.no_motion_seconds >= self.cfg.get("no_motion_shutdown_seconds", 5):
+                    self.state = "Powering off"
+                    self.start_time = None
+                    self.authorized = False
+                    self.alert = False
+                    self.confirm = 0
+                    notes.append("Five valid seconds without motion: cancel G4 preparation and power off")
+            else:
+                # Invalid camera readings interrupt the streak; do not call them no-motion.
+                self.no_motion_seconds = 0
+        # G7's alert-mode power follows the camera's latched activity status;
+        # G4 startup still requires consecutive *raw* positive motion samples.
+        # A missing g7_alert preserves behavior for the scripted replay and
+        # callers of the original tick interface.
+        active_alert = valid_motion if g7_alert is None else bool(g7_alert)
+        if not self.scripted and observation_valid and not active_alert and self.alert:
+            self.alert = False
+            notes.append("G7 motion alert ended: return to monitoring power")
+        if observation_valid and active_alert and not self.alert:
             self.alert = True
-            notes.append("G7 first unclassified perimeter-motion candidate")
-        if self.confirm >= self.cfg["required_consecutive_positive_samples"] and self.start_time is None:
+            notes.append("G7 unclassified perimeter-motion candidate")
+        if (self.confirm >= self.cfg["required_consecutive_positive_samples"]
+                and self.start_time is None and self.state in ("Standby", "Off")):
             startup_demand = demand(self.cfg, t, True, True)
             checks = safety_checks(self.cfg, self.deck_obstructed)
             # Readiness + resources can permit PREPARATION; deck clearance is
@@ -120,7 +153,8 @@ class ScenarioD:
             self.alert = False
             notes.append("Reconnaissance simulation complete")
         preflight = self.state in ("Starting", "Awaiting approval", "Simulated launch")
-        d = demand(self.cfg, t, self.alert, preflight)
+        d = demand(self.cfg, t, self.alert, preflight,
+                   g4_off=self.state in ("Powering off", "Off"))
         check = safety_checks(self.cfg, self.deck_obstructed)
         if not check["flight_deck_verified_clear"] and self.state in ("Awaiting approval", "Simulated launch"):
             notes.append("Flight deck obstruction: HOLD launch; perimeter is a different zone")
@@ -130,6 +164,8 @@ class ScenarioD:
             "second":t,
             "g7_status": "ALERT" if self.alert else "MONITORING",
             "consecutive_positive_samples":self.confirm,
+            "no_motion_seconds":self.no_motion_seconds,
+            "no_motion_shutdown_seconds":self.cfg.get("no_motion_shutdown_seconds", 5),
             "g4_state":self.state,
             "g4_battery_percent":self.cfg["g4_initial_battery_percent"],
             "operator_authorized":self.authorized,
