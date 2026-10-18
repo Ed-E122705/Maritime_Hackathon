@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/vesselos/guest_schema.json",
   "title": "VesselOS guest manifest v1.0",
-  "description": "Shared machine-readable format for the five Annex B guest cards. Null denotes unspecified, not zero.",
+  "description": "Machine-readable G1-G5 Annex B cards plus user-defined G6. Null denotes unspecified, not zero; G6 physical admission requires further evidence.",
   "type": "object",
   "required": [
     "schema_version",
@@ -247,7 +247,10 @@
             "uniqueItems": true
           },
           "port_only": {
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "crew_required": {
             "type": [

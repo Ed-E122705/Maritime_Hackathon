@@ -5,7 +5,9 @@
   "source": {
     "document": "Fincantieri Software-Defined Vessel SHORT, Technical Annex B (guest cards) and B.0 (ontology); Annex A (host-wide conditions)",
     "guest_card": "G5",
-    "assumptions_added": []
+    "assumptions_added": [
+      "Full operating mode is normalized to capability fraction 1.0; Annex B defines low-power operation as retaining 0.3 relative capability after a 70% loss."
+    ]
   },
   "capability": {
     "description": "Restores coastal connectivity and provides edge analytics.",
@@ -59,7 +61,7 @@
           {
             "component_id": "compute_node",
             "location": "bay2",
-            "bay_fraction": 1.0,
+            "bay_fraction": 1,
             "area_m2": null
           },
           {
@@ -79,7 +81,7 @@
           {
             "component_id": "compute_node",
             "location": "bay2",
-            "bay_fraction": 1.0,
+            "bay_fraction": 1,
             "area_m2": null
           },
           {
@@ -171,7 +173,7 @@
         },
         "max_duration_minutes": null,
         "interruptible": null,
-        "capability_fraction": null,
+        "capability_fraction": 1,
         "notes": "Continuous."
       },
       {
@@ -189,7 +191,7 @@
     ],
     "cooling": {
       "type": "chilled_water",
-      "electrical_kw_to_heat_kw": 1.0,
+      "electrical_kw_to_heat_kw": 1,
       "chilled_water_load_rule": "equals_electrical_kw",
       "notes": "Chilled-water draw follows electrical kW, per Annex A.2."
     },
@@ -212,7 +214,7 @@
           "max": null
         },
         "disabled_in_emission_silence": false,
-        "notes": null
+        "notes": "Declared local backbone bandwidth of 1 Gbit/s (1,000 Mbit/s); this is not a SATCOM requirement."
       }
     ],
     "compute": {
@@ -228,7 +230,10 @@
   "operational_modes": [
     {
       "id": "operating",
-      "allowed_power_mode_ids": ["full", "low_power"],
+      "allowed_power_mode_ids": [
+        "full",
+        "low_power"
+      ],
       "requirements": [
         {
           "field": "platform.emission_state",
