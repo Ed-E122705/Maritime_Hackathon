@@ -150,7 +150,7 @@ def test_scenario_d_per_system_power_breakdown():
 
 
 def test_g7_optional_checkbox_a_ap_b_and_live_gate():
-    """Regression: original v3 page plus opt-in G7 across A/A′ and B."""
+    """Regression: original v3 page; G7 joins Scenario A via the camera, not a checkbox."""
     from dashboard.app import app
     client = app.test_client()
     page = client.get("/").get_data(as_text=True)
@@ -159,9 +159,12 @@ def test_g7_optional_checkbox_a_ap_b_and_live_gate():
     assert 'data-tab="B"' in page
     assert 'id="gauges"' in page
     assert 'id="opGauges"' in page
-    assert 'id="g7Integrated"' in page
-    assert 'g === "G7"' in page  # G7 is selectable in B
-    assert "g7SelectionChanged()" in page
+    # G7 is no longer a checkbox: it comes aboard through the camera (motion → Submit → Scenario A).
+    assert 'id="g7Integrated"' not in page
+    assert "g7SelectionChanged" not in page
+    assert 'id="camBtn"' in page and 'id="camModal"' in page and 'id="camSubmit"' in page
+    assert 'const CAM_GUEST = "G7"' in page
+    assert "CAM_UNLOCKED = true" in page  # Submit unlocks G7 in Scenario A
     assert 'id="scenarioDCard"' not in page
     meta = client.get("/api/meta").get_json()
     assert "G7" in meta["guests"]

@@ -233,8 +233,6 @@ table.moments tr{cursor:pointer} table.moments tr:hover td{background:rgba(255,2
 table.moments tr.now td{background:rgba(92,200,255,.12)} table.moments td.m{font-family:var(--mono);color:var(--amber);white-space:nowrap}
 @media (max-width:1100px){.bstatic{grid-template-columns:1fr}.phases{grid-template-columns:repeat(2,1fr)}.ship{grid-template-columns:repeat(2,1fr)}}
 /* G7 additions only — all existing v3 dashboard controls remain unchanged. */
-#g7Integrated{margin:12px 22px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
-#g7Integrated h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
 .g7-live-grid{display:grid;grid-template-columns:minmax(230px,1fr) minmax(260px,1fr);gap:14px}
 .g7-metric{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}
 .g7-readout{border:1px solid var(--line);background:var(--panel2);border-radius:7px;padding:8px;font-family:var(--mono);font-size:12px}
@@ -242,11 +240,23 @@ table.moments tr.now td{background:rgba(92,200,255,.12)} table.moments td.m{font
 .g7-status{border-left:4px solid var(--ghost);padding:10px;background:var(--panel2);border-radius:6px;margin:7px 0}
 .g7-status.detected{border-color:var(--amber)} .g7-status.preparing{border-color:var(--cyan)}
 .g7-status.ready{border-color:var(--green)} .g7-status.off{border-color:var(--ghost)}
-#g7Integrated img{width:100%;max-width:620px;border:1px solid var(--line);border-radius:7px;display:block;min-height:180px;object-fit:contain}
-#g7Integrated button{width:auto;flex:none}
 @media(max-width:840px){.g7-live-grid{grid-template-columns:1fr}}
 .hide{display:none!important}
 @media (max-width:1100px){.gauges{grid-template-columns:repeat(2,1fr)} main{grid-template-columns:1fr} aside{position:static;max-height:none}.two{grid-template-columns:1fr}}
+/* G7 camera (browser motion detection) */
+header{position:relative}
+.camBtn{position:absolute;top:16px;right:22px;font-size:14px;padding:7px 14px}
+.camBtn.on{border-color:var(--green);color:var(--green)}
+#camModal{position:fixed;inset:0;background:rgba(3,8,16,.72);display:flex;align-items:center;justify-content:center;z-index:60}
+#camModal.hide{display:none}
+.camPanel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;width:min(960px,94vw);max-height:94vh;overflow:auto}
+.camGrid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:10px}
+.camStage{position:relative;background:#000;border-radius:10px;overflow:hidden;aspect-ratio:4/3}
+.camStage video,.camStage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.obs{display:flex;gap:6px;margin-top:8px} .obs i{flex:1;height:8px;border-radius:4px;background:#1d2a44} .obs i.on{background:var(--green)}
+.mf{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12.5px;margin-top:6px} .mf .k{color:var(--mute)}
+#camStatus{font-size:14px}
+@media (max-width:800px){.camGrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -255,36 +265,35 @@ table.moments tr.now td{background:rgba(92,200,255,.12)} table.moments td.m{font
   <h1>The Physics Engine <span>· A Strictly Finite Budget</span></h1>
   <div class="console">&gt; PHYSICAL LIMIT: NO SCALE-OUT AVAILABLE — allocate, deny, or steal from another system.</div>
   <div class="console status" id="status">&gt; loading engine…</div>
+  <button class="btn camBtn" id="camBtn" title="G7 deck camera: detect motion, then submit G7 to Scenario A">📷 Camera</button>
 </header>
+<div id="camModal" class="hide" role="dialog" aria-label="Camera">
+  <div class="camPanel">
+    <div class="row" style="justify-content:space-between"><h3 style="margin:0">Camera · G7 deck activity monitor</h3>
+      <button class="btn small" id="camClose" style="flex:0 0 auto">✕ Close</button></div>
+    <div class="camGrid">
+      <div>
+        <div class="camStage"><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas></div>
+        <label>Camera</label><select id="camDevice"></select>
+      </div>
+      <div>
+        <div class="dbox"><div class="t">Status</div><div id="camStatus" class="st">starting…</div>
+          <div class="mute" style="font-size:12px">Keep the camera still and <b>move a hand or object</b> in front of it. Motion is confirmed
+            as <b>G7</b> after two consecutive positive observations (card G7 policy). Detector: frame-difference motion, in the browser, no video stored.</div>
+          <div class="obs" id="camObs"><i></i><i></i></div></div>
+        <div class="dbox" id="camCard" style="margin-top:10px"><div class="t">G7 guest card</div><div class="mute" style="margin-top:4px">—</div></div>
+        <button class="btn" id="camSubmit" disabled style="margin-top:10px;width:100%">Submit to Scenario A</button>
+        <div class="mute" style="font-size:11.5px;margin-top:6px">The camera only brings the card aboard. Whether G7 fits the ship is decided by
+          Scenario A's optimizer, exactly as for any other card.</div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="tabs">
   <button class="tab on" data-tab="A">A · The Landlord (port)</button>
   <button class="tab" data-tab="AP">A′ · Under way</button>
   <button class="tab" data-tab="B">B · Right of Way</button>
 </div>
-<section id="g7Integrated" class="hide" aria-live="polite">
-  <h3>G7 · Live maritime perimeter camera → G4 simulated readiness</h3>
-  <div class="g7-live-grid">
-    <div>
-      <img id="g7IntegratedPreview" alt="Latest annotated G7 perimeter camera frame" />
-      <div class="mute" style="font-size:11px;margin-top:4px">Local BRIO 101 camera · motion-only detector · annotated region</div>
-    </div>
-    <div>
-      <div id="g7Detection" class="g7-status">Waiting for camera…</div>
-      <div id="g7Drone" class="g7-status">G4 simulated preparation: waiting for camera…</div>
-      <div class="g7-metric">
-        <div class="g7-readout">G7 model load<strong id="g7Power">— kW</strong></div>
-        <div class="g7-readout">G4 demo load<strong id="g4Power">— kW</strong></div>
-        <div class="g7-readout">G4 + G7 (demo)<strong id="g7Combined">— kW</strong></div>
-        <div class="g7-readout">Demo total, incl. 46 kW baseline<strong id="g7Total">— kW</strong></div>
-      </div>
-      <div class="row" style="justify-content:flex-start;flex-wrap:wrap">
-        <button class="btn" type="button" id="g7Approve">Operator approve (simulation only)</button>
-        <span id="g7Age" class="mute" style="font-size:11px">Waiting for valid camera frames</span>
-      </div>
-      <div class="mute" style="font-size:11px;margin-top:7px">The existing dials use the resource governor's guest manifest for G7 mass, mast occupancy, compute, data and power. The G4 preparation status and 46 kW baseline above are separate demo telemetry, not extra power added to those governor dials. No physical drone commands.</div>
-    </div>
-  </div>
-</section>
 <main>
   <aside id="side">
     <!-- A / A′ inputs -->
@@ -469,6 +478,9 @@ table.moments tr.now td{background:rgba(92,200,255,.12)} table.moments td.m{font
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 let META = null, TAB = "A", BDATA = null, playing = null;
+const CAM_GUEST = "G7";            // the guest the camera brings aboard (data/guests/G7_*.json)
+let CAM_UNLOCKED = false;          // Scenario A lists G7 only after motion was confirmed and Submit was pressed
+const visGuests = () => GUESTS.filter(g => g !== CAM_GUEST || CAM_UNLOCKED);
 let GUESTS = [];        // filled from /api/meta: every card in guests/ (G1–G6 …)
 
 // ---------- knobs: each one is just a jury override path with its default ----------
@@ -602,7 +614,7 @@ function gaugesA(j){
 
 function readA(){
   const installed = {};
-  GUESTS.forEach(g=>{ if ($("#ic_"+g).checked) installed[g] = $("#is_"+g).value; });
+  visGuests().forEach(g=>{ if ($("#ic_"+g) && $("#ic_"+g).checked) installed[g] = $("#is_"+g).value; });
   const body = {scenario: TAB==="AP" ? ($("#swap").checked ? "A_prime_drone_swap" : "A_prime_underway") : "A_landlord",
     priority: $("#pri").value, installed, candidate: $("#cand").value,
     overrides: [...knobOverrides($("#knobsA"), KNOBS_A), ...weightOverrides(), ...lines("#ovA")]};
@@ -639,7 +651,7 @@ function placeTip(el){
 }
 function renderWeights(){
   const p = $("#pri").value;
-  $("#weights").innerHTML = GUESTS.map(g=>`<div><label>${g}</label><input type="number" min="0" max="20" step="1" data-g="${g}" value="${META.priorities[p][g]}"></div>`).join("");
+  $("#weights").innerHTML = visGuests().map(g=>`<div><label>${g}</label><input type="number" min="0" max="20" step="1" data-g="${g}" value="${META.priorities[p][g]}"></div>`).join("");
   $$("#weights input").forEach(i=>i.addEventListener("input", schedule));
   $$("#weights > div").forEach(box=>{
     const inp = box.querySelector("input"), g = inp.dataset.g;
@@ -651,19 +663,19 @@ function renderWeights(){
   });
 }
 function renderInstalled(inst){
-  $("#installed").innerHTML = GUESTS.map(g=>{
+  $("#installed").innerHTML = visGuests().map(g=>{
     const G = META.guests[g];
     const opts = G.configs.map(c=>`<option value="${c.id}" ${inst&&inst[g]===c.id?"selected":""}>${c.id}${c.preferred?" ★":""}${c.issues.length?" ✕":""}</option>`).join("");
     return `<div class="guestrow"><input type="checkbox" id="ic_${g}" ${inst&&inst[g]?"checked":""}><b>${g}</b>
       <select id="is_${g}" title="${G.name}">${opts}</select></div>`;
   }).join("");
-  GUESTS.forEach(g=>{ $("#ic_"+g).addEventListener("change",()=>{refreshCand(); schedule(); if(g==="G7")g7SelectionChanged();}); $("#is_"+g).addEventListener("change",schedule); });
+  visGuests().forEach(g=>{ $("#ic_"+g).addEventListener("change",()=>{refreshCand(); schedule();}); $("#is_"+g).addEventListener("change",schedule); });
   refreshCand();
 }
 function refreshCand(){
   if ($("#addList")) renderAddList();
   const cur = $("#cand").value, swap = TAB==="AP" && $("#swap").checked;
-  const free = GUESTS.filter(g=> swap ? g==="G4" : !$("#ic_"+g).checked);
+  const free = visGuests().filter(g=> swap ? g==="G4" : !$("#ic_"+g).checked);
   $("#cand").innerHTML = free.map(g=>`<option value="${g}">${g} · ${META.guests[g].name}</option>`).join("");
   if (free.includes(cur)) $("#cand").value = cur;
 }
@@ -785,9 +797,9 @@ const GROUP_ROWS = {power_normal:["power (normal"], power_degraded:["power (gens
 function renderAddList(){
   const prev = {};
   $$("#addList .addrow").forEach(r=>{ prev[r.dataset.g] = {on: r.querySelector("input").checked, cfg: r.querySelector("select").value}; });
-  const free = GUESTS.filter(g=>!$("#ic_"+g).checked);
+  const free = visGuests().filter(g=>!$("#ic_"+g).checked);
   $("#addList").innerHTML = free.length ? free.map(g=>{
-    const G = META.guests[g], p = prev[g] || {on: g==="G4", cfg:"auto"};
+    const G = META.guests[g], p = prev[g] || {on: g==="G4" || g===CAM_GUEST, cfg:"auto"};
     const opts = `<option value="auto">auto (best position)</option>` + G.configs.map(c=>`<option value="${c.id}" ${p.cfg===c.id?"selected":""}>${c.id}${c.preferred?" ★":""}${c.issues.length?" ✕":""}</option>`).join("");
     return `<div class="guestrow addrow" data-g="${g}"><input type="checkbox" ${p.on?"checked":""}><b>${g}</b><select title="${esc(G.name)}">${opts}</select></div>
       <div class="mute" style="font-size:11px;margin:-2px 0 4px 26px">${esc(G.name)}</div>`;
@@ -978,14 +990,10 @@ const FLEET_DEFAULT = ["G2","G3","G4","G5"]; // Scenario B fleet as the PDF narr
 function renderFleet(sel){
   $("#fleetB").innerHTML = GUESTS.map(g=>{
     const on = sel.includes(g);
-    const box = g === "G7"
-      ? `<input type="checkbox" data-g="G7" ${on?"checked":""} title="Enable live G7 camera in Scenario B">`
-      : (on ? `<input type="checkbox" data-g="${g}" checked disabled>`
-            : `<span class="xbox" title="not part of Scenario B">✕</span>`);
+    const box = on ? `<input type="checkbox" data-g="${g}" checked disabled>`
+                   : `<span class="xbox" title="not part of Scenario B">✕</span>`;
     return `<div class="guestrow" style="grid-template-columns:22px 34px 1fr;${on?"":"opacity:.55"}">${box}
-      <b style="${on||g==="G7"?"":"text-decoration:line-through"}">${g}</b><span class="mute" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(META.guests[g].name)}</span></div>`;}).join("");
-  const g7 = $("#fleetB input[data-g='G7']");
-  if (g7) g7.addEventListener("change",()=>{ g7SelectionChanged(); schedule(); });
+      <b style="${on?"":"text-decoration:line-through"}">${g}</b><span class="mute" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(META.guests[g].name)}</span></div>`;}).join("");
 }
 function readB(){
   return {priority:$("#priB").value, crew:+$("#crewB .on").dataset.v,
@@ -1465,63 +1473,122 @@ $("#play").addEventListener("click", ()=>{
   playing = setInterval(()=>{ const t = +$("#tslider").value + 1; if (t > +$("#tslider").max){ clearInterval(playing); playing=null; $("#play").textContent="▶ Play"; return; } setT(t); }, 180);
 });
 
-// ---------- G7 live camera integration (additive to the unchanged v3 UI) ----------
-let G7_LAST_ACTIVITY = null, G7_LAST_ON = null, G7_REQUEST_BUSY = false;
-function g7Checked() {
-  if (TAB === "B") return !!$("#fleetB input[data-g='G7']")?.checked;
-  return !!$("#ic_G7")?.checked;
+
+// ---------- camera: motion → G7 → Scenario A (existing optimizer) ----------
+// Browser-side motion detector, same idea as vision/g7_deck_watch.py (MOG2 on a still camera), CPU only:
+// each frame is shrunk to 160×120 grey; a pixel "changed" if it differs from a slow running background by more
+// than PIX_DIFF; a frame shows motion if more than MOTION_FRAC of pixels changed. Observation rule from the
+// G7 card policy_hints: two consecutive positive observations. One observation = a 0.5 s window in which at
+// least OBS_FRAC of the frames showed motion. Vision tuning only — no ship physics here.
+const OBS_MS = 500, OBS_NEED = 2, OBS_FRAC = 0.6, MW = 160, MH = 120, PIX_DIFF = 28, MOTION_FRAC = 0.02, BG_ALPHA = 0.08, WARMUP = 15;
+const CAM = {stream:null, timer:null, win:[], winStart:0, pos:0, ok:false, bg:null, frames:0, sm:null};
+function camSay(kind, txt){
+  $("#camStatus").className = "st " + ({ok:"v-YES", wn:"v-YES-IF", bad:"v-NO"}[kind] || "v-KEEP");
+  $("#camStatus").textContent = txt;
 }
-async function g7SelectionChanged() {
-  const enabled = g7Checked();
-  $("#g7Integrated").classList.toggle("hide", !enabled);
-  if (G7_LAST_ON === enabled) return;
-  G7_LAST_ON = enabled;
-  try {
-    await fetch("/api/g7-enabled",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({enabled})});
-  } catch (e) { $("#g7Detection").textContent="G7 enable request failed: "+e; }
-  if (enabled) refreshG7Integrated();
+function camReset(){
+  Object.assign(CAM, {win:[], winStart:0, pos:0, ok:false, bg:null, frames:0});
+  $("#camSubmit").disabled = true; $$("#camObs i").forEach(e=>e.classList.remove("on"));
+  $("#camCard").innerHTML = `<div class="t">G7 guest card</div><div class="mute" style="margin-top:4px">—</div>`;
 }
-async function refreshG7Integrated() {
-  if (!g7Checked() || G7_REQUEST_BUSY) return;
-  G7_REQUEST_BUSY=true;
-  try {
-    const [cs,ls] = await Promise.all([
-      fetch("/api/g7-camera", {cache:"no-store"}),
-      fetch("/api/scenario/d/live", {cache:"no-store"})
-    ]);
-    if (!cs.ok || !ls.ok) throw Error("Camera/relay HTTP response unavailable");
-    const c=await cs.json(), state=await ls.json(), live=state.latest, p=live?.power;
-    const valid=c.camera_online && c.deck_activity !== "UNKNOWN" && c.deck_activity !== "INITIALIZING";
-    const act=valid && c.movement_detected ? "ALERT" : valid ? "MONITORING" : "UNKNOWN";
-    $("#g7Detection").textContent="G7: "+c.deck_activity+" · changed pixels "+(c.changed_pixels??"—");
-    $("#g7Detection").className="g7-status "+(act==="ALERT"?"detected":"off");
-    $("#g7Age").textContent="Camera: "+(c.camera_online?"online":"unavailable")+" · age "+(c.age_seconds??"—")+" s";
-    const g4=live?.g4_state||"Waiting for bridge";
-    $("#g7Drone").textContent="G4: "+g4+(g4==="Starting"||g4==="Awaiting approval"?
-      " · No-motion countdown "+(live.no_motion_seconds??0)+"/5 s":"")+" · operator authorization "+(live?.operator_authorized?"YES":"NO");
-    $("#g7Drone").className="g7-status "+(g4==="Awaiting approval"?"ready":g4==="Starting"?"preparing":"off");
-    $("#g7Power").textContent=valid?(act==="ALERT"?"0.065":"0.040")+" kW":"UNKNOWN";
-    $("#g4Power").textContent=p?p.g4_kw.toFixed(3)+" kW":"— kW";
-    $("#g7Combined").textContent=p?(p.g4_kw+p.g7_kw).toFixed(3)+" kW":"— kW";
-    $("#g7Total").textContent=p?p.total_kw.toFixed(3)+" kW":"— kW";
-    if(valid) {
-      const im=$("#g7IntegratedPreview");
-      if(im) im.src="/api/g7-preview.jpg?t="+Date.now();
+function camStopStream(){
+  clearInterval(CAM.timer); CAM.timer = null;
+  if (CAM.stream) CAM.stream.getTracks().forEach(t=>t.stop());
+  CAM.stream = null;
+}
+function camClose(){ camStopStream(); $("#camModal").classList.add("hide"); }
+async function camOpen(){
+  $("#camModal").classList.remove("hide"); camReset();
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    camSay("bad", "camera not available here — open the dashboard at http://127.0.0.1:5050 (browsers allow cameras only on localhost or https)"); return;
+  }
+  try { await camStart(); } catch(e){ camSay("bad", "camera: " + (e.message || e.name)); }
+}
+async function camStart(deviceId){
+  camStopStream(); camReset(); camSay("", "opening camera…");
+  CAM.stream = await navigator.mediaDevices.getUserMedia({audio:false,
+    video: deviceId ? {deviceId:{exact:deviceId}, width:640, height:480} : {width:640, height:480}});
+  const v = $("#camVideo"); v.srcObject = CAM.stream; await v.play();
+  const cur = CAM.stream.getVideoTracks()[0].getSettings().deviceId;
+  const devs = (await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput");
+  $("#camDevice").innerHTML = devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?"selected":""}>${esc(d.label || "camera " + (i+1))}</option>`).join("");
+  if (!CAM.sm){ CAM.sm = document.createElement("canvas"); CAM.sm.width = MW; CAM.sm.height = MH; }
+  camSay("", "warming up — keep the camera still…");
+  CAM.timer = setInterval(camTick, 66);
+}
+function camTick(){
+  const v = $("#camVideo");
+  if (!v.videoWidth) return;
+  const sx = CAM.sm.getContext("2d", {willReadFrequently:true});
+  sx.drawImage(v, 0, 0, MW, MH);
+  const px = sx.getImageData(0, 0, MW, MH).data, n = MW * MH;
+  const g = new Float32Array(n);
+  for (let i = 0; i < n; i++) g[i] = 0.299*px[4*i] + 0.587*px[4*i+1] + 0.114*px[4*i+2];
+  if (!CAM.bg){ CAM.bg = g; return; }
+  let changed = 0, x0 = MW, y0 = MH, x1 = -1, y1 = -1;
+  for (let i = 0; i < n; i++){
+    if (Math.abs(g[i] - CAM.bg[i]) > PIX_DIFF){
+      changed++; const x = i % MW, y = (i / MW) | 0;
+      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
     }
-    if(G7_LAST_ACTIVITY!==null && act!==G7_LAST_ACTIVITY && valid) schedule();
-    if(valid) G7_LAST_ACTIVITY=act;
-  } catch(e){ $("#g7Detection").textContent="G7 live status unavailable: "+e; }
-  finally{G7_REQUEST_BUSY=false;}
+    CAM.bg[i] += BG_ALPHA * (g[i] - CAM.bg[i]);
+  }
+  CAM.frames++;
+  if (CAM.frames < WARMUP){ camSay("", `warming up — keep the camera still… ${CAM.frames}/${WARMUP}`); return; }
+  const frac = changed / n, motion = frac > MOTION_FRAC;
+  camResults(motion ? {x:x0, y:y0, w:x1-x0+1, h:y1-y0+1} : null, frac, v);
 }
-$("#g7Approve").addEventListener("click",async()=>{
-  if (!confirm("Authorize SIMULATED G4 launch? Independent launch-deck clearance remains necessary.")) return;
-  const res=await fetch("/api/scenario/d/live/sample", {method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({perimeter_motion:false,deck_obstructed:false,operator_approval:true,observation_valid:false})});
-  if (!res.ok) { $("#g7Drone").textContent="Simulated approval failed: HTTP "+res.status; return; }
-  refreshG7Integrated();
-});
-setInterval(refreshG7Integrated,1000);
+function camResults(box, frac, v){
+  const cv = $("#camCanvas");
+  cv.width = v.videoWidth || 640; cv.height = v.videoHeight || 480;
+  const ctx = cv.getContext("2d"); ctx.clearRect(0, 0, cv.width, cv.height);
+  if (box){
+    const kx = cv.width / MW, ky = cv.height / MH;
+    ctx.strokeStyle = CAM.ok ? "#3ddc84" : "#f5a524"; ctx.lineWidth = 4;
+    ctx.strokeRect(box.x*kx, box.y*ky, box.w*kx, box.h*ky);
+  }
+  const now = performance.now();
+  if (!CAM.winStart) CAM.winStart = now;
+  CAM.win.push(!!box);
+  if (now - CAM.winStart >= OBS_MS){
+    const f = CAM.win.filter(Boolean).length / CAM.win.length;
+    CAM.pos = f >= OBS_FRAC ? CAM.pos + 1 : 0;
+    CAM.win = []; CAM.winStart = now;
+    if (CAM.pos >= OBS_NEED && !CAM.ok) camRecognised(frac);
+  }
+  $$("#camObs i").forEach((e,i)=>e.classList.toggle("on", CAM.ok || i < CAM.pos));
+  if (!CAM.ok) camSay(box ? "wn" : "", box ? `MOVEMENT_DETECTED (${(frac*100).toFixed(1)} % of pixels) — observation ${Math.min(CAM.pos+1, OBS_NEED)} / ${OBS_NEED}`
+                                          : `NO_MOVEMENT_DETECTED (${(frac*100).toFixed(1)} % ≤ ${(MOTION_FRAC*100).toFixed(0)} %)`);
+}
+function camRecognised(frac){
+  CAM.ok = true;
+  const G = META.guests[CAM_GUEST], card = (META.card || {})[CAM_GUEST] || {};
+  if (!G){ camSay("bad", `${CAM_GUEST} has no card in data/guests/`); return; }
+  const r = card.resources || {};
+  const pw = (r.power_modes || []).map(m=>`${m.id} ${m.power_kw && m.power_kw.nominal != null ? m.power_kw.nominal : "–"} kW`).join(" · ");
+  const dl = (r.data_links || []).map(d=>`${d.type} ${d.bandwidth_mbps && d.bandwidth_mbps.nominal != null ? d.bandwidth_mbps.nominal : "–"} Mbit/s`).join(" · ");
+  camSay("ok", `${CAM_GUEST} detected — motion confirmed`);
+  $("#camCard").innerHTML = `<div class="t">G7 guest card</div>
+    <div style="font-weight:800;margin-top:4px">${CAM_GUEST} · ${esc(G.name)}</div>
+    <div class="mf"><span class="k">evidence</span><span>motion in ${OBS_NEED} consecutive observations (${(frac*100).toFixed(1)} % of pixels changed)</span>
+      <span class="k">mass</span><span>${esc(G.mass_kg)} kg</span>
+      <span class="k">positions</span><span>${G.configs.map(c=>esc(c.id) + (c.preferred ? " ★" : "")).join(", ")}</span>
+      <span class="k">power</span><span>${esc(pw || "–")}</span>
+      <span class="k">cooling</span><span>${esc((r.cooling || {}).type || "–")}</span>
+      <span class="k">data</span><span>${esc(dl || "–")}</span>
+      <span class="k">safety-critical</span><span>${G.safety_critical ? "yes" : "no"}</span>
+      <span class="k">capability</span><span>${esc((card.capability || {}).description || "–")}</span></div>`;
+  $("#camSubmit").disabled = false;
+}
+function camSubmit(){
+  if (!CAM.ok) return;
+  camClose();
+  CAM_UNLOCKED = true;
+  $("#camBtn").classList.add("on"); $("#camBtn").textContent = `📷 ${CAM_GUEST} ✓`;
+  if (TAB !== "A") switchTab("A");                 // Scenario A renders G7 ticked as a candidate and runs
+  else { const inst = readA().installed; renderWeights(); renderInstalled(inst); runCheck(); }
+  $("#status").textContent = `> camera: motion → ${CAM_GUEST} detected → added to Scenario A candidates; running the optimizer …`;
+}
 
 // ---------- wiring ----------
 let timer = null;
@@ -1556,7 +1623,6 @@ function switchTab(t){
   if (isB){ renderGaugeShells(GB); runB(); }
   else if (t==="AP"){ renderGaugeShells(GA); loadScenario($("#swap").checked?"A_prime_drone_swap":"A_prime_underway"); runAP(); }
   else { renderGaugeShells(GA); loadScenario("A_landlord_survey_max"); renderAddList(); runCheck(); }
-  g7SelectionChanged();
 }
 
 (async function init(){
@@ -1592,6 +1658,11 @@ function switchTab(t){
   renderFleet(FLEET_DEFAULT);
   renderFleet(META.scenarios.B_right_of_way.aboard || FLEET_DEFAULT);
   $$("#aview button").forEach(b=>b.addEventListener("click", ()=>{ $$("#aview button").forEach(x=>x.classList.toggle("on", x===b)); AVIEW = b.dataset.v; drawAGauges(); }));
+  $("#camBtn").addEventListener("click", camOpen);
+  $("#camClose").addEventListener("click", camClose);
+  $("#camSubmit").addEventListener("click", camSubmit);
+  $("#camDevice").addEventListener("change", e=>{ camStart(e.target.value).catch(err=>camSay("bad", "camera: " + (err.message || err.name))); });
+  document.addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("#camModal").classList.contains("hide")) camClose(); });
   switchTab("A");
 })();
 </script>
