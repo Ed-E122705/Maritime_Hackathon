@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0",
+  "id": "G7",
+  "name": "Camera-based deck activity monitor",
+  "source": {
+    "document": "Team-defined Logitech BRIO 101 USB camera prototype running CPU OpenCV on Dell Snapdragon X Elite; not an official Annex B guest.",
+    "guest_card": "G7",
+    "assumptions_added": [
+      "All onboard power, mass, placement, bandwidth, compute and installation figures are demonstration assumptions, not verified ship or camera measurements.",
+      "0.5 kg represents a hypothetical ship-mounted camera and bracket, not the laptop.",
+      "0.1 kW is a synthetic reservation for the entire camera/processing system, not the BRIO 101's measured USB power.",
+      "Mast-slot placement is simulated; live webcam is connected to a separate Dell prototype.",
+      "0.01 Mbit/s models status metadata only. Raw video is not sent over the simulated ship network.",
+      "One crew member and 30 minutes for port installation are hypothetical demonstration values, not an installation authorization."
+    ]
+  },
+  "capability": {
+    "description": "Observes movement within a marked simulated deck area and provides non-safety-certified crew advisory events.",
+    "value_by_mission": {
+      "rescue": "medium",
+      "patrol": "medium",
+      "survey": "low",
+      "disaster_relief": "medium",
+      "default": "low"
+    }
+  },
+  "criticality": {
+    "safety_critical": false,
+    "mission_criticality": "resolved_from_external_mission_priority_file"
+  },
+  "assembly": {
+    "atomic_for_admission_and_shedding": true,
+    "components": [
+      {
+        "id": "deck_camera_pod",
+        "name": "Camera and hypothetical mast mounting",
+        "mass_kg": 0.5,
+        "footprint_m2": 0.05
+      }
+    ],
+    "requires": [],
+    "excludes": []
+  },
+  "placement": {
+    "configurations": [
+      {
+        "id": "mast_camera",
+        "preferred": true,
+        "assignments": [
+          {
+            "component_id": "deck_camera_pod",
+            "location": "mast_slot",
+            "bay_fraction": null,
+            "area_m2": 0.05
+          }
+        ],
+        "requirements": [],
+        "notes": "Hypothetical use of the one free mast slot; may compete with G1/G5. Physical mounting is not verified."
+      }
+    ]
+  },
+  "resources": {
+    "power_modes": [
+      {
+        "id": "active",
+        "power_kw": {
+          "min": null,
+          "nominal": 0.1,
+          "peak": null
+        },
+        "max_duration_minutes": null,
+        "interruptible": true,
+        "capability_fraction": 1,
+        "notes": "Synthetic sustained 0.1 kW reservation, not measured camera draw."
+      }
+    ],
+    "cooling": {
+      "type": "air",
+      "electrical_kw_to_heat_kw": 1,
+      "chilled_water_load_rule": "not_on_chilled_water_loop",
+      "notes": "Hypothetical mast air cooling; 1:1 electrical-to-heat convention."
+    },
+    "data_links": [
+      {
+        "type": "backbone",
+        "bandwidth_mbps": {
+          "min": null,
+          "nominal": 0.01,
+          "max": null
+        },
+        "disabled_in_emission_silence": false,
+        "notes": "Local activity-event metadata only, not camera frames."
+      }
+    ],
+    "compute": {
+      "cpu_cores": null,
+      "ram_gb": null,
+      "accelerator_units": null,
+      "storage_gb": null
+    },
+    "response_time": {
+      "max_processing_latency_ms": null
+    }
+  },
+  "operational_modes": [
+    {
+      "id": "observing",
+      "power_mode_id": "active",
+      "requirements": [],
+      "conflicts": [],
+      "notes": "OpenCV motion detector reports moving pixels in a marked region; absence of motion never certifies deck clearance."
+    }
+  ],
+  "installation": [
+    {
+      "operation": "install_component",
+      "component_ids": [
+        "deck_camera_pod"
+      ],
+      "port_only": true,
+      "crew_required": 1,
+      "duration_minutes": 30,
+      "at_sea_window": null,
+      "notes": "Hypothetical one-person 30-minute port-only install for solver demonstration; not a real installation certificate."
+    }
+  ],
+  "special_events": [],
+  "policy_hints": [
+    "G7 alerts are advisory only; never infer safe deck clearance from NO_MOVEMENT_DETECTED.",
+    "Camera failure or stale data is UNKNOWN, not safe.",
+    "Do not trigger G6 fire suppression or G4 flight authorization from G7."
+  ],
+  "documented_unknowns": [
+    "Real onboard camera placement, power including host computer, weather tolerance and installation details unknown.",
+    "OpenCV motion detection can miss stationary objects, fail under glare or in darkness, and cannot identify persons reliably.",
+    "Actual deck-safety logic and Scenario D trigger conditions are not yet defined.",
+    "Real per-guest hardware requirements and processing-latency limits remain unverified."
+  ],
+  "notes": [
+    "User-defined G7; physical values model hypothetical shipboard adoption, live camera runs on a Dell development laptop.",
+    "The live JSON event stream does not automatically affect D1–D4 or safety interlocks.",
+    "Not a Snapdragon NPU workload."
+  ]
+}
