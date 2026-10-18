@@ -144,6 +144,30 @@
       },
       "default_power_line": "stbd",
       "satcom_demand_policy": "manifest_maximum_for_each_mode"
+    },    
+    "G6": {
+      "compute_node": "node4",
+
+      "compute_by_mode": {
+        "monitoring": {
+          "cores": 1,
+          "ram_gb": 2,
+          "accelerators": 0,
+          "storage_tb": 0.1
+        },
+        "suppression": {
+          "cores": 2,
+          "ram_gb": 4,
+          "accelerators": 0,
+          "storage_tb": 0.1
+        }
+      },
+
+      "dimensions_by_location": {
+        "bay2": [2.0, 1.0, 1.5]
+      },
+
+      "default_power_line": "stbd"
     }
   },
   "link_latency_ms": {

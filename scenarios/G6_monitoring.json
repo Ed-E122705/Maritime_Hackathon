@@ -1,0 +1,73 @@
+
+{
+  "notes": "G6 synthetic monitoring demonstration. G5 disabled because G6 occupies Bay 2.",
+
+  "guests": {
+    "G1": {
+      "installed": false,
+      "placement": "mast",
+      "power_mode": "active",
+      "operation": "passive_sensing",
+      "power_line": "port"
+    },
+
+    "G2": {
+      "installed": false,
+      "placement": "bay2",
+      "power_mode": "continuous",
+      "operation": null,
+      "power_line": "port"
+    },
+
+    "G3": {
+      "installed": true,
+      "placement": "bay1",
+      "power_mode": "standby",
+      "operation": "standby",
+      "power_line": "port"
+    },
+
+    "G4": {
+      "installed": true,
+      "placement": "flight_deck_hangar",
+      "power_mode": "standby",
+      "operation": "standby",
+      "power_line": "stbd"
+    },
+
+    "G5": {
+      "installed": false,
+      "placement": "bay2_mast",
+      "power_mode": "full",
+      "operation": "operating",
+      "power_line": "stbd"
+    },
+
+    "G6": {
+      "installed": true,
+      "placement": "module_installation",
+      "power_mode": "monitoring",
+      "operation": "monitoring",
+      "power_line": "stbd"
+    }
+  },
+
+  "guest_state": {
+    "G4": {
+      "battery_percent": 60
+    }
+  },
+
+  "install_requests": [],
+  "mode_change_requests": [],
+  "shedding_requests": [],
+
+  "ship_location": "at_sea",
+  "manoeuvre_freedom": true,
+  "deck_area_around_bay_clear": true,
+  "stern_ramp_free": true,
+  "hangar_roof_available": true,
+  "drone_clearance_verified": true,
+  "own_radar_transmitting_nearby": false,
+  "elapsed_time_min": 0
+}

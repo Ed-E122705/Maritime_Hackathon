@@ -1,17 +1,28 @@
+
 {
   "schema_version": "1.0",
   "id": "G6",
   "name": "Automated fire detection and suppression module",
+
   "source": {
-    "document": "Software Defined Vessel.pdf (resource-governor brief) and supplied Automated Fire Detection and Suppression Module concept image; G4_vtol_rescue_drone_and_hangar.json used as the manifest structure reference only.",
+    "document": "User-defined G6 concept based on the vessel resource-governor challenge.",
     "guest_card": "G6",
     "assumptions_added": [
-      "User-defined G6 adopts the optional safety-critical designation proposed in the concept image.",
-      "The module is represented as one atomic guest with monitoring and suppression modes; these are modelling choices using existing G4 fields."
+      "G6 is a custom simulated safety-critical guest, not an official Annex B guest.",
+      "The module is modeled as one atomic guest with monitoring and suppression modes.",
+      "Total installed mass is assumed to be 500 kg.",
+      "Physical dimensions are assumed to be 2.0 x 1.0 x 1.5 m, with a 2.0 m2 footprint.",
+      "G6 is assigned the entirety of Bay 2 for this demonstration.",
+      "Monitoring consumes an assumed 2 kW.",
+      "Suppression consumes an assumed 8 kW.",
+      "G6 uses chilled-water cooling, with 1 kW electrical demand producing 1 kW of heat.",
+      "Local backbone demand is assumed to be 1 Mbit/s.",
+      "Compute demands and power-line assignment are synthetic values stored in resource_profiles.json."
     ]
   },
+
   "capability": {
-    "description": "Monitors simulated compartments for overheating or fires and automatically coordinates the simulated suppression system.",
+    "description": "Monitors simulated compartments for overheating or fire and coordinates simulated fire suppression.",
     "value_by_mission": {
       "rescue": null,
       "patrol": null,
@@ -20,129 +31,158 @@
       "default": null
     }
   },
+
   "criticality": {
     "safety_critical": true,
     "mission_criticality": "resolved_from_external_mission_priority_file"
   },
+
   "assembly": {
     "atomic_for_admission_and_shedding": true,
     "components": [
       {
         "id": "fire_detection_and_suppression_module",
         "name": "Automated fire detection and suppression module",
-        "mass_kg": null,
-        "footprint_m2": null
+        "mass_kg": 500,
+        "footprint_m2": 2.0
       }
     ],
     "requires": [],
     "excludes": []
   },
+
   "placement": {
     "configurations": [
       {
         "id": "module_installation",
-        "preferred": null,
+        "preferred": true,
         "assignments": [
           {
             "component_id": "fire_detection_and_suppression_module",
-            "location": null,
-            "bay_fraction": null,
-            "area_m2": null
+            "location": "bay2",
+            "bay_fraction": 1.0,
+            "area_m2": 2.0
           }
         ],
         "requirements": [],
-        "notes": "Installation space is required. Location, area and bay allocation are not specified; this entry is an unresolved placement, not an approved configuration."
+        "notes": "Synthetic placement: reserves Bay 2 exclusively for G6. Cannot share Bay 2 with G2 or G5."
       }
     ]
   },
+
   "resources": {
     "power_modes": [
       {
         "id": "monitoring",
         "power_kw": {
           "min": null,
-          "nominal": null,
+          "nominal": 2,
           "peak": null
         },
         "max_duration_minutes": null,
         "interruptible": false,
         "capability_fraction": null,
-        "notes": "Electrical demand for compartment monitoring and fire detection is unspecified. The governor must not interrupt this safety-critical mode to reclaim resources."
+        "notes": "Assumed continuous demand of 2 kW. Safety-critical operation cannot be automatically shed."
       },
       {
         "id": "suppression",
         "power_kw": {
           "min": null,
-          "nominal": null,
+          "nominal": 8,
           "peak": null
         },
         "max_duration_minutes": null,
         "interruptible": false,
         "capability_fraction": null,
-        "notes": "Electrical demand while coordinating suppression is unspecified. The governor must not interrupt this safety-critical mode to reclaim resources."
+        "notes": "Assumed suppression demand of 8 kW. Safety-critical operation cannot be automatically shed."
       }
     ],
+
     "cooling": {
-      "type": null,
-      "electrical_kw_to_heat_kw": null,
-      "chilled_water_load_rule": null,
-      "notes": "Cooling is a required resource in the concept image. Cooling type, conversion factor and load rule are not specified for G6."
+      "type": "chilled_water",
+      "electrical_kw_to_heat_kw": 1.0,
+      "chilled_water_load_rule": "equals_electrical_kw",
+      "notes": "Synthetic assumption: chilled-water demand equals electrical demand, 2 kW in monitoring and 8 kW in suppression."
     },
-    "data_links": [],
+
+    "data_links": [
+      {
+        "type": "backbone",
+        "bandwidth_mbps": {
+          "min": null,
+          "nominal": 1,
+          "max": null
+        },
+        "disabled_in_emission_silence": false,
+        "notes": "Assumed 1 Mbit/s local backbone demand for simulated monitoring and suppression coordination."
+      }
+    ],
+
     "compute": {
       "cpu_cores": null,
       "ram_gb": null,
       "accelerator_units": null,
       "storage_gb": null
     },
+
     "response_time": {
       "max_processing_latency_ms": null
     }
   },
+
   "operational_modes": [
     {
       "id": "monitoring",
       "power_mode_id": "monitoring",
       "requirements": [],
       "conflicts": [],
-      "notes": "Monitors simulated compartments for overheating or fire. Detection criteria and mode-transition logic are not specified in the supplied references."
+      "notes": "Continuously monitors simulated compartments. Fire-detection logic is handled separately by the simulator."
     },
     {
       "id": "suppression",
       "power_mode_id": "suppression",
       "requirements": [],
       "conflicts": [],
-      "notes": "Coordinates the simulated suppression system in response to detected fire. Activation, stopping and reset logic must be supplied by the simulation/controller; no new trigger parameters are introduced in this manifest."
+      "notes": "Coordinates simulated suppression after an external fire event. No automatic fire trigger is defined by this manifest."
     }
   ],
+
   "installation": [
     {
       "operation": "install_component",
-      "component_ids": ["fire_detection_and_suppression_module"],
+      "component_ids": [
+        "fire_detection_and_suppression_module"
+      ],
       "port_only": null,
       "crew_required": null,
       "duration_minutes": null,
       "at_sea_window": null,
-      "notes": "Installation conditions, crew and duration are not specified."
+      "notes": "Installation crew, duration and permitted installation conditions remain unspecified."
     }
   ],
+
   "special_events": [],
+
   "policy_hints": [
-    "Exclude G6 from automatic load shedding when resources become scarce because criticality.safety_critical is true.",
-    "Mission-priority changes must not override G6's safety-critical protection.",
-    "If resources cannot support G6, report the unresolved safety-critical resource deficit rather than silently shedding the module.",
-    "Unknown resource values must not be treated as zero or used to claim that admission is feasible."
+    "G6 cannot be automatically shed because safety_critical is true.",
+    "Mission priorities cannot override safety-critical protection.",
+    "Insufficient resources must be reported rather than silently disconnecting G6.",
+    "Synthetic demands are not verified hardware specifications."
   ],
+
   "documented_unknowns": [
-    "Electrical demand in both modes, cooling demand and compute allocation are unspecified.",
-    "Mass, installation footprint, location and installation procedure are unspecified.",
-    "Mission-specific capability values, data-link requirements and processing latency are unspecified.",
-    "Fire-detection criteria, suppression activation, stopping/reset conditions and event timing are unspecified; no executable trigger is defined.",
-    "Operational dependencies and conflicts are unspecified; empty arrays do not establish that no constraints exist."
+    "Actual mass, dimensions and electrical demands remain unverified.",
+    "Minimum and peak electrical demands are unspecified.",
+    "Installation crew, duration and permitted installation conditions are unspecified.",
+    "Actual compute requirements, bandwidth and processing latency are unspecified.",
+    "Fire-detection thresholds, automatic suppression activation, stopping and reset behavior are not defined.",
+    "Monitoring-to-suppression transitions require controller logic beyond this manifest."
   ],
+
   "notes": [
-    "G6 is a user-defined simulation guest, not an official guest card contained in the supplied vessel presentation.",
-    "Only parameter names already present in G4 are used. G4-specific drone loads, flight restrictions and battery events are not applicable to G6.",
-    "This file declares a guest manifest. The governor/controller must implement its safety-critical policy and automatic response behavior."
+    "G6 is a custom demonstration guest.",
+    "Physical and resource assumptions must remain traceable.",
+    "The resource governor must preserve G6 safety-critical protection.",
+    "This manifest represents simulated resource demands, not a real fire-control system."
   ]
 }
