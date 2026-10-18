@@ -57,6 +57,7 @@ def main():
                     "deck_obstructed": False,
                     "operator_approval": False,
                     "observation_valid": bool(valid),
+                    "g7_alert": bool(status.get("movement_detected", False)),
                 }
                 result = submit(base+"/sample", payload)
                 print(f"{result['second']:03d}s G7={status['deck_activity']} "
