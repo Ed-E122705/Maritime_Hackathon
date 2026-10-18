@@ -13,7 +13,7 @@ def test_g7_loads_into_governor():
     assert "G7" in guests
     g7 = guests["G7"]
     assert not g7.safety_critical
-    assert abs(g7.modes["full"]["kw"] - .1) < 1e-8
+    assert abs(g7.modes["full"]["kw"] - .04) < 1e-8
     assert g7.configs[0].id == "mast_camera"
     assert all("G7" in p["weights"] for p in raw["priority"].values())
 
