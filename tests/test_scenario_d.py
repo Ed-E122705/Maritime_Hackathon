@@ -203,3 +203,34 @@ def test_g7_alert_power_tracks_valid_latched_activity():
     row = engine.tick(perimeter_motion=False, g7_alert=False, observation_valid=False)
     assert row["power"]["g7_kw"] == 0.04
     assert row["g4_state"] == "Starting"
+
+
+def test_original_v3_gauge_endpoints_restore_A_and_B():
+    """The ZIP-based v3 dashboard requires /api/decision and B fleet fields."""
+    from dashboard.app import app
+    client = app.test_client()
+
+    # This endpoint was accidentally omitted during the G7 UI import:
+    a = client.post("/api/decision", json={
+        "priority": "survey",
+        "installed": {"G1": "mast"}, "adds": {}, "overrides": [],
+    })
+    assert a.status_code == 200, a.get_data(as_text=True)[:400]
+    j = a.get_json()
+    assert "error" not in j
+    assert "baseline" in j and "final" in j and "start_usage" in j
+    assert "usage" in j["baseline"]
+
+    # Original v3 Scenario B expects these keys for the resource and ops dials.
+    b = client.post("/api/b", json={
+        "priority": "survey", "crew": 14,
+        "aboard": ["G3", "G4"], "overrides": [],
+    })
+    assert b.status_code == 200, b.get_data(as_text=True)[:400]
+    k = b.get_json()
+    assert "error" not in k
+    for key in ("rows", "static", "fleet_check", "horizon_min",
+                "d4_timing", "response_limits", "modes"):
+        assert key in k
+    assert "usage" in k["fleet_check"]
+    assert client.get("/preview").status_code == 200
