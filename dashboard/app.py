@@ -581,6 +581,12 @@ def scenario_b():
         scn = loader.apply_overrides(scn, scn_ov) if scn_ov else scn
     except Exception as e:
         return jsonify({"error": f"override: {e}"}), 400
+    if q.get("aboard"):
+        # Preserve v3 selectable fleet, with G3/G4 compulsory in B.
+        fleet_ids = set(q["aboard"]) | {"G3", "G4"}
+        scn["aboard"] = sorted(
+            (g for g in fleet_ids if g in raw["card"]),
+            key=lambda g: (len(g), g))
     crew = q.get("crew")
     d = right_of_way(raw, scn, q.get("priority", "survey"), crew=int(crew) if crew not in (None, "") else None)
     sim = d.pop("sim")
@@ -594,8 +600,53 @@ def scenario_b():
               "cpu": sum((guests[g].compute or {}).get("cpu_cores", 0) or 0 for g in aboard),
               "cpu_cap": budget["cpu_cores"], "satcom_cap": budget["satcom_mbps"]}
     weights = raw["priority"][q.get("priority", "survey")]["weights"]
-    return jsonify(_json({"decision": d, "rows": sim.rows, "log": sim.log, "caps": sim.caps, "lost": sim.lost,
-                          "static": static, "aboard": aboard, "weights": weights, "overrides": sets}))
+    fleet_check = _fleet_check(raw, guests, budget, aboard, q.get("priority", "survey"))
+    return jsonify(_json({
+        "decision": d, "rows": sim.rows, "log": sim.log,
+        "caps": sim.caps, "lost": sim.lost,
+        "static": static, "aboard": aboard, "weights": weights,
+        "overrides": sets, "fleet_check": fleet_check,
+        "horizon_min": _ops()["d3"]["horizon_min"],
+        "d4_timing": {k: _ops()["d4"][k] for k in
+                      ("first_action_s", "step_interval_s")},
+        "response_limits": raw["ship"]["response_time"],
+        "modes": {g: {m: {"kw": v["kw"], "capability": v["capability"]}
+                      for m, v in guests[g].modes.items()} for g in aboard},
+    }))
+
+
+def _ops():
+    from governor.rightofway import load_ops
+    return load_ops()
+
+
+def _fleet_check(raw, guests, budget, aboard, priority):
+    """Restore original v3 Scenario B static fleet resource dial data."""
+    from governor.admission import _demand_plan, degraded_floor, describe_group
+    from governor.model import binding_groups
+    installed = {g: None for g in aboard}
+    p = build_problem(raw, guests, {"installed": installed}, priority,
+                      baseline=True, allow_removal=False)
+    plan, core = solve_model(p)
+    if plan is not None:
+        return {"fits": True, "binding": [], "binding_text": [],
+                "usage": _usage_table(evaluate(plan, guests, budget), budget),
+                "placement": {g: plan["config"][g] for g in plan["config"]}}
+    binding = binding_groups(p, core)
+    demand = _demand_plan(
+        raw, guests, {"installed": installed}, priority, minimal=False)
+    dev = evaluate(demand, guests, budget) if demand else None
+    floor = degraded_floor(demand, guests, budget) if demand else None
+    return {
+        "fits": False, "binding": binding,
+        "binding_text": [
+            describe_group(g, dev, budget, guests, demand, floor) if dev else g
+            for g in binding
+        ],
+        "usage": _usage_table(dev, budget) if dev else [],
+        "placement": {g: demand["config"][g] for g in demand["config"]}
+                     if demand else {},
+    }
 
 
 @app.get("/api/physical-g6")
@@ -622,6 +673,11 @@ def physical_g6():
         return jsonify({"status": "UNKNOWN", "assessment_status": "UNKNOWN",
                         "full_admission_status": "NOT_EVALUATED",
                         "note": f"G6 physical snapshot unavailable: {type(exc).__name__}: {exc}"})
+
+
+@app.get("/preview")
+def preview():
+    return render_template("preview.html")
 
 
 @app.get("/")
