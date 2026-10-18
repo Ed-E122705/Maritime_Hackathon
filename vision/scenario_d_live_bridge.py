@@ -43,6 +43,7 @@ def main():
                 "perimeter_motion": bool(movement),
                 "deck_obstructed": False,
                 "operator_approval": False,
+                "observation_valid": bool(status["camera_online"] and status["deck_activity"] not in ("UNKNOWN", "INITIALIZING")),
             }
             result = submit(base+"/sample", payload)
             print(f"{result['second']:03d}s G7={status['deck_activity']} "
