@@ -93,3 +93,16 @@ G6:
   needs_bay_clear: false
   compute: { cpu_cores: 2, ram_gb: 4, accelerator_units: 0, storage_gb: 100 }
   data: { backbone: 1, satcom: 0, los_radio: 0 }
+
+# G7 Logitech BRIO 101 deck motion advisory (team-defined simulation assumptions).
+# Real camera runs on a Dell; these describe hypothetical vessel integration.
+G7:
+  full: { power_mode: active, capability: 1.0 }
+  low: null
+  standby: null
+  "off": { kw: 0, capability: 0.0 }
+  windows: []
+  cooling: air
+  needs_bay_clear: false
+  compute: { cpu_cores: 2, ram_gb: 4, accelerator_units: 0, storage_gb: 10 }
+  data: { backbone: 0.01, satcom: 0, los_radio: 0 }
