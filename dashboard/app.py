@@ -506,6 +506,11 @@ _scenario_d_lock = Lock()
 _scenario_d_live = ScenarioD(scripted=False)
 
 
+@app.get("/scenario/D")
+def scenario_d_page():
+    return render_template("index.html")
+
+
 @app.get("/api/scenario/d")
 def scenario_d_replay():
     response = jsonify(replay())
