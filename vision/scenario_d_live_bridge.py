@@ -38,7 +38,7 @@ def main():
             status = load_camera_status()
             # The webcam reports UNCLASSIFIED motion only. Two consecutive
             # submitted positive samples trigger simulated G4 startup.
-            movement = status["camera_online"] and status["deck_activity"] == "MOVEMENT_DETECTED"
+            movement = status["camera_online"] and status.get("positive_motion_sample", False)
             payload = {
                 "perimeter_motion": bool(movement),
                 "deck_obstructed": False,
