@@ -29,10 +29,10 @@ def test_scenario_d_needs_two_samples_and_operator():
     assert engine.tick(perimeter_motion=True)["g4_state"] == "Standby"
     assert engine.tick(perimeter_motion=True)["g4_state"] == "Starting"
     for _ in range(8):
-        last = engine.tick()
+        last = engine.tick(perimeter_motion=True)
     assert last["g4_state"] == "Awaiting approval"
     for _ in range(4):
-        last = engine.tick()
+        last = engine.tick(perimeter_motion=True)
     assert last["g4_state"] == "Awaiting approval"
     assert last["operator_authorized"] is False
     assert engine.tick(approve=True)["g4_state"] == "Simulated launch"
@@ -43,7 +43,7 @@ def test_scenario_d_obstructed_flight_deck_blocks_launch():
     engine.tick(perimeter_motion=True)
     engine.tick(perimeter_motion=True)
     for _ in range(8):
-        engine.tick()
+        engine.tick(perimeter_motion=True)
     row = engine.tick(deck_obstructed=True,approve=True)
     assert row["g4_state"] == "Awaiting approval"
     assert not row["operator_authorized"]
@@ -71,3 +71,56 @@ def test_scenario_d_dashboard_api():
     r=client.post("/api/scenario/d/live/sample",json={"perimeter_motion":True})
     assert r.status_code == 200
     assert r.get_json()["g4_state"] == "Standby"
+
+
+def test_live_five_valid_no_motion_samples_power_g4_off():
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True)
+    for _ in range(8):
+        engine.tick(perimeter_motion=True)
+    assert engine.state == "Awaiting approval"
+    for n in range(1, 5):
+        row = engine.tick(perimeter_motion=False, observation_valid=True)
+        assert row["g4_state"] == "Awaiting approval"
+        assert row["no_motion_seconds"] == n
+    row = engine.tick(perimeter_motion=False, observation_valid=True)
+    assert row["g4_state"] == "Powering off"
+    assert row["power"]["g4_kw"] == 0
+    assert row["g7_status"] == "MONITORING"
+    row = engine.tick(perimeter_motion=False, observation_valid=True)
+    assert row["g4_state"] == "Off"
+    assert row["power"]["g4_kw"] == 0
+    engine.tick(perimeter_motion=True)
+    row = engine.tick(perimeter_motion=True)
+    assert row["g4_state"] == "Starting"
+    assert row["power"]["g4_kw"] == 3
+
+
+def test_live_no_motion_streak_resets_on_motion_or_camera_failure():
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True)
+    row = engine.tick(perimeter_motion=False)
+    assert row["no_motion_seconds"] == 1
+    row = engine.tick(perimeter_motion=False, observation_valid=False)
+    assert row["no_motion_seconds"] == 0
+    assert row["g4_state"] == "Starting"
+    row = engine.tick(perimeter_motion=False)
+    assert row["no_motion_seconds"] == 1
+    row = engine.tick(perimeter_motion=True)
+    assert row["no_motion_seconds"] == 0
+
+
+def test_live_no_motion_does_not_abort_authorized_takeoff():
+    engine = ScenarioD(scripted=False)
+    engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True)
+    for _ in range(8):
+        engine.tick(perimeter_motion=True)
+    engine.tick(perimeter_motion=True, approve=True)
+    assert engine.state == "Simulated launch"
+    for _ in range(5):
+        row = engine.tick(perimeter_motion=False)
+    assert row["g4_state"] == "In flight"
+    assert row["power"]["g4_kw"] == 2
