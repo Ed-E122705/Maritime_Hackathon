@@ -604,7 +604,7 @@ def scenario_d_live_sample():
     data = request.get_json(silent=True) or {}
     if not isinstance(data, dict):
         return jsonify({"error": "Expected JSON object"}), 400
-    if not all(isinstance(data.get(k, False), bool) for k in ("perimeter_motion", "deck_obstructed", "operator_approval", "observation_valid")):
+    if not all(isinstance(data.get(k, False), bool) for k in ("perimeter_motion", "deck_obstructed", "operator_approval", "observation_valid", "g7_alert")):
         return jsonify({"error": "All booleans must be true/false"}), 400
     with _scenario_d_lock:
         # Live webcam monitoring is continuous; only the scripted replay is 180 s.
