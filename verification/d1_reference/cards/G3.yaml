@@ -1,0 +1,11 @@
+# Annex B card G3 — Seabed inspection vehicle + cradle
+id: G3
+name: Seabed inspection vehicle + cradle
+power_kw: 25               # charging 25 kW for 60 min after each leg, not interruptible -> treated as continuous (A.1: sustained draws are not peaks)
+low_power_kw: null         # 1 kW standby exists but is not a mission mode (vehicle cannot charge) -> not offered as LOW
+parts:
+  - { name: vehicle_and_cradle, mass_t: 5.5, at: deck }   # Bay 1 whole (card)
+capability:                # card: "high for survey, low for rescue"
+  survey: high
+  sar: low
+  patrol: low              # ASSUMED — card is silent on patrol

@@ -1,0 +1,6 @@
+# Scenario A — The Landlord (admission in port, judged against the mission envelope A.10)
+name: "A — The Landlord"
+installed: [G1, G2, G5]        # three guests already aboard (our choice; Annex B "Jury use" -> expect G3 or G4)
+candidates: [G3, G4]           # cards the jury may present; the CLI --candidate flag narrows this
+priorities: []                 # empty = every file in config/priorities
+overrides: []                  # scenario-level overrides, same syntax as --set, e.g. "platform.power_reserve_kw=90"

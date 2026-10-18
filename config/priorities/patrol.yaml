@@ -1,0 +1,6 @@
+# Patrol primary. [ASSUMED] same mapping as rescue.yaml (G3 has no patrol value → 1).
+mission: patrol
+weights: { G1: 10, G2: 5, G3: 1, G4: 5, G5: 1, G6: 10 , G7: 5}   # [ASSUMED] card value_by_mission mapped high=10, medium=5, low=1; null → card default, else 1
+# [ASSUMED] Custom G6 mission utility weight 10 (demonstration policy, not Annex B).
+# G7: synthetic demonstration priority 5; camera data remains advisory.
+# Safety-critical no-shed protection applies regardless of priority weight.

@@ -1,0 +1,11 @@
+# Annex B card G2 — Ocean & weather module
+id: G2
+name: Ocean & weather module
+power_kw: 6                # continuous (card). Winch 20 kW sustained 5 min is a peak -> NOT modelled in Scenario A
+low_power_kw: null
+parts:
+  - { name: module_with_winch_and_probe, mass_t: 3.5, at: deck }   # Bay 2 preferred (card)
+capability:                # card: "high for survey, medium otherwise"
+  survey: high
+  sar: medium
+  patrol: medium

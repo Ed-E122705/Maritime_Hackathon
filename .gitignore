@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+vision/g7_status.json
+vision/g7_status.tmp
+vision/g7_events.jsonl
+vision/g7_preview.jpg
+vision/g7_preview.jpg.tmp

@@ -1,0 +1,10 @@
+# Scenario A with the G1–G5 default set that maximises rescue value: G2 + G4 + G5 (25/25).
+name: A_landlord_rescue_max
+priority: rescue
+installed:
+  G2: bay2
+  G4: flight_deck_hangar
+  G5: half_bay1_hangar_roof
+candidate: G3
+state: { location: port, crew: 14 }
+overrides: []

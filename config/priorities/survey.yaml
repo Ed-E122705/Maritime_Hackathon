@@ -1,0 +1,7 @@
+# Mission priority file — an INPUT, swappable at run time (PDF: "an input, not a constant").
+# Survey weights copied verbatim from Whole_model.docx §5.
+mission: survey
+weights: { G1: 1, G2: 5, G3: 10, G4: 1, G5: 1, G6: 10 , G7: 1}   # [docx] §5 survey weights
+# [ASSUMED] Custom G6 mission utility weight 10 (demonstration policy, not Annex B).
+# G7: synthetic demonstration priority 1; camera data remains advisory.
+# Safety-critical no-shed protection applies regardless of priority weight.

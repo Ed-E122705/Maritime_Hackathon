@@ -1,0 +1,12 @@
+# Scenario A′ — the only physical change possible under way with Annex cards: swap the G4 drone through
+# the flight deck in an installation window (A.11).
+name: A_prime_drone_swap
+priority: rescue
+installed:
+  G1: mast
+  G2: bay2
+  G4: flight_deck_hangar
+  G5: half_bay1_hangar_roof
+candidate: G4
+swap: G4.drone
+state: { location: at_sea, crew: 6, speed_kn: 12, course: free, deck: occupied, sea_state: 3, wind_kn: 15, survey_vehicle_listening: false }

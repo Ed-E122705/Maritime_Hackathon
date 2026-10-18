@@ -36,6 +36,13 @@ class UpdatedGuestTests(unittest.TestCase):
                     self.select(card['id'])
                     values = self.state.to_dict()
                     choice = values['guests'][card['id']]
+                    # A newly added guest may not have a selection in the sample runtime.
+                    # This test isolates operation-to-power mapping; use its only declared
+                    # placement explicitly rather than letting the model guess a location.
+                    if not choice.get('placement'):
+                        configs = card['placement']['configurations']
+                        self.assertEqual(len(configs), 1, 'Explicit placement needed for multi-config guest')
+                        choice['placement'] = configs[0]['id']
                     choice.pop('power_mode', None)
                     choice['operation'] = operation['id']
                     normalized, _ = normalize_guests(self.guests, values, self.profiles)

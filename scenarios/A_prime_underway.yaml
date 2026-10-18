@@ -1,0 +1,11 @@
+# Scenario A′ — same card, under way. Physical change only through the flight deck / ramp in an
+# installation window (A.11); at crew 0 only logical reconfiguration.
+name: A_prime_underway
+priority: survey
+installed:
+  G1: mast
+  G2: bay2
+  G5: half_bay1_hangar_roof
+candidate: G4
+state: { location: at_sea, crew: 6, speed_kn: 12, course: free, deck: occupied, sea_state: 3, wind_kn: 15, survey_vehicle_listening: false }
+overrides: []

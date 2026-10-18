@@ -1,0 +1,6 @@
+# Mission-priority file: search-and-rescue primary. Swappable input.
+name: sar_primary
+weights:                   # ASSUMED weights — not in the Annex; see PHYSICAL_ACCOUNT.md
+  sar: 1.0
+  survey: 0.2
+  patrol: 0.3

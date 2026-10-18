@@ -1,0 +1,23 @@
+# Governor settings — how the decision engine scores and solves. Not physics; still inputs.
+
+# Resource classes active in this decision, in reporting order.
+# Each name must exist in src/governor/resources.py REGISTRY. Adding cooling later = add it here + one registry entry.
+resources: [power, mass, stability]
+
+# Capability level -> number used by the Capability Index
+levels: { high: 3, medium: 2, low: 1 }
+default_capability_level: low          # a mission the card does not mention counts as "low"
+
+# Share of a guest's capability kept when it runs in its low-power mode
+# (G5 card: low-power mode = 70 % capability loss -> 30 % retained; applied to any guest with low_power_kw)
+low_power_capability_retained: 0.30
+
+solver:
+  time_limit_s: 5.0        # per CP-SAT solve; D1 budget is 30 s for the whole admission
+  seed: 0
+  num_workers: 1           # single worker + fixed seed -> deterministic, replayable
+  scale: 1000              # kW / t -> integer milli-units for CP-SAT
+  margin_resolution: 10000 # free share expressed in 1/10000 (basis points) inside the model
+
+report:
+  alternatives: 5          # how many ranked alternatives to show

@@ -25,8 +25,8 @@ class CanonicalIntegrationTests(unittest.TestCase):
                 self.state.setdefault(k,copy.deepcopy(v))
         guests,assumptions=normalize_guests(self.canonical,self.runtime|self.state,self.profile)
         return evaluate_all(self.spec,self.state,guests),guests,assumptions
-    def test_schema_all_six(self):
-        self.assertEqual({g['id'] for g in self.canonical},{'G1','G2','G3','G4','G5','G6'})
+    def test_schema_all_seven(self):
+        self.assertEqual({g['id'] for g in self.canonical},{'G1','G2','G3','G4','G5','G6','G7'})
     def test_original_manifests_unmodified(self):
         old=copy.deepcopy(self.canonical)
         self.inspect()

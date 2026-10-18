@@ -1,0 +1,14 @@
+# Scenario A — The Landlord (admission in port). Ship alongside, stopped, shore power, 16 °C water:
+# shown but irrelevant to the verdict, which is judged on the mission envelope (A.10).
+# Installed set = the Annex B "jury use" example (G1, G2, G5), placed by the D2 optimizer.
+# The jury names the candidate and may change one number:
+#   python -m governor.cli admit --candidate G4 --set card.G4.resources.power_modes.charging_initial.power_kw.nominal=50
+name: A_landlord
+priority: survey
+installed:
+  G1: mast
+  G2: bay2
+  G5: half_bay1_hangar_roof
+candidate: G3
+state: { location: port, crew: 14 }
+overrides: []

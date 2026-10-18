@@ -1,0 +1,12 @@
+# Annex B card G4 — VTOL rescue drone + hangar
+id: G4
+name: VTOL rescue drone + hangar
+power_kw: 35               # 35 kW sustained 20 min charging -> treated as continuous for admission (A.1: sustained draws are not peaks)
+low_power_kw: null         # 10 kW post-charge / 2 kW standby are not admission modes (drone must be able to charge) -> not offered as LOW
+parts:
+  - { name: drone,  mass_t: 0.14, at: hangar }   # 140 kg (card)
+  - { name: hangar, mass_t: 0.90, at: hangar }   # 900 kg on flight deck (card); multiplier x1.2 (A.4)
+capability:                # card: "high for rescue, medium patrol, low survey"
+  sar: high
+  patrol: medium
+  survey: low

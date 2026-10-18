@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vesselos-d1-reference"
+version = "0.1.0"
+description = "Resource governor for the Software Defined Vessel challenge — Independent D1 reference admission (3-resource fixture)"
+requires-python = ">=3.9"
+dependencies = ["ortools>=9.8", "PyYAML>=6.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
