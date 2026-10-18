@@ -253,6 +253,36 @@ def _value(w, plan):
     return plan["objective"]["U_normal"] if plan else None
 
 
+def _admission_summary(result):
+    """Surface real D1/D2 output without mistaking a capacity fit for admission.
+
+    These fields are taken from classify_admission, not synthesized from the
+    resource-only candidate screen. A 'YES-IF' plan is a *proposal*, not an
+    instruction to physically displace or install hardware.
+    """
+    return {
+        "candidate": result["candidate"],
+        "verdict": result["verdict"],
+        "sentence": result["sentence"],
+        "actions": [a["text"] for a in result.get("actions", [])],
+        "placement": result.get("placement") or {},  # D2 includes location and selected line
+        "placement_options": result.get("placement_options") or [],
+        "usage": result.get("usage") or [],
+        "binding": result.get("binding") or [],
+        "binding_text": result.get("binding_text") or [],
+        "value": result.get("value"),
+        "elapsed_s": result.get("elapsed_s"),
+        "warning": result.get("warning"),
+        "integration_warning": result.get("integration_warning"),
+        "physical_crosscheck": result.get("physical_crosscheck"),
+        "standing_rules": result.get("standing_rules") or [],
+        "operability": result.get("operability") or [],
+        "next_port_sentence": result.get("next_port_sentence"),
+        "solver_crosscheck": result.get("solver_crosscheck") or [],
+        "basis": "Actual D1 admission + D2 placement proposal; not a vessel authorization."
+    }
+
+
 @app.post("/api/check")
 def check():
     """Scenario A: judge ONE combination (installed + ticked candidates, everyone at full power, positions as
@@ -297,11 +327,19 @@ def check():
                                     + ": crew, duration, or port permission undefined. "
                                     + "Capacity evaluation is hypothetical only; D1 remains NOT-NOW."
                                     if pending else ""),
-           "assessment_note": "Capacity-only screen, not full mission admission or independent physical approval."}
+           "assessment_note": "Capacity-only screen, not full mission admission or independent physical approval.",
+           "d1": None,
+           "d1_note": ("Choose exactly one candidate to view its D1 verdict and D2 placement."
+                       if len(adds) != 1 else "The D1 verdict is evaluated separately from capacity.")}
     if plan is not None:
         ev = evaluate(plan, guests, budget)
         out.update(fits=True, binding=[], binding_text=[], usage=_usage_table(ev, budget),
                    placement={g: plan["config"][g] for g in plan["config"]}, U=_value(w, plan), alternatives=[])
+        if len(adds) == 1:
+            candidate = next(iter(adds))
+            admission = classify_admission(raw, {"installed": installed, "candidate": candidate},
+                                           pr, n_alternatives=0)
+            out["d1"] = _admission_summary(admission)
         out["elapsed_s"] = round(time.perf_counter() - t0, 3)
         return jsonify(_json(out))
 
@@ -328,6 +366,9 @@ def check():
         cur, changes, ok, last = dict(installed), [], True, None
         for c in order:
             r = classify_admission(raw, {"installed": cur, "candidate": c}, pr, n_alternatives=0)
+            if len(adds) == 1:
+                # A single-card check and D1 can disagree: report both clearly.
+                out["d1"] = _admission_summary(r)
             if r["verdict"] not in ("YES", "YES-IF"):
                 ok = False
                 break

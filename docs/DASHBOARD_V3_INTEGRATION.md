@@ -35,3 +35,27 @@ Open `http://127.0.0.1:5050` on the Qualcomm in Firefox, refresh with Ctrl+Shift
 A GET `/api/meta` HTTP 200 alone proves that metadata loaded, not that the decision runs. Check for successful `POST /api/check` HTTP 200 in the terminal; if not, inspect the dashboard's `status` error text and browser console before changing resource rules.
 
 **Limits:** Full D1/D2 solver tests and Flask interaction were not run in the packaging environment because OR-Tools and Flask were not available. The new endpoint must be tested on the Qualcomm. Runtime timing results cannot be claimed from source-only checks.
+
+## Scenario A: explicit D1/D2 proposal (review-branch extension)
+
+With exactly one candidate selected, `POST /api/check` now includes a `d1` object
+sourced from `classify_admission` (not inferred from capacity fitting). It includes
+`verdict`, `sentence`, required `actions`, the proposed `placement` with power-line
+wiring, governor `usage`, `value`, `elapsed_s`, operational restrictions, and an
+independent physical evidence status when present. With multiple candidates,
+`d1=null` and the UI explicitly says single-guest D1 admission is not evaluated.
+
+Scenario A presents the requested full-load capacity screen separately from the
+conditional D1 admission decision and D2 post-decision placement. The Stage 1
+resource table always shows the original request (e.g. 10.09 t, above the 10 t
+margin). In the G1+G2+G3 with G4 candidate survey example, a `YES-IF` proposal
+removes G2; Stage 3 shows G1/G3/G4, their location/power lines, and the
+post-proposal mass (6.59 t). G2 is explicitly marked displaced, rather than
+being silently absent from the placement table. The gauges default to the D1
+proposal if an admissible proposal exists, with buttons to compare the original
+request against D1. The initial over-capacity result stays visible.
+
+The proposal is not an executed ship action. G6's incomplete installation
+prerequisites continue to yield D1 `NOT-NOW`. An independent physical-screen
+`UNKNOWN`/`FAIL` is displayed as evidence, not converted into a full-mission
+approval. The candidate screen does not certify transition timelines.

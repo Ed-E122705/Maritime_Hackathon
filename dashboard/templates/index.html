@@ -227,7 +227,27 @@ td.num{font-family:var(--mono);text-align:right}
           <div class="board" id="alts2"></div>
         </div>
       </div>
-      <div class="card" id="boardCard">
+      <div class="card hide" id="decisionCard">
+      <h3>2 · D1 Admission decision (not just a capacity screen)</h3>
+      <div class="verdict"><div class="pill" id="dpill">…</div><div class="sentence" id="dsent"></div></div>
+      <div id="dvalue" style="margin-top:9px"></div>
+      <div id="dactions" style="margin-top:9px"></div>
+      <div id="devidence" class="note" style="margin-top:10px"></div>
+    </div>
+    <div class="card hide" id="placementCard">
+      <h3>3 · D2 Placement after the proposed D1 decision</h3>
+      <div class="explain">These are the guests that remain aboard <b>if</b> the D1 proposal is carried out. Guests displaced by D1 are intentionally absent.</div>
+      <div id="massCompare" style="margin:12px 0"></div>
+      <div id="dplacement"></div>
+      <div id="doperability" style="margin-top:10px"></div>
+      <div id="gaugeCompare" class="row" style="margin-top:12px;justify-content:flex-start;gap:8px">
+        <button class="btn small" id="showRequested" style="flex:0 0 auto">Show requested loads</button>
+        <button class="btn small" id="showProposed" style="flex:0 0 auto">Show D1 proposed loads</button>
+        <span id="gaugeStage" class="mute" style="flex:1;font-size:12px"></span>
+      </div>
+      <div class="explain" style="margin-top:7px">The resource table above always shows the original request. The gauges below can show either the original or the D1 proposal; neither result certifies installation or all operating states.</div>
+    </div>
+    <div class="card" id="boardCard">
         <h3 id="boardTitle">Decision board</h3>
         <div class="explain">Each card is one choice for the guests that are not aboard yet. The engine judges every card on the
           mission envelope (cruise power, 30 °C seawater, one genset down) and scores it with the priority file:
@@ -647,6 +667,73 @@ function readCheck(){
   $$("#addList .addrow").forEach(r=>{ if (r.querySelector("input").checked) adds[r.dataset.g] = r.querySelector("select").value; });
   return {priority:b.priority, installed:b.installed, adds, overrides:b.overrides};
 }
+function findMass(rows){ return (rows||[]).find(r=>r.resource === "mass"); }
+function showCheckGauges(stage){
+  if (!CHECK) return;
+  const d = CHECK.d1, accepted = d && ["YES", "YES-IF"].includes(d.verdict) && d.usage && d.usage.length;
+  const proposal = stage === "proposed" && accepted;
+  if (proposal){
+    // Requested overload remains explicit in the Stage 1 resource table.
+    gaugesA({result:{elapsed_s:d.elapsed_s, binding:[]}, before:CHECK.usage,
+             after:d.usage, demand:[]});
+  } else {
+    gaugesA({result:{elapsed_s:CHECK.elapsed_s, binding:CHECK.binding}, before:CHECK.before,
+             after:CHECK.fits?CHECK.usage:[], demand:CHECK.fits?[]:CHECK.usage});
+  }
+  $("#ghostLegend").innerHTML = `<i style="background:var(--ghost)"></i>${proposal?"requested before D1":"before (installed only)"}`;
+  $("#showRequested").disabled = !accepted;
+  $("#showProposed").disabled = !accepted;
+  $("#gaugeStage").textContent = proposal ? "Gauges: D1 proposed (white); requested (ghost)" : "Gauges: requested configuration";
+}
+function renderDecisionCheck(j){
+  const d = j.d1;
+  $("#decisionCard").classList.remove("hide");
+  if (!d){
+    $("#dpill").className="pill v-NOT-NOW";
+    $("#dpill").textContent="NOT EVALUATED";
+    $("#dsent").textContent=j.d1_note;
+    $("#dvalue").textContent="Capacity is not a D1 admission decision.";
+    $("#dactions").textContent="";
+    $("#devidence").textContent="Multiple candidates require step-by-step D1 admissions. No installation is authorized by this capacity screen.";
+    $("#placementCard").classList.add("hide");
+    return;
+  }
+  $("#dpill").className="pill v-"+d.verdict;
+  $("#dpill").textContent=d.verdict;
+  $("#dsent").textContent=d.sentence;
+  const value=d.value;
+  const tradeoff=value && value.before!=null && value.after!=null
+    ? `Mission value ${value.before} → ${value.after}${value.after<value.before?" (decreases; captain may decline)":""}.` : "";
+  $("#dvalue").textContent=`D1 decision time ${d.elapsed_s ?? "–"} s. ${tradeoff}`;
+  $("#dactions").innerHTML = `<b>D1 required actions</b>${d.actions.length
+    ? `<ul class="clean">${d.actions.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>`
+    : `<div class="mute">${d.verdict==="YES"?"No displacement required.":"No authorized action proposed."}</div>`}`;
+  const notes=[];
+  if (d.warning) notes.push(d.warning);
+  if (d.integration_warning) notes.push(d.integration_warning);
+  if (d.solver_crosscheck.length) notes.push("Solver cross-check warnings: "+d.solver_crosscheck.join("; "));
+  if (d.physical_crosscheck){
+    const p=d.physical_crosscheck;
+    notes.push(`Independent physical snapshot: ${p.status||"UNKNOWN"}; full admission ${p.full_admission_status||"NOT_EVALUATED"}. ${p.basis||p.reason||""}`);
+    (p.failed_constraints||[]).forEach(c=>notes.push(`Physical constraint: ${c}`));
+  }
+  notes.push("This is a conditional governor proposal, not an instruction to install, remove, or operate hardware.");
+  $("#devidence").textContent=notes.join(" ");
+  const accepted=["YES", "YES-IF"].includes(d.verdict) && d.usage.length && Object.keys(d.placement).length;
+  $("#placementCard").classList.toggle("hide", !accepted);
+  if (!accepted) return;
+  const current=findMass(j.usage), proposed=findMass(d.usage);
+  const massDisplay=(r)=>r?`${fmt(r.used)} / ${fmt(r.capacity)} ${esc(r.unit)}`:"not available";
+  $("#massCompare").innerHTML = `<div class="two">
+    <div><span class="tag ${j.fits?"ok":"bad"}">Requested configuration</span><div class="mono">Mass ${massDisplay(current)}</div></div>
+    <div><span class="tag ok">D1 proposed configuration</span><div class="mono">Mass ${massDisplay(proposed)}</div></div>
+  </div>`;
+  const displaced = Object.keys(j.installed).filter(g=>!Object.prototype.hasOwnProperty.call(d.placement,g));
+  $("#dplacement").innerHTML = `<table><tr><th>Guest retained aboard</th><th>D2 placement and power line</th></tr>${Object.entries(d.placement).map(([g,place])=>`<tr><td><b>${esc(g)}</b></td><td>${esc(place)}</td></tr>`).join("")}</table>`
+    + (displaced.length ? `<div class="note">Displaced by D1: <b>${displaced.map(esc).join(", ")}</b>. Not aboard after this proposal, so no D2 placement is assigned.</div>` : "");
+  const rules=[...d.standing_rules,...d.operability];
+  $("#doperability").innerHTML=rules.length?`<b>Standing operational restrictions</b><ul class="clean">${rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
+}
 async function runCheck(){
   const body = readCheck();
   $("#content").classList.add("busy");
@@ -671,7 +758,8 @@ async function runCheck(){
     $("#csent").innerHTML = `<b>Breaks:</b><ul class="clean">${j.binding_text.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`;
   }
   capTable(j.usage, j.binding);
-  gaugesA({result:{elapsed_s:j.elapsed_s, binding:j.binding}, before:j.before, after: j.fits ? j.usage : [], demand: j.fits ? [] : j.usage});
+  renderDecisionCheck(j);
+  showCheckGauges(j.d1 && ["YES", "YES-IF"].includes(j.d1.verdict) ? "proposed" : "requested");
   $("#status").textContent = `> ${j.fits?"FITS":"DOES NOT FIT"} in ${j.elapsed_s} s${j.fits?"":" — needles show what the combination would need; red = over capacity"}${j.overrides.length?" · overrides: "+j.overrides.join(", "):""}`;
   $("#altBox").classList.toggle("hide", j.fits);
   if (!j.fits){
@@ -689,7 +777,9 @@ async function runCheck(){
       const a = CHECK.alternatives[+el.dataset.i];
       capTable(a.usage, []);
       gaugesA({result:{elapsed_s:CHECK.elapsed_s, binding:[]}, before:CHECK.before, after:a.usage, demand:[]});
-      $("#status").textContent = `> showing alternative: ${a.kind} — every capacity holds`;
+      $("#gaugeStage").textContent = `Gauges: capacity-only alternative (${a.kind}); D1/D2 proposal above unchanged`;
+      $("#ghostLegend").innerHTML = `<i style="background:var(--ghost)"></i>starting installed set`;
+      $("#status").textContent = `> showing hypothetical capacity alternative: ${a.kind} — verify admission separately`;
     }));
   }
 }
@@ -882,6 +972,7 @@ function switchTab(t){
   $("#apState").classList.toggle("hide", t!=="AP");
   $("#candBox").classList.toggle("hide", t!=="AP"); $("#presets").classList.add("hide");
   $("#addBox").classList.toggle("hide", t!=="A"); $("#checkCard").classList.toggle("hide", t!=="A");
+  $("#decisionCard").classList.toggle("hide", t!=="A"); $("#placementCard").classList.toggle("hide", t!=="A" || !CHECK || !CHECK.d1 || !["YES","YES-IF"].includes(CHECK.d1.verdict));
   $("#boardCard").classList.add("hide"); $("#detailTitle").classList.add("hide");
   if (t==="A") $("#outA").classList.add("hide");
   $("#legend").querySelectorAll("span")[3].classList.toggle("hide", false);
@@ -912,6 +1003,8 @@ function switchTab(t){
   $("#runA").addEventListener("click", ()=> TAB==="A" ? runCheck() : runA());
   $$("#presets [data-preset]").forEach(b=>b.addEventListener("click", ()=>{ loadScenario(b.dataset.preset, true); schedule(); })); $("#runB").addEventListener("click", runB);
   $("#runDef").addEventListener("click", runDefaults);
+  $("#showRequested").addEventListener("click", ()=>showCheckGauges("requested"));
+  $("#showProposed").addEventListener("click", ()=>showCheckGauges("proposed"));
   $("#checkG6").addEventListener("click", async ()=>{
     const el = $("#g6Verification"); el.textContent = "Evaluating G6 physical snapshot…";
     try {

@@ -41,3 +41,47 @@ def test_physical_g6_endpoint_preserved(client):
     out=client.get('/api/physical-g6')
     assert out.status_code==200
     assert out.get_json()['full_admission_status']=='NOT_EVALUATED'
+
+
+def test_capacity_screen_exposes_real_d1_yes_if_and_d2_placements(client):
+    """Capacity overload and D1 admission are separate outcomes, both displayed."""
+    inst={'G1':'mast','G2':'bay2','G3':'bay1'}
+    response=client.post('/api/check',json={'installed':inst,'adds':{'G4':'auto'},'priority':'survey'})
+    assert response.status_code == 200
+    out=response.get_json()
+    assert out['fits'] is False
+    assert 'mass' in out['binding']
+    d1=out['d1']
+    assert d1['verdict'] == 'YES-IF'
+    assert d1['candidate'] == 'G4'
+    assert any('G2' in x for x in d1['actions'])
+    assert 'G2' not in d1['placement']
+    assert {'G1','G3','G4'} <= set(d1['placement'])
+    assert all('line=' in p for p in d1['placement'].values())
+    mass_in=next(x for x in out['usage'] if x['resource']=='mass')
+    mass_out=next(x for x in d1['usage'] if x['resource']=='mass')
+    assert mass_in['used'] > mass_in['capacity']
+    assert mass_out['used'] <= mass_out['capacity']
+    assert d1['elapsed_s'] < 30
+    assert d1['basis'].startswith('Actual D1 admission')
+
+
+def test_capacity_fit_with_single_candidate_still_reports_d1(client):
+    """A capacity-only green gauge never silently implies D1 approval."""
+    inst={'G1':'mast'}
+    out=client.post('/api/check',json={'installed':inst,'adds':{'G2':'auto'},'priority':'survey'}).get_json()
+    assert out['d1']['verdict'] in {'YES','YES-IF','NO','NOT-NOW'}
+    assert out['admission_status']=='NOT_EVALUATED'
+
+
+def test_g6_hypothetical_fit_never_becomes_authorized_admission(client):
+    out=client.post('/api/check',json={'installed':{},'adds':{'G6':'auto'},'priority':'survey'}).get_json()
+    assert out['d1']['verdict']=='NOT-NOW'
+    assert 'Installation not authorized' in out['installation_warning']
+
+
+def test_multiple_candidates_not_misrepresented_as_one_d1_decision(client):
+    inst={'G1':'mast'}
+    out=client.post('/api/check',json={'installed':inst,'adds':{'G2':'auto','G4':'auto'},'priority':'survey'}).get_json()
+    assert out['d1'] is None
+    assert 'exactly one candidate' in out['d1_note']
