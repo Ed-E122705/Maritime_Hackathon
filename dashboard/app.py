@@ -37,9 +37,28 @@ def _json(obj):
     return json.loads(json.dumps(obj, default=str))
 
 
+def _g7_camera_resource_raw(raw):
+    """Account for G7's synthetic alert mode without altering stored manifests.
+
+    The standard guest model already accounts for G7's position, mass, CPU,
+    links and 0.040 kW monitoring. When a current valid alert is active, its
+    modeled electrical reservation changes to 0.065 kW. No camera-dependent
+    decision can authorize physical G4 launch.
+    """
+    if "G7" not in raw["card"]:
+        return raw
+    from vision.g7_state import load_camera_status
+    status = load_camera_status(ROOT)
+    if status["camera_online"] and status["deck_activity"] == "MOVEMENT_DETECTED":
+        return loader.apply_overrides(
+            raw, ["card.G7.resources.power_modes.active.power_kw.nominal=0.065"])
+    return raw
+
+
 def _raw_with(overrides):
     ov = [o.strip() for o in overrides or [] if o and o.strip()]
-    return (loader.apply_overrides(RAW, ov) if ov else RAW), ov
+    raw = loader.apply_overrides(RAW, ov) if ov else RAW
+    return _g7_camera_resource_raw(raw), ov
 
 
 def _usage(raw, installed, priority):
@@ -436,6 +455,7 @@ def scenario_b():
     scn_ov = [o[4:] for o in sets if o.startswith("scn.")]
     try:
         raw = loader.apply_overrides(RAW, raw_ov) if raw_ov else RAW
+        raw = _g7_camera_resource_raw(raw)
         scn = loader.load_scenario(SCN["B_right_of_way"])
         scn = loader.apply_overrides(scn, scn_ov) if scn_ov else scn
     except Exception as e:
@@ -519,6 +539,29 @@ from governor.scenario_d import ScenarioD, replay
 
 _scenario_d_lock = Lock()
 _scenario_d_live = ScenarioD(scripted=False)
+_g7_enabled = False
+
+
+@app.get("/api/g7-enabled")
+def g7_enabled_get():
+    with _scenario_d_lock:
+        return jsonify({"enabled": _g7_enabled})
+
+
+@app.post("/api/g7-enabled")
+def g7_enabled_set():
+    """Opt in to G7 monitoring from the active A/A′/B checkbox."""
+    global _g7_enabled, _scenario_d_live
+    body = request.get_json(silent=True) or {}
+    if not isinstance(body, dict) or type(body.get("enabled")) is not bool:
+        return jsonify({"error": "enabled must be a boolean"}), 400
+    with _scenario_d_lock:
+        changed = _g7_enabled != body["enabled"]
+        _g7_enabled = body["enabled"]
+        if changed:
+            _scenario_d_live = ScenarioD(scripted=False)
+        return jsonify({"enabled": _g7_enabled, "reset": changed,
+                        "scope": "simulation_only"})
 
 
 @app.get("/scenario/D")
