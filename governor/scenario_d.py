@@ -109,6 +109,9 @@ class ScenarioD:
                 notes.append("Operator approved: simulated launch only (no drone command)")
             else:
                 notes.append("Launch held: " + ", ".join(k for k,v in {**checks,**d["checks"]}.items() if not v))
+        if self.state == "Simulated launch" and not safety_checks(self.cfg, self.deck_obstructed)["flight_deck_verified_clear"]:
+            self.state = "Launch held"
+            notes.append("Flight deck became obstructed: stop simulated takeoff, require new operator decision")
         if self.state == "Simulated launch" and t >= (self.launch_time or 0) + 5:
             self.state = "In flight"
             notes.append("Simulated takeoff complete; G4 ship-side returns to standby load")
