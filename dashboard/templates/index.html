@@ -154,7 +154,7 @@ td.num{font-family:var(--mono);text-align:right}
 <section class="card" id="g7CameraCard" aria-live="polite" style="margin:14px 22px">
   <h3>G7 · Live camera deck activity (advisory)</h3>
   <div class="two">
-    <div><div id="g7CameraStatus" class="mono">Loading camera status…</div>
+    <div><img id="g7Preview" alt="Live perimeter camera preview, annotated with detection region" style="display:none;width:100%;max-width:540px;border-radius:8px;margin:6px 0;border:1px solid var(--line)"><div id="g7PreviewFallback" class="mute">Waiting for BRIO 101 live preview…</div><div><div id="g7CameraStatus" class="mono">Loading camera status…</div>
       <div id="g7CameraAge" class="mute" style="margin-top:6px">Camera status is not a safety clearance</div></div>
     <div><b>Recent activity events</b><div id="g7CameraEvents" class="log mono" style="max-height:150px">None yet</div></div>
   </div>
@@ -1075,7 +1075,13 @@ async function refreshG7Camera(){
     const value = j.camera_online ? j.deck_activity : "OFFLINE / UNKNOWN";
     status.textContent = value + (j.changed_pixels == null ? "" : " · changed pixels "+j.changed_pixels);
     status.style.color = value === "MOVEMENT_DETECTED" ? "var(--amber)" : "var(--ink)";
-    age.textContent = "Last update: " + (j.timestamp_utc || "never") +
+    const img = document.getElementById("g7Preview");
+    const fallback = document.getElementById("g7PreviewFallback");
+    img.style.display = j.camera_online ? "block" : "none";
+    fallback.style.display = j.camera_online ? "none" : "block";
+    if (j.camera_online) img.src = "/api/g7-preview.jpg?t=" + Date.now();
+    fallback.textContent = j.reason || "Camera offline / stale";
+        age.textContent = "Last update: " + (j.timestamp_utc || "never") +
       " · age: " + (j.age_seconds == null ? "unknown" : j.age_seconds+"s") +
       " · safety clearance: NEVER VERIFIED";
     const history = Array.isArray(j.events) ? j.events.slice(-10).reverse() : [];
@@ -1084,6 +1090,8 @@ async function refreshG7Camera(){
       : "No activity transitions recorded";
   } catch (error) {
     document.getElementById("g7CameraStatus").textContent = "CAMERA STATUS UNAVAILABLE";
+    document.getElementById("g7Preview").style.display = "none";
+    document.getElementById("g7PreviewFallback").style.display = "block";
     document.getElementById("g7CameraAge").textContent = String(error);
   }
 }
